@@ -1,15 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { PromptService } from '../ai/services/prompt.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { CAPABILITIES_AVAILABLE } from '../ai/enums/capabilities-available.enum';
 import { LanguageModelCapabilities } from '../ai/types/language-model-capabilties.type';
-
-const INIT_CAPABILITIES = {
-  available: CAPABILITIES_AVAILABLE.NO,
-  defaultTemperature: 0,
-  defaultTopK: 0,
-  maxTopK: 0,
-}
 
 @Component({
   selector: 'app-capability',
@@ -33,9 +24,7 @@ const INIT_CAPABILITIES = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CapabilityComponent {
-  promptService = inject(PromptService);
-  defaultCapabilities = toSignal(this.promptService.getCapabilities(), 
-    { initialValue: INIT_CAPABILITIES as LanguageModelCapabilities });
-
+  defaultCapabilities = input.required<LanguageModelCapabilities>();
+  
   isReady = computed(() => this.defaultCapabilities().available === CAPABILITIES_AVAILABLE.READILY);
 }

@@ -1,15 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { FeedbackService } from './services/feedback.service';
-import { CapabilityComponent } from '../prompt/capability.component';
+import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
 import { PromptService } from '../ai/services/prompt.service';
+import { LanguageModelCapabilities } from '../ai/types/language-model-capabilties.type';
+import { CapabilityComponent } from '../prompt/capability.component';
+import { FeedbackService } from './services/feedback.service';
 
 @Component({
   selector: 'app-feedback-input',
   standalone: true,
   imports: [FormsModule, CapabilityComponent],
   template: `
-    <app-capability />
+    <app-capability [defaultCapabilities]="defaultCapabilities()" />
     <label class="label" for="input">Input customer feedback: </label>
     <textarea rows="8" id="input" name="input" [(ngModel)]="feedback"></textarea>
     <button (click)="submit()" [disabled]="buttonState().disabled">{{ buttonState().text }}</button>
@@ -56,11 +59,10 @@ export class FeedbackInputComponent {
       disabled: this.isLoading() || this.feedback().trim() === ''  
     }    
   })  
-
-  constructor() {
-    this.promptService.getCapabilities();
-  }
   
+  defaultCapabilities = toSignal(this.promptService.getCapabilities(), 
+    { initialValue: INIT_CAPABILITIES as LanguageModelCapabilities });
+
   async submit() {
     this.isLoading.set(true);
     this.error.set('');
