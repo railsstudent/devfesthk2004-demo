@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
-import { PromptService } from '../ai/services/prompt.service';
+import { ZeroPromptService } from '../ai/services/zero-prompt.service';
 import { LanguageModelCapabilities } from '../ai/types/language-model-capabilties.type';
 import { CapabilityComponent } from '../prompt/capability.component';
 import { ZeroPromptComponent } from '../prompt/zero-prompt.component';
@@ -26,7 +26,7 @@ import { ZeroPromptComponent } from '../prompt/zero-prompt.component';
 })
 export class FeedbackInputComponent {
   ZeroPromptComponent = ZeroPromptComponent;
-  promptService = inject(PromptService);
+  promptService = inject(ZeroPromptService);
 
   demos = signal([
     'Zero-shot prompting',
