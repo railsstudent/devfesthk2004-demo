@@ -5,7 +5,6 @@ import { LanguageModelCapabilities } from '../ai/types/language-model-capabiltie
 @Component({
   selector: 'app-capability',
   standalone: true,
-  imports: [],
   template: `
     @if (isReady()) {
       @let capabilities = defaultCapabilities();
