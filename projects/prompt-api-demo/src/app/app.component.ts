@@ -6,8 +6,8 @@ import { DetectAIComponent } from './detect-ai.component';
   standalone: true,
   imports: [DetectAIComponent],
   template: `
-    <h2>Generate Response for Customer Feedback</h2>
-    <h3>Use MediaPipe Text Classifier and Language Detection Tasks, and Chrome Built-In Prompt AI to generate reply</h3>
+    <h2>Chrome Built-in Prompt API </h2>
+    <h3>Use ai.assistant (Pre-131.0.6776.0) or ai.languageModel (Post-131.0.6776.0) to prompt model to generate text.</h3>
     <app-detect-ai />
   `,
   styles: `
