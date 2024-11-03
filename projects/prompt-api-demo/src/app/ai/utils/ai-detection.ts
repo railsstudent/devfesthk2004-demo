@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { catchError, from, Observable, of } from 'rxjs';
 import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
-import { CAPABILITIES } from '../enums/capabilities.enum';
+import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { getChromVersion, isChromeBrowser } from './user-agent-data';
 
 const CHROME_VERSION = 128
@@ -23,9 +23,9 @@ export async function checkChromeBuiltInAI(): Promise<string> {
    const status = (await assistant?.capabilities())?.available;
    if (!status) { 
       throw new Error('Build-in Prompt API not found in window. Please check the Prompt API\'s explainer in github.com/explainers-by-googlers/prompt-api');
-   } else if (status === CAPABILITIES.AFTER_DOWNLOAD) {
+   } else if (status === CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
       throw new Error('Built-in AI is not ready, please go to chrome://components and start downloading the Optimization Guide On Device Model');
-   } else if (status === CAPABILITIES.NO) {
+   } else if (status === CAPABILITIES_AVAILABLE.NO) {
       throw new Error('The model of the Prompt API is not implemented. Please check your configuration in chrome://flags/#optimization-guide-on-device-model');
    }
 

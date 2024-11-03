@@ -1,12 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FeedbackService } from './services/feedback.service';
+import { CapabilityComponent } from '../prompt/capability.component';
+import { PromptService } from '../ai/services/prompt.service';
 
 @Component({
   selector: 'app-feedback-input',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CapabilityComponent],
   template: `
+    <app-capability />
     <label class="label" for="input">Input customer feedback: </label>
     <textarea rows="8" id="input" name="input" [(ngModel)]="feedback"></textarea>
     <button (click)="submit()" [disabled]="buttonState().disabled">{{ buttonState().text }}</button>
@@ -39,6 +42,7 @@ import { FeedbackService } from './services/feedback.service';
 })
 export class FeedbackInputComponent {
   feedbackService = inject(FeedbackService);
+  promptService = inject(PromptService);
 
   feedback = signal('', { equal: () => false });
   isLoading = signal(false);
@@ -52,6 +56,10 @@ export class FeedbackInputComponent {
       disabled: this.isLoading() || this.feedback().trim() === ''  
     }    
   })  
+
+  constructor() {
+    this.promptService.getCapabilities();
+  }
   
   async submit() {
     this.isLoading.set(true);
