@@ -1,8 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, Injector, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, debounceTime, filter, finalize, from, of, switchMap, tap } from 'rxjs';
 import { TokenizationComponent } from './tokenization.component';
 
 @Component({
@@ -10,90 +8,122 @@ import { TokenizationComponent } from './tokenization.component';
   standalone: true,
   imports: [FormsModule, TokenizationComponent],
   template: `
-    <h3>Zero-shot prompting</h3>
-    <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
-    <div>
-      <span class="label">Status: </span><span>{{ status() }}</span>
-    </div>
-    <span class="label" for="input">Prompt: </span>
-    <input id="input" name="input" [(ngModel)]="query" [disabled]="isLoading()" />
-    <div>
-      <span class="label">Response:</span>
-      <!--
-      <p>{{ response() }}</p>
--->
+    <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
+      <h3>Zero-shot prompting</h3>
+      <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
+      @let myState = state();
+      <div>
+        <span class="label">Status: </span><span>{{ myState.status }}</span>
+      </div>
+      <div>
+        <span class="label" for="input">Prompt: </span>
+        <input id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" />
+      </div>
+      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
+      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
+      <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
+      <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
+      <div>
+        <span class="label">Response: </span>
+        <p>{{ response() }}</p>
+      </div>
+      @if (error()) {
+        <div>
+          <span class="label">Error: </span>
+          <p>{{ error() }}</p>
+        </div>
+      }
     </div>
   `,
   styles: `
     input {
-      width: 100%;
+      width: 50%;
     }
 
     button, input {
       margin-bottom: 0.5rem;
+    }
+
+    button {
+      margin-right: 0.5rem;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZeroPromptComponent {
   promptService = inject(ZeroPromptService);
+  session = this.promptService.session;
   
   query = signal('');
   isLoading = signal(false);
   error = signal('');
+  numPromptTokens = signal(0);
+  response = signal('');
 
-  injector = inject(Injector);
-  session = this.promptService.getSession(this.injector);
+  tokenContext = this.promptService.tokenContext;
 
-  #numPromptTokens$ = toObservable(this.query)
-    .pipe(
-      debounceTime(1000),
-      filter((str) => str !== ''),
-      tap(() => { 
-        this.isLoading.set(true);
-        this.error.set('');
-      }),
-      switchMap((str) => from(this.promptService.countNumTokens(this.session(), str))
-        .pipe(
-          catchError((e) => {
-            const errMsg = e instanceof Error ? (e as Error).message : 'Error occurs in prompt service';
-            console.error(errMsg);
-            this.error.set(errMsg);
-            return of(0);
-          }),
-          finalize(() => this.isLoading.set(false))
-        )
-      ),
-    );
-
-  numPromptTokens = toSignal(this.#numPromptTokens$, { initialValue: 0 });
-  tokenContext = computed(() => {
+  state = computed(() => {
+    const isLoading = this.isLoading();
     const session = this.session();
+    const query = this.query().trim();
     return {
-      tokensSoFar: session.tokensSoFar as number,
-      maxTokens: session.maxTokens as number,
-      tokensLeft: session.tokensLeft as number,
+      status: isLoading ? 'Processing...' : 'Idle',
+      text: isLoading ? 'Progressing...' : 'Submit',
+      disabled: isLoading,
+      destroyDisabled: !session || isLoading,
+      numTokensDisabled: !session || isLoading || query === '',
+      submitDisabled: !session || isLoading || query === ''
     }
   });
-  
-  // #response$ = toObservable(this.query)
-  //   .pipe(
-  //     debounceTime(1000),
-  //     filter((str) => str !== ''),
-  //     tap(() => this.isLoading.set(true)),
-  //     switchMap((str) => from(this.promptService.prompt(str))
-  //       .pipe(
-  //         catchError((e) => {
-  //           const errMsg = e instanceof Error ? (e as Error).message : 'Error occurs in prompt service';
-  //           console.error(errMsg);
-  //           return of({ answer: errMsg, nunmTokens: 0 });
-  //         }),
-  //         finalize(() => this.isLoading.set(false))
-  //       )
-  //     ),
-  //   );
-  
-  // response = toSignal(this.#response$, { initialValue: '' });
 
-  status = computed(() => this.isLoading() ? 'Processing...' : 'Idle');
+  async createSession() {
+    try {
+      this.isLoading.set(true);
+      await this.promptService.createSession();
+    } catch(e) {
+      const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
+      this.error.set(errMsg);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  destroySession() {
+    try {
+      this.isLoading.set(true);
+      this.promptService.destroySession();
+    } catch(e) {
+      const errMsg = e instanceof Error ? (e as Error).message : 'Error in destroySession';
+      this.error.set(errMsg);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async countPromptTokens() {
+    try {
+      this.isLoading.set(true);
+      const numTokens = await this.promptService.countNumTokens(this.query());
+      this.numPromptTokens.set(numTokens);
+    } catch(e) {
+      const errMsg = e instanceof Error ? (e as Error).message : 'Error in countPromptTokens';
+      this.error.set(errMsg);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async submitPrompt() {
+    try {
+      this.isLoading.set(true);
+      this.error.set('');
+      const answer = await this.promptService.prompt(this.query());
+      this.response.set(answer);
+    } catch(e) {
+      const errMsg = e instanceof Error ? (e as Error).message : 'Error in submitPrompt';
+      this.error.set(errMsg);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
 }

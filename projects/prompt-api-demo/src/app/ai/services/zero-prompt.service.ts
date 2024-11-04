@@ -1,22 +1,33 @@
-import { inject, Injectable, Injector, Signal } from '@angular/core';
+import { inject, Injectable, Injector, signal, Signal } from '@angular/core';
 import { from } from 'rxjs';
 import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
 import { LanguageModelCapabilities } from '../types/language-model-capabilties.type';
-import { CustomPrompt } from '../types/prompt.type';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Tokenization } from '../types/prompt.type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ZeroPromptService {
   #promptApi = inject(AI_PROMPT_API_TOKEN);
+  #session = signal<any | null>(null);
+  session = this.#session.asReadonly();
   #controller = new AbortController();
-  #session$ = from(this.#promptApi!.create({
-    signal: this.#controller.signal
-  }));
+  #tokenContext = signal<Tokenization | null>(null);
+  tokenContext = this.#tokenContext.asReadonly();
 
-  getSession(injector: Injector) {
-    return toSignal(this.#session$, { initialValue: undefined, injector }) as Signal<any>;
+  async createSession() {
+    const oldSession = this.#session();
+    if (oldSession) {
+      console.log('Destroy the prompt session.');
+      oldSession.destroy();
+    }
+    
+    const newSession = await this.#promptApi?.create({
+      signal: this.#controller.signal
+    });
+
+    this.#session.set(newSession);
   }
 
   getCapabilities() {
@@ -34,18 +45,36 @@ export class ZeroPromptService {
       throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
     }
 
-    const session = await this.#promptApi.create({  signal: this.#controller.signal });
+    const session = this.session();
     if (!session) {
       throw new Error('Failed to create AITextSession.');
     }
 
     const answer = await session.prompt(query);
-    session.destroy();
+    this.#tokenContext.set({
+      tokensSoFar: session.tokensSoFar as number,
+      maxTokens: session.maxTokens as number,
+      tokensLeft: session.tokensLeft as number,
+    })
 
     return answer;
   }
 
-  countNumTokens(session: any, query: string): Promise<number> {
-    return session.countPromptTokens(query);
+  countNumTokens(query: string): Promise<number> {
+    if (!this.#session) {
+      return Promise.resolve(0);
+    }
+
+    const session = this.#session();
+    return session.countPromptTokens(query) as Promise<number>;
+  }
+
+  destroySession() {
+    const session = this.session();
+
+    if (session) {
+      session.destroy();
+      this.#session.set(null);
+    }
   }
 }

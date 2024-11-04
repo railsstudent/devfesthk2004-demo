@@ -1,14 +1,5 @@
-export type CustomPrompt = {
-    query: string;
-    systemPrompt?: string;
-    initialPrompts?: {
-        role: 'system' | 'user' | 'assistant';
-        content: string;
-    }[];
+export type Tokenization = {
+    tokensSoFar: number,
+    maxTokens: number,
+    tokensLeft: number,
 }
-
-// maxToken,
-// temperature,
-// tokensLeft,
-// tokensSoFar
-// topK
