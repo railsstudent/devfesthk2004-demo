@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
 import { TokenizationComponent } from './tokenization.component';
@@ -14,6 +14,16 @@ import { TokenizationComponent } from './tokenization.component';
       @let myState = state();
       <div>
         <span class="label">Status: </span><span>{{ myState.status }}</span>
+      </div>
+      <div>
+        @if (isPerSession()) {
+          <div>
+            <span class="label" for="temp">Temperature: </span>
+            <input id="temp" name="temp" class="per-session" [(ngModel)]="temperature" />          
+            <span class="label" for="topK">TopK: </span>
+            <input id="topK" name="topK" class="per-session" [(ngModel)]="topK" />
+          </div>
+        }
       </div>
       <div>
         <span class="label" for="input">Prompt: </span>
@@ -47,11 +57,17 @@ import { TokenizationComponent } from './tokenization.component';
     button {
       margin-right: 0.5rem;
     }
+
+    .per-session {
+      width: 25%;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZeroPromptComponent {
   promptService = inject(ZeroPromptService);
+  isPerSession = input(false);
+
   session = this.promptService.session;
   
   query = signal('');
@@ -59,6 +75,8 @@ export class ZeroPromptComponent {
   error = signal('');
   numPromptTokens = signal(0);
   response = signal('');
+  topK = signal(3);
+  temperature = signal(1);
 
   tokenContext = this.promptService.tokenContext;
 
@@ -79,7 +97,8 @@ export class ZeroPromptComponent {
   async createSession() {
     try {
       this.isLoading.set(true);
-      await this.promptService.createSession();
+      await this.promptService.createSession(this.isPerSession(), 
+        { topK: this.topK(), temperature: this.temperature() });
     } catch(e) {
       const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
       this.error.set(errMsg);

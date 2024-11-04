@@ -15,12 +15,13 @@ import { ZeroPromptComponent } from '../prompt/zero-prompt.component';
   template: `
     <app-capability [defaultCapabilities]="defaultCapabilities()" />
     <label>Demo: </label>
-    <select [(ngModel)]="selectedDemo">
+    <select [(ngModel)]="selectedDemo" style="margin-bottom: 1rem;">
       @for (demo of demos(); track $index) {
         <option [ngValue]="demo">{{ demo }}</option>
       }
     </select>
-    <ng-container *ngComponentOutlet="ZeroPromptComponent" />
+    @let outlet = componentOutlet();
+    <ng-container [ngComponentOutlet]="outlet.component" [ngComponentOutletInputs]="outlet.inputs" />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -36,14 +37,29 @@ export class FeedbackInputComponent {
   ]);
   selectedDemo = signal(this.demos()[0]);
   
-  componentLoaded = computed(() => {
+  componentOutlet = computed(() => {
     const selection = this.selectedDemo();
     const demos = this.demos();
     if (selection ===  demos[0]) {
-      return ZeroPromptComponent;
+      return { 
+        component: ZeroPromptComponent,
+        inputs: { 
+          isPerSession: false
+        }
+      };
+    } else if (selection === demos[3]) {
+      return { 
+        component: ZeroPromptComponent,
+        inputs: { 
+          isPerSession: true
+        }
+      }; 
     }
-    return ZeroPromptComponent;
-  })
+    return {
+      component: ZeroPromptComponent,
+      inputs: undefined
+    }
+  });
  
   defaultCapabilities = toSignal(this.promptService.getCapabilities(), 
     { initialValue: INIT_CAPABILITIES as LanguageModelCapabilities });

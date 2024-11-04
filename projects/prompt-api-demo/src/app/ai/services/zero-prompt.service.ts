@@ -1,9 +1,8 @@
-import { inject, Injectable, Injector, signal, Signal } from '@angular/core';
-import { from } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { firstValueFrom, from } from 'rxjs';
 import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
 import { LanguageModelCapabilities } from '../types/language-model-capabilties.type';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Tokenization } from '../types/prompt.type';
+import { SessionConfiguration, Tokenization } from '../types/prompt.type';
 
 @Injectable({
   providedIn: 'root'
@@ -16,18 +15,30 @@ export class ZeroPromptService {
   #tokenContext = signal<Tokenization | null>(null);
   tokenContext = this.#tokenContext.asReadonly();
 
-  async createSession() {
+  private resetSession(newSession: any) {
+    this.#session.set(newSession);
+    this.#tokenContext.set(null);
+  }
+
+  async createSession(isPerSession: boolean, configuration: SessionConfiguration) {
     const oldSession = this.#session();
     if (oldSession) {
       console.log('Destroy the prompt session.');
       oldSession.destroy();
     }
     
-    const newSession = await this.#promptApi?.create({
-      signal: this.#controller.signal
-    });
+    const capabilities = await firstValueFrom(this.getCapabilities());
+    const temperature = Math.min(configuration.temperature, 3);
+    const topK = Math.floor(Math.min(configuration.topK, capabilities.maxTopK));
+    const createOptions = isPerSession ? {
+      signal: this.#controller.signal,
+      temperature,
+      topK,
+    } : { signal: this.#controller.signal };
 
-    this.#session.set(newSession);
+    console.log('createOptions', createOptions);
+    const newSession = await this.#promptApi?.create(createOptions);
+    this.resetSession(newSession);
   }
 
   getCapabilities() {
@@ -74,7 +85,7 @@ export class ZeroPromptService {
 
     if (session) {
       session.destroy();
-      this.#session.set(null);
+      this.resetSession(null);
     }
   }
 }
