@@ -1,4 +1,4 @@
-import { Directive, inject, signal } from '@angular/core';
+import { computed, Directive, inject, signal } from '@angular/core';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 
 @Directive({})
@@ -13,6 +13,21 @@ export abstract class BasePromptComponent {
     response = signal('');
     numPromptTokens = signal(0);
     
+    state = computed(() => {
+        const isLoading = this.isLoading();
+        const session = this.session();
+        const isNoSessionOrBusy = !this.session() || this.isLoading();
+        const isUnavailableForCall = isNoSessionOrBusy || this.query().trim() === '';
+        return {
+            status: isLoading ? 'Processing...' : 'Idle',
+            text: isLoading ? 'Progressing...' : 'Submit',
+            disabled: isLoading,
+            destroyDisabled: !session || isLoading,
+            numTokensDisabled: isUnavailableForCall,
+            submitDisabled: isUnavailableForCall
+        }
+    });
+
     destroySession() {
       try {
         this.isLoading.set(true);

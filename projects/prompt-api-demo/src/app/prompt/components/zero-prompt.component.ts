@@ -71,21 +71,6 @@ export class ZeroPromptComponent extends BasePromptComponent {
   
   tokenContext = this.promptService.tokenContext;
 
-  state = computed(() => {
-    const isLoading = this.isLoading();
-    const session = this.session();
-    const isNoSessionOrBusy = !this.session() || this.isLoading();
-    const isUnavailableForCall = isNoSessionOrBusy || this.query().trim() === '';
-    return {
-      status: isLoading ? 'Processing...' : 'Idle',
-      text: isLoading ? 'Progressing...' : 'Submit',
-      disabled: isLoading,
-      destroyDisabled: !session || isLoading,
-      numTokensDisabled: isUnavailableForCall,
-      submitDisabled: isUnavailableForCall
-    }
-  });
-
   perSessionStr = computed(() => {
     const zeroPromptService = this.promptService as ZeroPromptService;
     const perSession = zeroPromptService.perSession()

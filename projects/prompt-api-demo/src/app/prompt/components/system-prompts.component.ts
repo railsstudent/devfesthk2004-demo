@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { SystemPromptService } from '../../ai/services/system-prompts.service';
 import { BasePromptComponent } from './base-prompt.component';
 import { TokenizationComponent } from './tokenization.component';
-import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 
 @Component({
   selector: 'app-system-prompt',
@@ -52,22 +52,7 @@ import { AbstractPromptService } from '../../ai/services/abstract-prompt.service
 })
 export class SystemPromptsComponent extends BasePromptComponent {
   systemPrompt = signal('');
-
   tokenContext = this.promptService.tokenContext;
-
-  state = computed(() => {
-    const isLoading = this.isLoading();
-    const isNoSessionOrBusy = !this.session() || this.isLoading();
-    const isUnavailableForCall = isNoSessionOrBusy || this.query().trim() === '';
-    return {
-      status: isLoading ? 'Processing...' : 'Idle',
-      text: isLoading ? 'Progressing...' : 'Submit',
-      disabled: !this.systemPrompt().trim() || isLoading,
-      destroyDisabled: isNoSessionOrBusy,
-      numTokensDisabled: isUnavailableForCall,
-      submitDisabled: isUnavailableForCall,
-    }
-  });
 
   async createSession() {
     try {
