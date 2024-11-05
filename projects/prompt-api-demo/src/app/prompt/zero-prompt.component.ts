@@ -19,13 +19,20 @@ import { TokenizationComponent } from './tokenization.component';
         @if (isPerSession()) {
           <div>
             <span class="label" for="temp">Temperature: </span>
-            <input id="temp" name="temp" class="per-session" [(ngModel)]="temperature" />          
+            <input type="number" id="temp" name="temp" class="per-session" [(ngModel)]="temperature" max="3" />
+            <span class="label"> (Max temperature: 3) </span>          
             <span class="label" for="topK">TopK: </span>
-            <input id="topK" name="topK" class="per-session" [(ngModel)]="topK" />
+            <input type="number" id="topK" name="topK" class="per-session" [(ngModel)]="topK" max="8" />
           </div>
         }
       </div>
       <div>
+        @if (isPerSession()) {
+          <div>
+            <span class="label" for="temp">Per Session: </span>
+            <span>{{ this.perSessionStr() }}</span>
+          </div>
+        }
         <span class="label" for="input">Prompt: </span>
         <input id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" />
       </div>
@@ -70,11 +77,11 @@ export class ZeroPromptComponent {
 
   session = this.promptService.session;
   
-  query = signal('');
   isLoading = signal(false);
   error = signal('');
-  numPromptTokens = signal(0);
+  query = signal('');
   response = signal('');
+  numPromptTokens = signal(0);
   topK = signal(3);
   temperature = signal(1);
 
@@ -93,6 +100,16 @@ export class ZeroPromptComponent {
       submitDisabled: !session || isLoading || query === ''
     }
   });
+
+  perSessionStr = computed(() => {
+    const perSession = this.promptService.perSession()
+    if (perSession) {
+      const { topK, temperature } = perSession;
+      return `\{topK: ${topK}, temperature: ${temperature}\}`;
+    }
+
+    return '';
+  })
 
   async createSession() {
     try {

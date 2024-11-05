@@ -14,6 +14,8 @@ export class ZeroPromptService {
   #controller = new AbortController();
   #tokenContext = signal<Tokenization | null>(null);
   tokenContext = this.#tokenContext.asReadonly();
+  #perSession = signal<{ topK: number, temperature: number } | undefined>(undefined);
+  perSession = this.#perSession.asReadonly();
 
   private resetSession(newSession: any) {
     this.#session.set(newSession);
@@ -35,6 +37,11 @@ export class ZeroPromptService {
       temperature,
       topK,
     } : { signal: this.#controller.signal };
+
+    this.#perSession.set({
+      topK,
+      temperature
+    });
 
     console.log('createOptions', createOptions);
     const newSession = await this.#promptApi?.create(createOptions);
