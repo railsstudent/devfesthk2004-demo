@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { isPromptAPISupported } from './ai/utils/ai-detection';
-import { FeedbackInputComponent } from './feedback/feedback-input.component';
+import { PromptShowcaseComponent } from './prompt/prompt-showcase.component';
 import { UserAgentComponent } from './ai/user-agent.component';
 
 @Component({
   selector: 'app-detect-ai',
   standalone: true,
-  imports: [FeedbackInputComponent, UserAgentComponent],
+  imports: [PromptShowcaseComponent, UserAgentComponent],
   template: `
     <app-user-agent />
     <div>

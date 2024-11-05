@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { CAPABILITIES_AVAILABLE } from '../ai/enums/capabilities-available.enum';
-import { LanguageModelCapabilities } from '../ai/types/language-model-capabilties.type';
+import { CAPABILITIES_AVAILABLE } from '../../ai/enums/capabilities-available.enum';
+import { LanguageModelCapabilities } from '../../ai/types/language-model-capabilties.type';
 
 @Component({
   selector: 'app-capability',

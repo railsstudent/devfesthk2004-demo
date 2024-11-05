@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ZeroPromptService } from '../ai/services/zero-prompt.service';
+import { SystemPromptService } from '../../ai/services/system-prompts.service';
 import { TokenizationComponent } from './tokenization.component';
 
 @Component({
-  selector: 'app-zero-prompt',
+  selector: 'app-system-prompt',
   standalone: true,
   imports: [FormsModule, TokenizationComponent],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
-      <h3>Zero-shot prompting</h3>
+      <h3>System Prompts</h3>
       <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
       @let myState = state();
       <div>
@@ -71,8 +71,8 @@ import { TokenizationComponent } from './tokenization.component';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ZeroPromptComponent {
-  promptService = inject(ZeroPromptService);
+export class SystemPromptsComponent {
+  promptService = inject(SystemPromptService);
   isPerSession = input(false);
 
   session = this.promptService.session;

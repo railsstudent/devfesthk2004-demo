@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Tokenization } from '../ai/types/prompt.type';
+import { Tokenization } from '../../ai/types/prompt.type';
 
 @Component({
   selector: 'app-tokenization',

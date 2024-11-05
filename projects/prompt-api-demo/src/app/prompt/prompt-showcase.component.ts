@@ -5,8 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
 import { LanguageModelCapabilities } from '../ai/types/language-model-capabilties.type';
-import { CapabilityComponent } from '../prompt/capability.component';
-import { ZeroPromptComponent } from '../prompt/zero-prompt.component';
+import { CapabilityComponent } from './components/capability.component';
+import { ZeroPromptComponent } from './components/zero-prompt.component';
+import { SystemPromptsComponent } from './components/system-prompts.component';
 
 @Component({
   selector: 'app-feedback-input',
@@ -25,17 +26,19 @@ import { ZeroPromptComponent } from '../prompt/zero-prompt.component';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeedbackInputComponent {
+export class PromptShowcaseComponent {
   ZeroPromptComponent = ZeroPromptComponent;
+  SystemPromptsComponent = SystemPromptsComponent;
+
   promptService = inject(ZeroPromptService);
 
   demos = signal([
     'Zero-shot prompting',
+    'Per session Option',
     'System Prompts',
     'N-shot prompting',
-    'Per session Option',
   ]);
-  selectedDemo = signal(this.demos()[0]);
+  selectedDemo = signal(this.demos()[2]);
   
   componentOutlet = computed(() => {
     const selection = this.selectedDemo();
@@ -47,12 +50,17 @@ export class FeedbackInputComponent {
           isPerSession: false
         }
       };
-    } else if (selection === demos[3]) {
+    } else if (selection === demos[1]) {
       return { 
         component: ZeroPromptComponent,
         inputs: { 
           isPerSession: true
         }
+      }; 
+    } else if (selection === demos[2]) {
+      return { 
+        component: SystemPromptsComponent,
+        inputs: {}
       }; 
     }
     return {
