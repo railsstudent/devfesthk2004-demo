@@ -52,23 +52,7 @@ import { TokenizationComponent } from './tokenization.component';
       }
     </div>
   `,
-  styles: `
-    input {
-      width: 50%;
-    }
-
-    button, input {
-      margin-bottom: 0.5rem;
-    }
-
-    button {
-      margin-right: 0.5rem;
-    }
-
-    .per-session {
-      width: 25%;
-    }
-  `,
+  styleUrl: './prompt.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZeroPromptComponent {
@@ -90,14 +74,15 @@ export class ZeroPromptComponent {
   state = computed(() => {
     const isLoading = this.isLoading();
     const session = this.session();
-    const query = this.query().trim();
+    const isNoSessionOrBusy = !this.session() || this.isLoading();
+    const isUnavailableForCall = isNoSessionOrBusy || this.query().trim() === '';
     return {
       status: isLoading ? 'Processing...' : 'Idle',
       text: isLoading ? 'Progressing...' : 'Submit',
       disabled: isLoading,
       destroyDisabled: !session || isLoading,
-      numTokensDisabled: !session || isLoading || query === '',
-      submitDisabled: !session || isLoading || query === ''
+      numTokensDisabled: isUnavailableForCall,
+      submitDisabled: isUnavailableForCall
     }
   });
 
