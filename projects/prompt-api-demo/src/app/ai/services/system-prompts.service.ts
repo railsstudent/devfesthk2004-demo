@@ -1,8 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { firstValueFrom, from } from 'rxjs';
+import { from } from 'rxjs';
 import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
 import { LanguageModelCapabilities } from '../types/language-model-capabilties.type';
-import { SessionConfiguration, Tokenization } from '../types/prompt.type';
+import { Tokenization } from '../types/prompt.type';
 
 @Injectable({
   providedIn: 'root'
@@ -14,37 +14,20 @@ export class SystemPromptService {
   #controller = new AbortController();
   #tokenContext = signal<Tokenization | null>(null);
   tokenContext = this.#tokenContext.asReadonly();
-  #perSession = signal<{ topK: number, temperature: number } | undefined>(undefined);
-  perSession = this.#perSession.asReadonly();
 
   private resetSession(newSession: any) {
     this.#session.set(newSession);
     this.#tokenContext.set(null);
   }
 
-  async createSession(isPerSession: boolean, configuration: SessionConfiguration) {
+  async createSession(systemPrompt: string) {
     const oldSession = this.#session();
     if (oldSession) {
       console.log('Destroy the prompt session.');
       oldSession.destroy();
     }
     
-    const capabilities = await firstValueFrom(this.getCapabilities());
-    const temperature = Math.min(configuration.temperature, 3);
-    const topK = Math.floor(Math.min(configuration.topK, capabilities.maxTopK));
-    const createOptions = isPerSession ? {
-      signal: this.#controller.signal,
-      temperature,
-      topK,
-    } : { signal: this.#controller.signal };
-
-    this.#perSession.set({
-      topK,
-      temperature
-    });
-
-    console.log('createOptions', createOptions);
-    const newSession = await this.#promptApi?.create(createOptions);
+    const newSession = await this.#promptApi?.create({ systemPrompt }, { signal: this.#controller.signal });
     this.resetSession(newSession);
   }
 

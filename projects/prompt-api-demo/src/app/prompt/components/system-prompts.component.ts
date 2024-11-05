@@ -10,34 +10,21 @@ import { TokenizationComponent } from './tokenization.component';
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>System Prompts</h3>
-      <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
       @let myState = state();
+      <div>
+        <span class="label" for="input">System Prompt: </span>
+        <input id="input" name="input" [(ngModel)]="systemPrompt" />
+      </div>
+      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
+      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
+      <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
       <div>
         <span class="label">Status: </span><span>{{ myState.status }}</span>
       </div>
       <div>
-        @if (isPerSession()) {
-          <div>
-            <span class="label" for="temp">Temperature: </span>
-            <input type="number" id="temp" name="temp" class="per-session" [(ngModel)]="temperature" max="3" />
-            <span class="label"> (Max temperature: 3) </span>          
-            <span class="label" for="topK">TopK: </span>
-            <input type="number" id="topK" name="topK" class="per-session" [(ngModel)]="topK" max="8" />
-          </div>
-        }
-      </div>
-      <div>
-        @if (isPerSession()) {
-          <div>
-            <span class="label" for="temp">Per Session: </span>
-            <span>{{ this.perSessionStr() }}</span>
-          </div>
-        }
         <span class="label" for="input">Prompt: </span>
         <input id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" />
       </div>
-      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
-      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
       <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
@@ -73,7 +60,6 @@ import { TokenizationComponent } from './tokenization.component';
 })
 export class SystemPromptsComponent {
   promptService = inject(SystemPromptService);
-  isPerSession = input(false);
 
   session = this.promptService.session;
   
@@ -82,40 +68,28 @@ export class SystemPromptsComponent {
   query = signal('');
   response = signal('');
   numPromptTokens = signal(0);
-  topK = signal(3);
-  temperature = signal(1);
+  systemPrompt = signal('');
 
   tokenContext = this.promptService.tokenContext;
 
   state = computed(() => {
     const isLoading = this.isLoading();
-    const session = this.session();
-    const query = this.query().trim();
+    const isNoSessionOrBusy = !this.session() || this.isLoading();
+    const isUnavailableForCall = isNoSessionOrBusy || this.query().trim() === '';
     return {
       status: isLoading ? 'Processing...' : 'Idle',
       text: isLoading ? 'Progressing...' : 'Submit',
-      disabled: isLoading,
-      destroyDisabled: !session || isLoading,
-      numTokensDisabled: !session || isLoading || query === '',
-      submitDisabled: !session || isLoading || query === ''
+      disabled: !this.systemPrompt().trim() || isLoading,
+      destroyDisabled: isNoSessionOrBusy,
+      numTokensDisabled: isUnavailableForCall,
+      submitDisabled: isUnavailableForCall,
     }
   });
-
-  perSessionStr = computed(() => {
-    const perSession = this.promptService.perSession()
-    if (perSession) {
-      const { topK, temperature } = perSession;
-      return `\{topK: ${topK}, temperature: ${temperature}\}`;
-    }
-
-    return '';
-  })
 
   async createSession() {
     try {
       this.isLoading.set(true);
-      await this.promptService.createSession(this.isPerSession(), 
-        { topK: this.topK(), temperature: this.temperature() });
+      await this.promptService.createSession(this.systemPrompt());
     } catch(e) {
       const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
       this.error.set(errMsg);
