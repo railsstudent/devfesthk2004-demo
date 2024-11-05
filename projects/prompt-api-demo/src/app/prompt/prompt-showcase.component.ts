@@ -38,7 +38,7 @@ export class PromptShowcaseComponent {
     'System Prompts',
     'N-shot prompting',
   ]);
-  selectedDemo = signal(this.demos()[2]);
+  selectedDemo = signal(this.demos()[0]);
   
   componentOutlet = computed(() => {
     const selection = this.selectedDemo();

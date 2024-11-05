@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SystemPromptService } from '../../ai/services/system-prompts.service';
+import { BasePromptComponent } from './base-prompt.component';
 import { TokenizationComponent } from './tokenization.component';
+import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 
 @Component({
   selector: 'app-system-prompt',
@@ -40,18 +42,15 @@ import { TokenizationComponent } from './tokenization.component';
     </div>
   `,
   styleUrl: './prompt.component.css',
+  providers: [
+    {
+      provide: AbstractPromptService,
+      useClass: SystemPromptService,
+    }
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SystemPromptsComponent {
-  promptService = inject(SystemPromptService);
-
-  session = this.promptService.session;
-  
-  isLoading = signal(false);
-  error = signal('');
-  query = signal('');
-  response = signal('');
-  numPromptTokens = signal(0);
+export class SystemPromptsComponent extends BasePromptComponent {
   systemPrompt = signal('');
 
   tokenContext = this.promptService.tokenContext;
@@ -73,48 +72,10 @@ export class SystemPromptsComponent {
   async createSession() {
     try {
       this.isLoading.set(true);
-      await this.promptService.createSession(this.systemPrompt());
+      const systemPromptService = this.promptService as SystemPromptService;
+      await systemPromptService.createSession(this.systemPrompt());
     } catch(e) {
       const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  destroySession() {
-    try {
-      this.isLoading.set(true);
-      this.promptService.destroySession();
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in destroySession';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  async countPromptTokens() {
-    try {
-      this.isLoading.set(true);
-      const numTokens = await this.promptService.countNumTokens(this.query());
-      this.numPromptTokens.set(numTokens);
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in countPromptTokens';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  async submitPrompt() {
-    try {
-      this.isLoading.set(true);
-      this.error.set('');
-      const answer = await this.promptService.prompt(this.query());
-      this.response.set(answer);
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in submitPrompt';
       this.error.set(errMsg);
     } finally {
       this.isLoading.set(false);
