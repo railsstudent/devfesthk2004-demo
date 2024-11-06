@@ -5,7 +5,6 @@ import { getBrowserName, getChromVersion, getFirefoxVersion } from './utils/user
   selector: 'app-user-agent',
   standalone: true,
   template: `
-    <hr />
     <div>
       <h3>User Agent</h3>
       <p>
