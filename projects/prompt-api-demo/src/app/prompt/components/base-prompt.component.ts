@@ -9,7 +9,7 @@ export abstract class BasePromptComponent {
     
     isLoading = signal(false);
     error = signal('');
-    query = signal('');
+    query = signal('Tell me about the job responsibility of an A.I. engineer, maximum 500 words.');
     response = signal('');
     numPromptTokens = signal(0);
     
@@ -57,6 +57,7 @@ export abstract class BasePromptComponent {
       try {
         this.isLoading.set(true);
         this.error.set('');
+        this.response.set('');
         const answer = await this.promptService.prompt(this.query());
         this.response.set(answer);
       } catch(e) {

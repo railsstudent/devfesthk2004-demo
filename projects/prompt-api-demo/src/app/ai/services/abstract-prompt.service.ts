@@ -21,9 +21,10 @@ export abstract class AbstractPromptService {
 
         const session = this.session();
         if (!session) {
-        throw new Error('Failed to create AITextSession.');
+            throw new Error('Failed to create AITextSession.');
         }
 
+        this.#tokenContext.set(null);
         const answer = await session.prompt(query);
         this.#tokenContext.set({
             tokensSoFar: session.tokensSoFar as number,

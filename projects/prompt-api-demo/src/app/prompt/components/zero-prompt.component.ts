@@ -36,7 +36,8 @@ import { TokenizationComponent } from './tokenization.component';
           </div>
         }
         <span class="label" for="input">Prompt: </span>
-        <input id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" />
+        <textarea id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" 
+          rows="3"></textarea>
       </div>
       <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
       <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
