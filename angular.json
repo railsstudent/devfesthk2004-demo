@@ -51,7 +51,8 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "https://railsstudent.github.io/devfesthk2004-demo/prompt-api-demo/"
             },
             "development": {
               "optimization": false,
