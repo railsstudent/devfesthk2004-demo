@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { isPromptAPISupported } from './ai/utils/ai-detection';
 import { PromptShowcaseComponent } from './prompt/prompt-showcase.component';
@@ -9,7 +9,9 @@ import { UserAgentComponent } from './ai/user-agent.component';
   standalone: true,
   imports: [PromptShowcaseComponent, UserAgentComponent],
   template: `
-    <app-user-agent />
+    @if (showUserAgent()) {
+      <app-user-agent />
+    }
     <div>
       @let error = hasCapability();
       @if (!error) {
@@ -26,5 +28,6 @@ import { UserAgentComponent } from './ai/user-agent.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
+  showUserAgent = input(true);
   hasCapability = toSignal(isPromptAPISupported(), { initialValue: '' });
 }
