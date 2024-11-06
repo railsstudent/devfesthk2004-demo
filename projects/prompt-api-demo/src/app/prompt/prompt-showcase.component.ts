@@ -6,8 +6,9 @@ import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
 import { LanguageModelCapabilities } from '../ai/types/language-model-capabilties.type';
 import { CapabilityComponent } from './components/capability.component';
-import { ZeroPromptComponent } from './components/zero-prompt.component';
+import { NShotPromptComponent } from './components/n-shot-prompt.component';
 import { SystemPromptsComponent } from './components/system-prompts.component';
+import { ZeroPromptComponent } from './components/zero-prompt.component';
 
 @Component({
   selector: 'app-feedback-input',
@@ -64,8 +65,8 @@ export class PromptShowcaseComponent {
       }; 
     }
     return {
-      component: ZeroPromptComponent,
-      inputs: undefined
+      component: NShotPromptComponent,
+      inputs: {}
     }
   });
  
