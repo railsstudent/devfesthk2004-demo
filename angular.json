@@ -144,7 +144,8 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "https://railsstudent.github.io/devfesthk2004-demo/language-detector-demo/"
             },
             "development": {
               "optimization": false,
