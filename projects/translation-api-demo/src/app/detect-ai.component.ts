@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserAgentComponent } from './ai/user-agent.component';
-import { isLanguageDetectionAPISupported } from './ai/utils/ai-detection';
-import { LanguageDetectionComponent } from './language-detection/language-detection.component';
+import { isTranslationApiSupported } from './ai/utils/ai-detection';
+import { TranslationComponent } from './translation/translation.component';
 
 @Component({
   selector: 'app-detect-ai',
   standalone: true,
-  imports: [UserAgentComponent, LanguageDetectionComponent],
+  imports: [TranslationComponent, UserAgentComponent],
   template: `
     @if (showUserAgent()) {
       <app-user-agent />
@@ -15,7 +15,8 @@ import { LanguageDetectionComponent } from './language-detection/language-detect
     <div>
       @let error = hasCapability();
       @if (!error) {
-        <app-language-detection />
+        <p>Another demo: <a [href]="glitchDemo" target="_blank">{{ glitchDemo }}</a></p>
+        <app-translation />
       } @else if (error !== 'unknown') {
         {{ error }}
       } @else {
@@ -28,6 +29,7 @@ import { LanguageDetectionComponent } from './language-detection/language-detect
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
+  glitchDemo = 'https://translation-demo.glitch.me/';
   showUserAgent = input(true);
-  hasCapability = toSignal(isLanguageDetectionAPISupported(), { initialValue: '' });
+  hasCapability = toSignal(isTranslationApiSupported(), { initialValue: '' });
 }
