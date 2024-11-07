@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { isLanguageDetectionAPISupported } from './ai/utils/ai-detection';
 import { UserAgentComponent } from './ai/user-agent.component';
+import { isLanguageDetectionAPISupported } from './ai/utils/ai-detection';
 import { LanguageDetectionComponent } from './language-detection/language-detection.component';
 
 @Component({
