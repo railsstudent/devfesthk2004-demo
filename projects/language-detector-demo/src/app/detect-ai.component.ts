@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { toSignal } from '@angular/core/rxjs-interop';
 import { isLanguageDetectionAPISupported } from './ai/utils/ai-detection';
 import { UserAgentComponent } from './ai/user-agent.component';
+import { LanguageDetectionComponent } from './language-detection/language-detection.component';
 
 @Component({
   selector: 'app-detect-ai',
   standalone: true,
-  imports: [UserAgentComponent],
+  imports: [UserAgentComponent, LanguageDetectionComponent],
   template: `
     @if (showUserAgent()) {
       <app-user-agent />
@@ -14,7 +15,7 @@ import { UserAgentComponent } from './ai/user-agent.component';
     <div>
       @let error = hasCapability();
       @if (!error) {
-        <div>Do again</div>
+        <app-language-detection />
       } @else if (error !== 'unknown') {
         {{ error }}
       } @else {
