@@ -1,12 +1,4 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
-import { NShotsPromptService } from '../../ai/services/n-shots-prompt.service';
-import { BasePromptComponent } from './base-prompt.component';
-import { LanguageInitialPrompt } from '../../ai/types/language-initial-prompt.type';
-import { AILanguageModelInitialPromptRole } from '../../ai/enums/initial-prompt-role.enum';
-import { FormsModule } from '@angular/forms';
-import { TokenizationComponent } from './tokenization.component';
-import { InitialPromptComponent } from './initial-prompt.component';
 
 @Component({
   selector: 'app-setup',
