@@ -1,13 +1,34 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { DetectAIComponent } from './detect-ai.component';
+import { SetupComponent } from './language-detection/components/setup.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [DetectAIComponent, SetupComponent],
+  template: `
+    <h2>Chrome Built-in Language Detection API </h2>
+    <div style="margin-bottom: 0.5rem;">
+      <button style="margin-right: 0.25rem;" (click)="showSetup.set(!showSetup())">{{ btnSetupText() }}</button>
+      <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText() }}</button>
+    </div>
+    @if (showSetup()) {
+      <app-setup />
+    }
+    <app-detect-ai [showUserAgent]="showUserAgent()" />
+  `,
+  styles: `
+    :host {
+      display: block;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  title = 'language-detector-demo';
+  showSetup = signal(true);
+  showUserAgent = signal(true);
+  btnSetupText = computed(() => this.showSetup() ? 'Hide Setup' : 'Show Setup');
+  btnUserAgentText = computed(() => this.showUserAgent() ? 'Hide User Agent' : 'Show Setup');
 }
