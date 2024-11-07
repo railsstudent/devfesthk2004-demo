@@ -7,6 +7,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
     <p>Explainer: <a href="https://github.com/explainers-by-googlers/prompt-api" target="_blank">
       https://github.com/explainers-by-googlers/prompt-api</a>
     </p>
+    <p>You will need Version 128.0.6545.0 or above.</p>
     <h3>Setup</h3>
     <ol style="margin-left: 1rem; color: black;">
         @for (step of steps(); track $index) {

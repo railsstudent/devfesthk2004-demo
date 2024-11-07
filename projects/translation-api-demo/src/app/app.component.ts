@@ -1,12 +1,18 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  standalone: true,
+  imports: [],
+  template: '<div>Testing</div>',
+  styles: `
+    :host {
+      display: block;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  title = 'translation-api-demo';
 }

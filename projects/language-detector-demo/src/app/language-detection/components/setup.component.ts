@@ -7,6 +7,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
     <p>Explainer: <a href="https://github.com/WICG/translation-api?tab=readme-ov-file#language-detection" target="_blank">
     https://github.com/WICG/translation-api?tab=readme-ov-file#language-detection</a>
     </p>
+    <p>You will need Version 129.0.6639.0 or above.</p>
     <h3>Setup</h3>
     <ol style="margin-left: 1rem; color: black;">
         @for (step of steps(); track $index) {
