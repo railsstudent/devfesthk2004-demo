@@ -16,7 +16,7 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
       </div>
       <button style="margin-right: 0.5rem;" (click)="setup()">Create language detector</button>
       <button (click)="detectLanguage()" [disabled]="isDisableDetectLanguage()">Detect Language</button>
-      <app-language-detection-result [detectedLanguages]="detectedLanguages()" />
+      <app-language-detection-result [detectedLanguages]="detectedLanguages()" [minConfidence]="minConfidence" />
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -30,6 +30,7 @@ export class LanguageDetectionComponent {
   detector = this.service.detector;
 
   isDisableDetectLanguage = computed(() => !this.detector() || this.inputText().trim() === '');
+  minConfidence = 0.6
 
   async setup() {
     await this.service.createDetector();
@@ -38,7 +39,7 @@ export class LanguageDetectionComponent {
   async detectLanguage() {
     this.showUnrecognizeError.set(false);
     const inputText = this.inputText().trim();
-    const results = await this.service.detect(inputText);
+    const results = await this.service.detect(inputText, this.minConfidence);
     this.detectedLanguages.set(results);
 
     this.showUnrecognizeError.set(results.length <= 0 && inputText !== '');

@@ -11,7 +11,7 @@ export class LanguageDetectionService  {
     #detector = signal<any | null>(null);
     detector = this.#detector.asReadonly();
 
-    async detect(query: string): Promise<LanguageDetectionWithNameResult[]> {
+    async detect(query: string, minConfidence = 0.6): Promise<LanguageDetectionWithNameResult[]> {
         if (!this.#translationAPI) {
             throw new Error(`Your browser doesn't support the Translation API. If you are on Chrome, join the Early Preview Program to enable it.`);
         }
@@ -27,7 +27,7 @@ export class LanguageDetectionService  {
         }
 
         // choose languages for which its confidence >= 0.6
-        const highConfidenceResults = results.filter((result) => result.confidence >= 0.6);
+        const highConfidenceResults = results.filter((result) => result.confidence >= minConfidence);
         if (highConfidenceResults.length <= 0) {
             console.log(results[0]);
         }
