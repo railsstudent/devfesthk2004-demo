@@ -26,7 +26,6 @@ export class LanguageDetectionService  {
 
     async destroyCapabilities() {
         this.#capabilities.set(null);
-        console.log(this.capabilities());
     }
 
     async detect(query: string, topNResults = 3): Promise<LanguageDetectionWithNameResult[]> {
@@ -36,7 +35,7 @@ export class LanguageDetectionService  {
 
         const detector = this.detector();
         if (!detector) {
-            throw new Error('Failed to create AILanguage.');
+            throw new Error('Failed to create LanguageDetector.');
         }
 
         const minTopNReesults = Math.min(topNResults, MAX_LANGUAGE_RESULTS);

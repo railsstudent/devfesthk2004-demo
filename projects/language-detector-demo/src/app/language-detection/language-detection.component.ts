@@ -5,6 +5,7 @@ import { LanguageAvailable } from '../ai/types/language-available.type';
 import { LanguageDetectionWithNameResult } from '../ai/types/language-detection-result.type';
 import { LanguageAvailabledComponent } from './components/language-available.component';
 import { LanguageDetectionResultComponent } from './components/language-detection-result.component';
+import { CAPABILITIES_AVAILABLE } from '../ai/enums/capabilities-available.enum';
 
 @Component({
   selector: 'app-language-detection',
@@ -39,8 +40,8 @@ export class LanguageDetectionComponent {
   capabilities = this.service.capabilities;
   detector = this.service.detector;
 
-  isDisableDetectLanguage = computed(() => !this.capabilities() || !this.detector()
-    || this.inputText().trim() === '');
+  isUnavailable = computed(() => !this.capabilities() || this.capabilities().available !== CAPABILITIES_AVAILABLE.READILY);
+  isDisableDetectLanguage = computed(() => this.isUnavailable() || !this.detector() || this.inputText().trim() === '');
 
   async setup() {
     await this.service.createCapabilities();
