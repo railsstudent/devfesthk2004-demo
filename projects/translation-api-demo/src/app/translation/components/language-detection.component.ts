@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LanguageDetectionService } from '../../ai/services/language-detection.service';
 import { LanguageDetectionWithNameResult } from '../../ai/types/language-detection-result.type';
 import { LanguageDetectionResultComponent } from './language-detection-result.component';
+import { AllowTranslation } from '../types/allow-translation.type';
 
 @Component({
   selector: 'app-language-detection',
@@ -16,7 +17,7 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
       </div>
       <button style="margin-right: 0.5rem;" (click)="setup()">Create language detector</button>
       <button (click)="detectLanguage()" [disabled]="isDisableDetectLanguage()">Detect Language</button>
-      <app-language-detection-result [detectedLanguages]="detectedLanguages()" [minConfidence]="minConfidence" />
+      <app-language-detection-result [detectedLanguage]="detectedLanguage()" [minConfidence]="minConfidence" />
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -24,12 +25,14 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
 export class LanguageDetectionComponent {
   service = inject(LanguageDetectionService);
   inputText = signal('');
-  detectedLanguages = signal<LanguageDetectionWithNameResult[]>([]);
-  showUnrecognizeError = signal(false);
+  detectedLanguage = signal<LanguageDetectionWithNameResult | undefined>(undefined);
 
   detector = this.service.detector;
 
   isDisableDetectLanguage = computed(() => !this.detector() || this.inputText().trim() === '');
+
+  nextStep = output<AllowTranslation>();
+
   minConfidence = 0.6
 
   async setup() {
@@ -37,11 +40,17 @@ export class LanguageDetectionComponent {
   }
 
   async detectLanguage() {
-    this.showUnrecognizeError.set(false);
     const inputText = this.inputText().trim();
-    const results = await this.service.detect(inputText, this.minConfidence);
-    this.detectedLanguages.set(results);
+    const result = await this.service.detect(inputText, this.minConfidence);
+    this.detectedLanguage.set(result);
 
-    this.showUnrecognizeError.set(results.length <= 0 && inputText !== '');
+    if (result) {
+      this.nextStep.emit({
+        code: result.detectedLanguage,
+        toTranslate: result.confidence >= this.minConfidence 
+      });
+    } else {
+      this.nextStep.emit(undefined);
+    }
   }
 }

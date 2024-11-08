@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { LanguageDetectionWithNameResult } from '../../ai/types/language-detection-result.type';
 import { ConfidencePipe } from '../pipes/confidence.pipe';
 
@@ -9,7 +9,8 @@ import { ConfidencePipe } from '../pipes/confidence.pipe';
   template: `
     <div>
         <span class="label">Response: </span>
-        @for (language of detectedLanguages(); track language.detectedLanguage) {
+        @let language = detectedLanguage();
+        @if (language) {
           <p>
             <span>Confidence: {{ language.confidence | confidence:minConfidence() }}, </span>
             <span>Detected Language: {{ language.detectedLanguage }}, </span>
@@ -21,6 +22,6 @@ import { ConfidencePipe } from '../pipes/confidence.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageDetectionResultComponent {
-    detectedLanguages = input.required<LanguageDetectionWithNameResult[]>();
+    detectedLanguage = input.required<LanguageDetectionWithNameResult | undefined>();
     minConfidence = input.required<number, number>({ transform: (data) => data < 0 || data > 1 ? 0.6 : data });
 }
