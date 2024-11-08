@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserAgentComponent } from './ai/user-agent.component';
 import { isTranslationApiSupported } from './ai/utils/ai-detection';
-import { TranslationComponent } from './translation/translation.component';
+import { TranslationContainerComponent } from './translation/translation-container.component';
 
 @Component({
   selector: 'app-detect-ai',
   standalone: true,
-  imports: [TranslationComponent, UserAgentComponent],
+  imports: [TranslationContainerComponent, UserAgentComponent],
   template: `
     @if (showUserAgent()) {
       <app-user-agent />
@@ -16,7 +16,7 @@ import { TranslationComponent } from './translation/translation.component';
       @let error = hasCapability();
       @if (!error) {
         <p>Another demo: <a [href]="glitchDemo" target="_blank">{{ glitchDemo }}</a></p>
-        <app-translation />
+        <app-translation-container />
       } @else if (error !== 'unknown') {
         {{ error }}
       } @else {

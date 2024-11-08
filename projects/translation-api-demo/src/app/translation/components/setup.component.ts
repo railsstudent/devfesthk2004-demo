@@ -29,9 +29,6 @@ export class SetupComponent {
     'Find Chrome TranslateKit',
     'Click "Check for update" button to download the language model. Version number should update.',
     '(Optional) Open new tab, go to chrome://on-device-translation-internals/',
-    '(Optional) Install language pairs.',
-    '(Optional) Open new tab, go to chrome://components.',
-    '(Optional) Find Chrome TranslateKit <language pair>.',
-    'Click "Check for update" button to download the language model. Version number should update.',
+    '(Optional) Install language pairs.'
   ]);
 }
