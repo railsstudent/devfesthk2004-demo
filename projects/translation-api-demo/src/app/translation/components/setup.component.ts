@@ -5,6 +5,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   standalone: true,
   template: `
     <p>Explainer: <a [href]="explainer" target="_blank">{{ explainer }}</a>
+      (Outdated or broken changes)
     </p>
     <p>You will need Version {{ minimumVersion }} or above.</p>
     <h3>Setup</h3>
@@ -29,9 +30,6 @@ export class SetupComponent {
     'Find Chrome TranslateKit',
     'Click "Check for update" button to download the language model. Version number should update.',
     '(Optional) Open new tab, go to chrome://on-device-translation-internals/',
-    '(Optional) Install language pairs.',
-    '(Optional) Open new tab, go to chrome://components.',
-    '(Optional) Find Chrome TranslateKit <language pair>.',
-    'Click "Check for update" button to download the language model. Version number should update.',
+    '(Optional) Install language pairs.'
   ]);
 }
