@@ -47,7 +47,8 @@ export class LanguageDetectionComponent {
     if (result) {
       this.nextStep.emit({
         code: result.detectedLanguage,
-        toTranslate: result.confidence >= this.minConfidence 
+        toTranslate: result.confidence >= this.minConfidence,
+        inputText,
       });
     } else {
       this.nextStep.emit(undefined);
