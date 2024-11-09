@@ -5,6 +5,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   standalone: true,
   template: `
     <p>Explainer: <a [href]="explainer" target="_blank">{{ explainer }}</a>
+      (Outdated or broken changes)
     </p>
     <p>You will need Version {{ minimumVersion }} or above.</p>
     <h3>Setup</h3>
