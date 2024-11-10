@@ -20,40 +20,67 @@ export class SummarizationService {
         return this.#summarizationApi.capabilities();
     }
 
-    async checkSummarizerFormat(format: AISummarizerFormat): Promise<string> {
+    async checkSummarizerFormats(): Promise<string[]> {
         const capabilities = await this.initCapabilities();
+        const formats = [AISummarizerFormat.PLAIN_TEXT, AISummarizerFormat.MARKDOWN];
+
         if ((capabilities as OldCapabilitiesApi).supportsFormat) {
-            const formatStatus = (capabilities as OldCapabilitiesApi).supportsFormat(format);
-            return `supportsFormat(${format}) = ${formatStatus}`;
+            return formats.map((format) => {
+                const result = (capabilities as OldCapabilitiesApi).supportsFormat(format);
+                return `supportsFormat(${format}) = ${result}`
+            });
         } else if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
-            const formatStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ format });
-            return `createOptionsAvailable({ ${format} }) = ${formatStatus}`;
+            return formats.map((format) => {
+                const result = (capabilities as CapabilitiesApi).createOptionsAvailable({ format });
+                return `createOptionsAvailable({ ${format} }) = ${result}`
+            });
         }
 
         throw new Error('There is no method to determine whether the format is supported');
     }
 
-    async checkSummarizerType(type: AISummarizerType): Promise<string> {
+    async checkSummarizerTypes(): Promise<string[]> {
         const capabilities = await this.initCapabilities(); 
+
+        const types = [
+            AISummarizerType.HEADLINE,
+            AISummarizerType.KEYPOINTS,
+            AISummarizerType.TEASER,
+            AISummarizerType.TLDR
+        ];
         if ((capabilities as OldCapabilitiesApi).supportsType) {
-            const typeStatus = (capabilities as OldCapabilitiesApi).supportsType(type);
-            return `supportsType(${type}) = ${typeStatus}`;
+            return types.map((type) => {
+                const typeStatus = (capabilities as OldCapabilitiesApi).supportsType(type);
+                return `supportsType(${type}) = ${typeStatus}`;    
+            });
         } else if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
-            const typeStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ type });
-            return `createOptionsAvailable({ ${type} }) = ${typeStatus}`;
+            return types.map((type) => {
+                const typeStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ type });
+                return `createOptionsAvailable({ ${type} }) = ${typeStatus}`;   
+            });
         }
 
         throw new Error('There is no method to determine whether type is supported');
     }
     
-    async checkSummarizerLength(length: AISummarizerLength): Promise<string> {
+    async checkSummarizerLengths(): Promise<string[]> {
         const capabilities = await this.initCapabilities();
+
+        const lengths = [
+            AISummarizerLength.LONG,
+            AISummarizerLength.MEDIUM,
+            AISummarizerLength.SHORT,
+        ];
         if ((capabilities as OldCapabilitiesApi).supportsLength) {
-            const lengthStatus = (capabilities as OldCapabilitiesApi).supportsLength(length);
-            return `supportsLength(${length}) = ${lengthStatus}`;
+            return lengths.map((length) => {
+                const lengthStatus = (capabilities as OldCapabilitiesApi).supportsLength(length);
+                return `supportsLength(${length}) = ${lengthStatus}`;    
+            });
         } else if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
-            const lengthStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ length });
-            return `createOptionsAvailable({ ${length} }) = ${lengthStatus}`;
+            return lengths.map((length) => {
+                const lengthStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ length });
+                return `createOptionsAvailable({ ${length} }) = ${lengthStatus}`;    
+            });
         }
         
         throw new Error('There is no method to determine whether the length is supported');

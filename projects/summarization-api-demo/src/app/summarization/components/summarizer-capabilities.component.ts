@@ -8,20 +8,26 @@ import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core
     @if (show()) {
       <div class="container">
         <div>
-          <h4 style="text-decoration: underline; font-style: italic;">Supported Types</h4>
+          <h4>Supported Types</h4>
           @for (format of supportedTypes(); track $index) {
             <p>{{ format }}</p> 
           }
         </div>
         <div>
-          <h4 style="text-decoration: underline; font-style: italic;">Supported Formats</h4>
+          <h4>Supported Formats</h4>
           @for (format of supportedFormats(); track $index) {
             <p>{{ format }}</p> 
           }
         </div>
         <div>
-          <h4 style="text-decoration: underline; font-style: italic;">Supported Length</h4>
+          <h4>Supported Length</h4>
           @for (format of supportedLength(); track $index) {
+            <p>{{ format }}</p> 
+          }
+        </div>
+        <div>
+          <h4>Available Language</h4>
+          @for (format of languageAvailable(); track $index) {
             <p>{{ format }}</p> 
           }
         </div>
@@ -32,6 +38,7 @@ import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core
   styles: `
     .container {
       display: flex;
+      flex-wrap: wrap;
     }
 
     .container > div {
@@ -41,7 +48,12 @@ import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core
     }
 
     .container > div > p {
-      line-height: 1.35rem;
+      line-height: 1.25rem;
+    }
+
+    h4 {
+      text-decoration: underline; 
+      font-style: italic;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -50,6 +62,7 @@ export class SummarizerCapabilitiesComponent {
   supportedFormats = input.required<string[]>();
   supportedTypes = input.required<string[]>();
   supportedLength = input.required<string[]>();
+  languageAvailable = input.required<string[]>();
 
   show = signal(true)
 }
