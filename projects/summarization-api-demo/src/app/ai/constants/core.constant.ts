@@ -1,10 +1,4 @@
 import { InjectionToken } from '@angular/core';
+import { SummarizerApiDefinition } from '../types/summarizer-api-definition.type';
 
-export interface AISummarizationApi { 
-    create: Function, 
-    capabilities: Function,
-}
-
-export type SummarizationApiDefinition = AISummarizationApi | undefined;
-
-export const AI_SUMMARIZATION_API_TOKEN = new InjectionToken<SummarizationApiDefinition>('AI_SUMMARIZATION_API_TOKEN');
+export const AI_SUMMARIZATION_API_TOKEN = new InjectionToken<SummarizerApiDefinition>('AI_SUMMARIZATION_API_TOKEN');

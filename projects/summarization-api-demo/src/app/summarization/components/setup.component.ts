@@ -5,6 +5,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   standalone: true,
   template: `
     <p>Explainer: <a [href]="explainer" target="_blank">{{ explainer }}</a></p>
+    <p>Expect breaking changess because the Explainer markdown has newer API than my browser.</p>
     <p>You will need Version {{ minimumVersion }} or above.</p>
     <h3>Setup</h3>
     <ol style="margin-left: 1rem; color: black;">

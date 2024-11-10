@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserAgentComponent } from './ai/user-agent.component';
 import { isSummarizationAPISupported } from './ai/utils/ai-detection';
+import { SummarizerContainerComponent } from './summarization/summarizer-container.component';
 
 @Component({
   selector: 'app-detect-ai',
   standalone: true,
-  imports: [UserAgentComponent],
+  imports: [UserAgentComponent, SummarizerContainerComponent],
   template: `
     @if (showUserAgent()) {
       <app-user-agent />
@@ -15,7 +16,7 @@ import { isSummarizationAPISupported } from './ai/utils/ai-detection';
       @let error = hasCapability();
       @if (!error) {
         <p>Another demo: <a [href]="officialDemo" target="_blank">{{ officialDemo }}</a></p>
-        <!-- app-translation-container -->
+        <app-summarizer-container />
       } @else if (error !== 'unknown') {
         {{ error }}
       } @else {

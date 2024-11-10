@@ -1,45 +1,58 @@
 import { inject, signal } from '@angular/core';
 import { AI_SUMMARIZATION_API_TOKEN } from '../constants/core.constant';
+import { from } from 'rxjs';
 
 export class SummarizationService {
-    promptApi = inject(AI_SUMMARIZATION_API_TOKEN);
-    #session = signal<any | null>(null);
-    session = this.#session.asReadonly();
+    summarizationApi = inject(AI_SUMMARIZATION_API_TOKEN);
+    abortSignal = new AbortController().signal;
 
-    resetSession(newSession: any) {
-        this.#session.set(newSession);
-    }
+    // #session = signal<any | null>(null);
+    // session = this.#session.asReadonly();
 
-    async prompt(query: string): Promise<string> {
-        if (!this.promptApi) {
-        throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
-        }
+    // getCapabilities() {
+    //     if (!this.summarizationApi) {
+    //       throw new Error(`Your browser doesn't support the Summarization API. If you are on Chrome, join the Early Preview Program to enable it.`);
+    //     } else if (!this.summarizationApi.capabilities) {
+    //       throw new Error('Capabilities detection is unsupported. Please check your configuration in chrome://flags/#optimization-guide-on-device-model');
+    //     }
+    
+    //     return from(this.summarizationApi.capabilities() as Promise<LanguageModelCapabilities>);
+    // }
 
-        const session = this.session();
-        if (!session) {
-            throw new Error('Failed to create AITextSession.');
-        }
+    // resetSession(newSession: any) {
+    //     this.#session.set(newSession);
+    // }
 
-        const answer = await session.prompt(query);
-        return answer;
-    }
+    // async prompt(query: string): Promise<string> {
+    //     if (!this.summarizationApi) {
+    //     throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
+    //     }
 
-    countNumTokens(query: string): Promise<number> {
-        if (!this.#session) {
-            return Promise.resolve(0);
-        }
+    //     const session = this.session();
+    //     if (!session) {
+    //         throw new Error('Failed to create AITextSession.');
+    //     }
 
-        const session = this.#session();
-        return session.countPromptTokens(query) as Promise<number>;
-    }
+    //     const answer = await session.prompt(query);
+    //     return answer;
+    // }
 
-    destroySession() {
-        const session = this.session();
+    // countNumTokens(query: string): Promise<number> {
+    //     if (!this.#session) {
+    //         return Promise.resolve(0);
+    //     }
 
-        if (session) {
-            session.destroy();
-            console.log('Destroy the prompt session.');
-            this.resetSession(null);
-        }
-    }
+    //     const session = this.#session();
+    //     return session.countPromptTokens(query) as Promise<number>;
+    // }
+
+    // destroySession() {
+    //     const session = this.session();
+
+    //     if (session) {
+    //         session.destroy();
+    //         console.log('Destroy the prompt session.');
+    //         this.resetSession(null);
+    //     }
+    // }
 }
