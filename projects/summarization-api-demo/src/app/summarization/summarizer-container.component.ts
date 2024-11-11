@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../ai/enums/capabilities-core-options.enum';
 import { SummarizationService } from '../ai/services/summarization.service';
 import { SummarizerCapabilitiesComponent } from './components/summarizer-capabilities.component';
 
