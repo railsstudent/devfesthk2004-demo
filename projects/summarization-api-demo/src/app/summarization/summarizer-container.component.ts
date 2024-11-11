@@ -1,19 +1,22 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { SummarizationService } from '../ai/services/summarization.service';
 import { SummarizerCapabilitiesComponent } from './components/summarizer-capabilities.component';
+import { SummarizerComponent } from './components/summarizer.component';
+import { SummarizerSelectOptions } from '../ai/types/summarizer-select-options.type';
 
 @Component({
   selector: 'app-summarizer-container',
   standalone: true,
-  imports: [SummarizerCapabilitiesComponent],
+  imports: [SummarizerCapabilitiesComponent, SummarizerComponent],
   template: `
     <div>
       <h3>Summarization API Demo</h3>
-        <app-summarizer-capabilities [supportedFormats]="supportedFormats()"
+      <app-summarizer-capabilities [supportedFormats]="supportedFormats()"
         [supportedLength]="supportedLength()"
         [supportedTypes]="supportedTypes()"
         [languageAvailable]="languageAvailable()"
       />
+      <app-summarizer [selectOptions]="selectOptions()" />
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -24,6 +27,11 @@ export class SummarizerContainerComponent {
   supportedTypes = signal<string[]>([]);
   supportedLength = signal<string[]>([]);
   languageAvailable = signal<string[]>([]);
+  selectOptions = signal<SummarizerSelectOptions>({
+    formatValues: [],
+    lengthValues: [],
+    typeValues: [],
+  });
 
   constructor() {
     Promise.all([
@@ -39,5 +47,8 @@ export class SummarizerContainerComponent {
     this.summarizationService.languageAvailable(['en', 'zh']).then((results) => 
       this.languageAvailable.set(results)
     )
+
+    this.summarizationService.populateSelectOptions()
+      .then((result) => this.selectOptions.set(result));
   }
 }
