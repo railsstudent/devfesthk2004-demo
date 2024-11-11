@@ -21,7 +21,9 @@ import { SummarizerOptionsComponent } from './summarizer-oprions.component';
     <label for="content">Content 2:</label>
     <textarea id="content2" name="content2" rows="10" [(ngModel)]="text2"></textarea>
     <div>
-      <button (click)="generateSummaries()">Summarize</button>
+      @let buttonText = isSummarizing() ? 'Summarizing...' : 'Summarize';
+      @let disabled = text().trim() === '' || text2().trim() === '' || isSummarizing();
+      <button (click)="generateSummaries()" [disabled]="disabled">{{ buttonText }}</button>
     </div>
     @for (content of summaries(); track $index) {
       <p>Summary {{$index + 1}}</p>
@@ -59,17 +61,15 @@ export class SummarizerComponent {
   });
 
   sharedContext = signal('A blog post from langchain blog site, https://blog.langchain.dev/.');
-  text = signal(`
-  Procedural Memory
-  This term refers to long-term memory for how to perform tasks, similar to a brain’s core instruction set.
+  text = signal(`Procedural Memory
+This term refers to long-term memory for how to perform tasks, similar to a brain’s core instruction set.
   
-  Procedural memory in humans: remembering how to ride a bike.
+Procedural memory in humans: remembering how to ride a bike.
   
-  Procedural memory in Agents: the CoALA paper describes procedural memory as the combination of LLM weights and agent code, which fundamentally determine how the agent works.
+Procedural memory in Agents: the CoALA paper describes procedural memory as the combination of LLM weights and agent code, which fundamentally determine how the agent works.
   
-  In practice, we don’t see many (any?) agentic systems that update the weights of their LLM automatically or rewrite their code. We do, however, see some examples of an agent updating its own system prompt. While this is the closest practical example, it remains relatively uncommon.`);
-  text2 = signal(`
-  Semantic Memory
+In practice, we don’t see many (any?) agentic systems that update the weights of their LLM automatically or rewrite their code. We do, however, see some examples of an agent updating its own system prompt. While this is the closest practical example, it remains relatively uncommon.`);
+  text2 = signal(`Semantic Memory
 This is someone’s long-term store of knowledge.
 
 Semantic memory in humans: it’s composed of pieces of information such as facts learned in school, what concepts mean and how they are related.
@@ -91,8 +91,7 @@ This is used primarily to get an agent to perform as intended.
 
 In practice, episodic memory is implemented as few-shot example prompting. If you collect enough of these sequences, then this can be done via dynamic few-shot prompting. This is usually great for guiding the agent if there is a correct way to perform specific actions that have been done before. In contrast, semantic memory is more relevant if there isn’t necessarily a correct way to do things, or if the agent is constantly doing new things so the previous examples don’t help much.
 `);
-
-  texts = computed(() => ([ this.text(), this.text2() ]));
+  isSummarizing = signal(false);
 
   summarizerCreateOptions = computed(() => {
     return {
@@ -106,6 +105,12 @@ In practice, episodic memory is implemented as few-shot example prompting. If yo
   summaries = this.summarizationService.summaries;
 
   async generateSummaries() {
-    await this.summarizationService.summarize(this.summarizerCreateOptions(), ...this.texts());
+    try {
+      this.isSummarizing.set(true);
+      const texts = [this.text().trim(), this.text2().trim()];
+      await this.summarizationService.summarize(this.summarizerCreateOptions(), this.text().trim(), this.text2().trim());
+    } finally {
+      this.isSummarizing.set(false);
+    }
   }
 }
