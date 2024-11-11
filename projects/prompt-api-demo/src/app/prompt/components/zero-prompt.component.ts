@@ -4,11 +4,12 @@ import { AbstractPromptService } from '../../ai/services/abstract-prompt.service
 import { ZeroPromptService } from '../../ai/services/zero-prompt.service';
 import { BasePromptComponent } from './base-prompt.component';
 import { TokenizationComponent } from './tokenization.component';
+import { LineBreakPipe } from '../pipes/line-break.pipe';
 
 @Component({
   selector: 'app-zero-prompt',
   standalone: true,
-  imports: [FormsModule, TokenizationComponent],
+  imports: [FormsModule, TokenizationComponent, LineBreakPipe],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Zero-shot prompting</h3>
@@ -45,7 +46,7 @@ import { TokenizationComponent } from './tokenization.component';
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
         <span class="label">Response: </span>
-        <p>{{ response() }}</p>
+        <p [innerHTML]="response() | lineBreak"></p>
       </div>
       @if (error()) {
         <div>

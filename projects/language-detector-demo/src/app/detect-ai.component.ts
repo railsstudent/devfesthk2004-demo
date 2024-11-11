@@ -28,6 +28,6 @@ import { LanguageDetectionComponent } from './language-detection/language-detect
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
-  showUserAgent = input(true);
+  showUserAgent = input(false);
   hasCapability = toSignal(isLanguageDetectionAPISupported(), { initialValue: '' });
 }

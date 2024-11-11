@@ -28,6 +28,6 @@ import { PromptShowcaseComponent } from './prompt/prompt-showcase.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
-  showUserAgent = input(true);
+  showUserAgent = input(false);
   hasCapability = toSignal(isPromptAPISupported(), { initialValue: '' });
 }

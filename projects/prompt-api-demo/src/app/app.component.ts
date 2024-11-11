@@ -10,8 +10,10 @@ import { SetupComponent } from './prompt/components/setup.component';
     <h2>Chrome Built-in Prompt API </h2>
     <h3>Use ai.assistant (Pre-131.0.6776.0) or ai.languageModel (Post-131.0.6776.0) to prompt model to generate text.</h3>
     <div style="margin-bottom: 0.5rem;">
-      <button style="margin-right: 0.25rem;" (click)="showSetup.set(!showSetup())">{{ btnSetupText() }}</button>
-      <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText() }}</button>
+      @let btnSetupText = showSetup() ? 'Hide Setup' : 'Show Setup';
+      @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show Setup';
+      <button style="margin-right: 0.25rem;" (click)="showSetup.set(!showSetup())">{{ btnSetupText }}</button>
+      <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText }}</button>
     </div>
     @if (showSetup()) {
       <app-setup />
@@ -28,8 +30,8 @@ import { SetupComponent } from './prompt/components/setup.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  showSetup = signal(true);
-  showUserAgent = signal(true);
-  btnSetupText = computed(() => this.showSetup() ? 'Hide Setup' : 'Show Setup');
-  btnUserAgentText = computed(() => this.showUserAgent() ? 'Hide User Agent' : 'Show Setup');
+  showSetup = signal(false);
+  showUserAgent = signal(false);
+  // btnSetupText = computed(() => this.showSetup() ? 'Hide Setup' : 'Show Setup');
+  // btnUserAgentText = computed(() => this.showUserAgent() ? 'Hide User Agent' : 'Show Setup');
 }

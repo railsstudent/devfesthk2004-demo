@@ -11,7 +11,7 @@ import { LanguageInitialPrompt } from '../../ai/types/language-initial-prompt.ty
         <h3 style="text-decoration: underline;">Initial Prompts</h3>
         @for (initialPrompt of initialPrompts(); track $index) {
             <p><span class="label">{{ initialPrompt.role }}: </span>
-                <span>{{ initialPrompt.content }}</span>
+              <span>{{ initialPrompt.content }}</span>
             </p>
         }
         <hr/>

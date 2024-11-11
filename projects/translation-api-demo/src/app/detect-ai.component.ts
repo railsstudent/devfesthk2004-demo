@@ -30,6 +30,6 @@ import { TranslationContainerComponent } from './translation/translation-contain
 })
 export class DetectAIComponent {
   glitchDemo = 'https://translation-demo.glitch.me/';
-  showUserAgent = input(true);
+  showUserAgent = input(false);
   hasCapability = toSignal(isTranslationApiSupported(), { initialValue: '' });
 }

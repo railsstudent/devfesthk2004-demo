@@ -7,11 +7,12 @@ import { AILanguageModelInitialPromptRole } from '../../ai/enums/initial-prompt-
 import { FormsModule } from '@angular/forms';
 import { TokenizationComponent } from './tokenization.component';
 import { InitialPromptComponent } from './initial-prompt.component';
+import { LineBreakPipe } from '../pipes/line-break.pipe';
 
 @Component({
   selector: 'app-n-shot-prompt',
   standalone: true,
-  imports: [FormsModule, TokenizationComponent, InitialPromptComponent],
+  imports: [FormsModule, TokenizationComponent, InitialPromptComponent, LineBreakPipe],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>N-shots prompting</h3>
@@ -31,7 +32,7 @@ import { InitialPromptComponent } from './initial-prompt.component';
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
         <span class="label">Response: </span>
-        <p>{{ response() }}</p>
+        <p [innerHTML]="response() | lineBreak"></p>
       </div>
       @if (error()) {
         <div>

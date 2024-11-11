@@ -4,11 +4,12 @@ import { AbstractPromptService } from '../../ai/services/abstract-prompt.service
 import { SystemPromptService } from '../../ai/services/system-prompts.service';
 import { BasePromptComponent } from './base-prompt.component';
 import { TokenizationComponent } from './tokenization.component';
+import { LineBreakPipe } from '../pipes/line-break.pipe';
 
 @Component({
   selector: 'app-system-prompt',
   standalone: true,
-  imports: [FormsModule, TokenizationComponent],
+  imports: [FormsModule, TokenizationComponent, LineBreakPipe],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>System Prompts</h3>
@@ -31,7 +32,7 @@ import { TokenizationComponent } from './tokenization.component';
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
         <span class="label">Response: </span>
-        <p>{{ response() }}</p>
+        <p [innerHTML]="response() | lineBreak"></p>
       </div>
       @if (error()) {
         <div>
