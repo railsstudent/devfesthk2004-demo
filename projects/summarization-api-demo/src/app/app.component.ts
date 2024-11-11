@@ -27,8 +27,8 @@ import { SetupComponent } from './summarization/components/setup.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  showSetup = signal(true);
-  showUserAgent = signal(true);
+  showSetup = signal(false);
+  showUserAgent = signal(false);
   btnSetupText = computed(() => this.showSetup() ? 'Hide Setup' : 'Show Setup');
   btnUserAgentText = computed(() => this.showUserAgent() ? 'Hide User Agent' : 'Show Setup');
 }

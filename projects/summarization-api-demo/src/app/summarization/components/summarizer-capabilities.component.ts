@@ -64,5 +64,5 @@ export class SummarizerCapabilitiesComponent {
   supportedLength = input.required<string[]>();
   languageAvailable = input.required<string[]>();
 
-  show = signal(true)
+  show = signal(false)
 }
