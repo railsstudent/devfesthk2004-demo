@@ -25,8 +25,8 @@ const lengths = [
 export class SummarizationService {
     #summarizationApi = inject(AI_SUMMARIZATION_API_TOKEN);
     #abortController = new AbortController();
-    #summary = signal<string>('');
-    summary = this.#summary.asReadonly();
+    #summaries = signal<string[]>([]);
+    summaries = this.#summaries.asReadonly();
 
     private initCapabilities() {
         if (!this.#summarizationApi) {
@@ -100,7 +100,6 @@ export class SummarizationService {
         return results;
     }
     
-
     private initSession(options: AISummarizerCreateOptions) {
         if (!this.#summarizationApi) {
             throw new Error(`Your browser doesn't support the Summarization API. If you are on Chrome, join the Early Preview Program to enable it.`);
@@ -111,11 +110,17 @@ export class SummarizationService {
         return this.#summarizationApi.create(options);
     }
 
-    async createSummarizer(options: AISummarizerCreateOptions, text: string) {
+    async summarize(options: AISummarizerCreateOptions, ...texts: string[]) {
+        this.#summaries.set([]);
         const session = await this.initSession({ ...options, signal: this.#abortController.signal });
         
-        const summary = await session.summarize(text);
-        this.#summary.set(summary);
+        const summaries: string[] = [];
+        for (const text of texts) {
+            const result = await session.summarize(text);
+            summaries.push(result);
+        }
+
+        this.#summaries.set(summaries);
         session.destroy();
     }
 
