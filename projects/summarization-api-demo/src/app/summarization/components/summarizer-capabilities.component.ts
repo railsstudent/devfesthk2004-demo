@@ -42,7 +42,7 @@ import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core
     }
 
     .container > div {
-      flex-basis: 33.33%; 
+      flex-basis: 25%; 
       flex-grow: 1; 
       flex-shrink: 1;
     }

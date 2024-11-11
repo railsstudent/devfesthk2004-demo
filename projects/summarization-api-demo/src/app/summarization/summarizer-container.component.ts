@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { SummarizationService } from '../ai/services/summarization.service';
 import { SummarizerCapabilitiesComponent } from './components/summarizer-capabilities.component';
-import { SummarizerComponent } from './components/summarizer.component';
+import { SummarizerOptionsComponent } from './components/summarizer-oprions.component';
 import { SummarizerSelectOptions } from '../ai/types/summarizer-select-options.type';
+import { SummarizerComponent } from './components/summarizer.component';
 
 @Component({
   selector: 'app-summarizer-container',
