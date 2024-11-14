@@ -15,7 +15,7 @@ import { PromptShowcaseComponent } from './prompt/prompt-showcase.component';
     <div>
       @let error = hasCapability();
       @if (!error) {
-        <app-feedback-input />
+        <app-prompt-showcase />
       } @else if (error !== 'unknown') {
         {{ error }}
       } @else {

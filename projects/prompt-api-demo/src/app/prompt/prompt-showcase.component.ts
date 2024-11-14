@@ -11,7 +11,7 @@ import { SystemPromptsComponent } from './components/system-prompts.component';
 import { ZeroPromptComponent } from './components/zero-prompt.component';
 
 @Component({
-  selector: 'app-feedback-input',
+  selector: 'app-prompt-showcase',
   standalone: true,
   imports: [FormsModule, CapabilityComponent, NgComponentOutlet],
   template: `
