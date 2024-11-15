@@ -18,7 +18,7 @@ export class LanguageDetectionService  {
 
         const detector = this.detector();
         if (!detector) {
-            throw new Error('Failed to create LanguageDetector.');
+            throw new Error('Failed to create a LanguageDetector.');
         }
 
         const results = (await detector.detect(query)) as LanguageDetectionResult[];
@@ -27,9 +27,9 @@ export class LanguageDetectionService  {
         }
 
         // choose the first language for which its confidence >= minConfidence
-        const highConfidenceResults = results.filter((result) => result.confidence >= minConfidence);
+        const highConfidenceResult = results.find((result) => result.confidence >= minConfidence);
         
-        const finalLanguage = highConfidenceResults.length ? highConfidenceResults[0] : results[0];
+        const finalLanguage = highConfidenceResult ? highConfidenceResult : results[0];
         return ({ ...finalLanguage, name: this.languageTagToHumanReadable(finalLanguage.detectedLanguage)});
     }
 

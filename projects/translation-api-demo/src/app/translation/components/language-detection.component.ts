@@ -24,7 +24,7 @@ import { AllowTranslation } from '../types/allow-translation.type';
 })
 export class LanguageDetectionComponent {
   service = inject(LanguageDetectionService);
-  inputText = signal('');
+  inputText = signal('Buenos dias. Hoy es 23 de Noviembre, 2024.  Mucho Gusto.');
   detectedLanguage = signal<LanguageDetectionWithNameResult | undefined>(undefined);
 
   detector = this.service.detector;
