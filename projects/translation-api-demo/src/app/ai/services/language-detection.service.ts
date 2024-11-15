@@ -35,7 +35,8 @@ export class LanguageDetectionService  {
     }
 
     async createDetector() {
-        if (this.#detector()) {
+        if (this.detector()) {
+            console.log('Language Detector found.');
             return;
         }
 
