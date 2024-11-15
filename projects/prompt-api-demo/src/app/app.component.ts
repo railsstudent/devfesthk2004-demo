@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DetectAIComponent } from './detect-ai.component';
 import { SetupComponent } from './prompt/components/setup.component';
 
@@ -7,8 +7,8 @@ import { SetupComponent } from './prompt/components/setup.component';
   standalone: true,
   imports: [DetectAIComponent, SetupComponent],
   template: `
-    <h2>Chrome Built-in Prompt API </h2>
-    <h3>Use ai.assistant (Pre-131.0.6776.0) or ai.languageModel (Post-131.0.6776.0) to prompt model to generate text.</h3>
+    <h2>Chrome Built-in Prompt API</h2>
+    <h3>Use ai.assistant (Pre-131.0.6776.0) or ai.languageModel (Post-131.0.6776.0) to prompt model to generate texts.</h3>
     <div style="margin-bottom: 0.5rem;">
       @let btnSetupText = showSetup() ? 'Hide Setup' : 'Show Setup';
       @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show Setup';
@@ -32,6 +32,4 @@ import { SetupComponent } from './prompt/components/setup.component';
 export class AppComponent {
   showSetup = signal(false);
   showUserAgent = signal(false);
-  // btnSetupText = computed(() => this.showSetup() ? 'Hide Setup' : 'Show Setup');
-  // btnUserAgentText = computed(() => this.showUserAgent() ? 'Hide User Agent' : 'Show Setup');
 }
