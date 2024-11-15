@@ -3,6 +3,10 @@ import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
 import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { LanguagePair, LanguagePairAvailable } from '../types/language-pair.type';
 
+enum ERROR_CODES {
+    NO_API = `Your browser doesn't support the Translation API. If you are on Chrome, join the Early Preview Program to enable it.`,
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,7 +19,7 @@ export class TranslationService  {
 
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePairAvailable[]> {
         if (!this.#translationAPI) {
-            throw new Error(`Your browser doesn't support the Translation API. If you are on Chrome, join the Early Preview Program to enable it.`);
+            throw new Error(ERROR_CODES.NO_API);
         }
 
         const results: LanguagePairAvailable[] = [];
@@ -33,7 +37,7 @@ export class TranslationService  {
     async translate(languagePair: LanguagePair, inputText: string): Promise<string> {
         try { 
             if (!this.#translationAPI) {
-                throw new Error(`Your browser doesn't support the Translation API. If you are on Chrome, join the Early Preview Program to enable it.`);
+                throw new Error(ERROR_CODES.NO_API);
             }
 
             const translator = await this.#translationAPI.createTranslator(languagePair);
@@ -49,6 +53,24 @@ export class TranslationService  {
         } catch (e) {
             console.error(e);
             return '';
+        }
+    }
+
+    async downloadLanguagePackage(languagePair: LanguagePair) {
+        try {
+            if (!this.#translationAPI) {
+                throw new Error(ERROR_CODES.NO_API);
+            }
+            
+            const translator = await this.#translationAPI.createTranslator(languagePair);
+            if (translator.destroy) {
+                translator.destroy();
+            }
+
+            return { ...languagePair, available: CAPABILITIES_AVAILABLE.READILY };
+        } catch (e) {
+            console.error(e);
+            return undefined;
         }
     }
 }

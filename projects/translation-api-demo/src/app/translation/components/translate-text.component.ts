@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CAPABILITIES_AVAILABLE } from '../../ai/enums/capabilities-available.enum';
 import { TranslationService } from '../../ai/services/translation.service';
@@ -15,14 +15,20 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
                 <p>canTranslate('{{ pair.sourceLanguage }}', '{{ pair.targetLanguage}}') = {{ pair.available }}</p>
             }
         </div>
-        <div>
-            @for(item of canTranslateButtons(); track $index) {
-                @let pair = { sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage };
-                <button style="margin-right: 0.25rem;" (click)="translateText(pair)">{{ item.text }}</button>
-            }
-        </div>
-        <div>
-            <p>Translation: {{ translation() }}</p>
+        <div style="display: flex; flex-direction: column;">
+            <div style="margin: 1rem;">
+                @for(item of canTranslateButtons(); track $index) {
+                    @let pair = { sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage };
+                    @if (item.available === 'readily') {
+                        <button style="margin-right: 0.25rem;" (click)="translateText(pair)">{{ item.text }}</button>
+                    } @else if (item.available === 'after-download') {
+                        <button style="margin-right: 0.25rem;" (click)="download(pair)">{{ item.text }}</button>
+                    } 
+                }
+            </div>
+            <div>
+                <p>Translation: {{ translation() }}</p>
+            </div>
         </div>
     </div>
   `,
@@ -33,17 +39,33 @@ export class TranslateTextComponent {
     languagePairs = input.required<LanguagePairAvailable[]>();
     inputText = input.required<string>();
     translation = signal('');
+    downloadSuccess = output<LanguagePairAvailable>();
 
     canTranslateButtons = computed(() =>
-        this.languagePairs().reduce((acc, { available, sourceLanguage, targetLanguage }) => { 
-            return (available === CAPABILITIES_AVAILABLE.READILY) ?
-                acc.concat({ sourceLanguage, targetLanguage, text: `${sourceLanguage} to ${targetLanguage}` }) : acc
-        }, [] as  { sourceLanguage: string, targetLanguage: string, text: string }[])
+        this.languagePairs().reduce((acc, pair) => {
+            if (pair.available === CAPABILITIES_AVAILABLE.READILY) {
+                return acc.concat({ ...pair, text: `${pair.sourceLanguage} to ${pair.targetLanguage}` })
+            } else if (pair.available === CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
+                return acc.concat({ ...pair, text: `Download ${pair.targetLanguage}` })
+            }
+            return acc;
+        }, [] as (LanguagePairAvailable & { text: string })[])
     );
 
     async translateText(languagePair: LanguagePair) {
         this.translation.set('');
         const result = await this.service.translate(languagePair, this.inputText());
         this.translation.set(result);
+    }
+
+    async download(languagePair: LanguagePair) {
+        try {
+         const result = await this.service.downloadLanguagePackage(languagePair);
+         if (result?.available === CAPABILITIES_AVAILABLE.READILY) {
+            this.downloadSuccess.emit(result);
+         }
+        } catch (e) {
+            console.error(e);
+        }
     }
 }

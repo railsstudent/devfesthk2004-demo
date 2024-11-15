@@ -18,7 +18,7 @@ export class LanguageDetectionService  {
 
         const detector = this.detector();
         if (!detector) {
-            throw new Error('Failed to create a LanguageDetector.');
+            throw new Error('Failed to create a language detector.');
         }
 
         const results = (await detector.detect(query)) as LanguageDetectionResult[];
