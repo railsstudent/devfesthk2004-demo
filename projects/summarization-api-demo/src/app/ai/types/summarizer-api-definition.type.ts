@@ -2,18 +2,19 @@ import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../enums/capabilities-core-options.enum';
 import { AISummarizerCreateCoreOptions, AISummarizerCreateOptions } from './create-summarizer-options.type';
 
-export interface OldCapabilitiesApi {
+interface CommonCapability {
     available: CAPABILITIES_AVAILABLE
-    supportsFormat: (input: AISummarizerFormat) => CAPABILITIES_AVAILABLE,
-    supportsLength: (input: AISummarizerLength) => CAPABILITIES_AVAILABLE,
-    supportsType: (input: AISummarizerType) => CAPABILITIES_AVAILABLE,
     languageAvailable: (languageFlag: string) => CAPABILITIES_AVAILABLE,
 }
 
-export interface CapabilitiesApi {
-    available: CAPABILITIES_AVAILABLE,
+export interface OldCapabilitiesApi extends CommonCapability {
+    supportsFormat: (input: AISummarizerFormat) => CAPABILITIES_AVAILABLE,
+    supportsLength: (input: AISummarizerLength) => CAPABILITIES_AVAILABLE,
+    supportsType: (input: AISummarizerType) => CAPABILITIES_AVAILABLE,
+}
+
+export interface CapabilitiesApi extends CommonCapability {
     createOptionsAvailable: (options: AISummarizerCreateCoreOptions) => CAPABILITIES_AVAILABLE,
-    languageAvailable: (languageFlag: string) => CAPABILITIES_AVAILABLE,
 }
 
 export type UnionCapabilities = OldCapabilitiesApi | CapabilitiesApi;

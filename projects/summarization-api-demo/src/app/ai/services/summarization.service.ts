@@ -2,6 +2,8 @@ import { inject, Injectable, signal } from '@angular/core';
 import { AI_SUMMARIZATION_API_TOKEN } from '../constants/core.constant';
 import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../enums/capabilities-core-options.enum';
+import { isCapabilitiesApi } from '../guards/capabilities-api.guard';
+import { isOldCapabilitiesApi } from '../guards/old-capabilities-api.guard';
 import { AISummarizerCreateOptions } from '../types/create-summarizer-options.type';
 import { CapabilitiesApi, OldCapabilitiesApi, UnionCapabilities } from '../types/summarizer-api-definition.type';
 import { SummarizerSelectOptions } from '../types/summarizer-select-options.type';
@@ -146,22 +148,19 @@ export class SummarizationService {
     private populateSupportValues(capabilities: UnionCapabilities): 
         SummarizerSelectOptions | undefined {
         
-        if ((capabilities as OldCapabilitiesApi).supportsFormat && 
-            (capabilities as OldCapabilitiesApi).supportsType &&
-            (capabilities as OldCapabilitiesApi).supportsLength
-        ) {
+        if (isOldCapabilitiesApi(capabilities)) {
             const formatValues = formats.reduce((acc, format) => {
-                const result = (capabilities as OldCapabilitiesApi).supportsFormat(format);
+                const result = capabilities.supportsFormat(format);
                 return result === CAPABILITIES_AVAILABLE.READILY ? acc.concat(format) : acc;
             }, [] as string[]);
 
             const typeValues = types.reduce((acc, type) => {
-                const typeStatus = (capabilities as OldCapabilitiesApi).supportsType(type);
+                const typeStatus = capabilities.supportsType(type);
                 return typeStatus === CAPABILITIES_AVAILABLE.READILY ? acc.concat(type) : acc;
             }, [] as string[]);
 
             const lengthValues = lengths.reduce((acc, length) => {
-                const lengthStatus = (capabilities as OldCapabilitiesApi).supportsLength(length);
+                const lengthStatus = capabilities.supportsLength(length);
                 return lengthStatus === CAPABILITIES_AVAILABLE.READILY ? acc.concat(length) : acc;
             }, [] as string[]);
 
@@ -178,19 +177,19 @@ export class SummarizationService {
     private populateCreateOptionValues(capabilities: UnionCapabilities) : 
         SummarizerSelectOptions | undefined {
         
-        if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
+        if (isCapabilitiesApi(capabilities)) {
             const formatValues = formats.reduce((acc, format) => {
-                const result = (capabilities as CapabilitiesApi).createOptionsAvailable({ format });
+                const result = capabilities.createOptionsAvailable({ format });
                 return result === CAPABILITIES_AVAILABLE.READILY ? acc.concat(format) : acc;
             }, [] as string[]);
 
             const typeValues = types.reduce((acc, type) => {
-                const typeStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ type });
+                const typeStatus = capabilities.createOptionsAvailable({ type });
                 return typeStatus === CAPABILITIES_AVAILABLE.READILY ? acc.concat(type) : acc;
             }, [] as string[]);
 
             const lengthValues = lengths.reduce((acc, length) => {
-                const lengthStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ length });
+                const lengthStatus = capabilities.createOptionsAvailable({ length });
                 return lengthStatus === CAPABILITIES_AVAILABLE.READILY ? acc.concat(length) : acc;
             }, [] as string[]);
 
