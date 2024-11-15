@@ -6,6 +6,13 @@ import { getChromVersion, isChromeBrowser } from './user-agent-data';
 
 const CHROME_VERSION = 131
 
+enum ERROR_CODES {
+   NO_TRANSLATOR = 'Build-in Language Translator not found in window. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation',
+   TRANSLATION_AFTER_DOWNLLOAD = 'Built-in AI is not ready, please go to chrome://components and start downloading the Chrome TranslateKit.',
+   NO_TRANSLATION_API = 'The model of the Translation API is not implemented. Please check your configuration in chrome://flags/#translation-api',
+   NO_LANGUAGE_DETECTOR = 'Build-in Language Detector not found in window. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation',
+}
+
 export async function checkChromeBuiltInAI(): Promise<string> {
    if (!isChromeBrowser()) {
       throw new Error('Your browser is not supported. Please use Google Chrome Dev or Canary.');
@@ -29,22 +36,22 @@ export async function checkChromeBuiltInAI(): Promise<string> {
 async function validateLanguageTranslator(translation: TranslationApiDefinition | undefined) {
    const canTranslateStatus = await translation?.canTranslate({ sourceLanguage: 'en', targetLanguage: 'es' });
    if (!canTranslateStatus) {
-      throw new Error('Build-in Language Translator not found in window. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation');
+      throw new Error(ERROR_CODES.NO_TRANSLATOR);
    } else if (canTranslateStatus == CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
-      throw new Error('Built-in AI is not ready, please go to chrome://components and start downloading the Chrome TranslateKit.');
+      throw new Error(ERROR_CODES.TRANSLATION_AFTER_DOWNLLOAD);
    } else if (canTranslateStatus === CAPABILITIES_AVAILABLE.NO) {
-      throw new Error('The model of the Translation API is not implemented. Please check your configuration in chrome://flags/#translation-api');
+      throw new Error(ERROR_CODES.NO_TRANSLATION_API);
    }
 }
 
 async function validateLanguageDetector(translation: TranslationApiDefinition | undefined) {
    const canDetectStatus = await translation?.canDetect();
    if (!canDetectStatus) {
-      throw new Error('Build-in Language Detector not found in window. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation');
+      throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
    } else if (canDetectStatus == CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
-      throw new Error('Built-in AI is not ready, please go to chrome://components and start downloading the Chrome TranslateKit.');
+      throw new Error(ERROR_CODES.TRANSLATION_AFTER_DOWNLLOAD);
    } else if (canDetectStatus === CAPABILITIES_AVAILABLE.NO) {
-      throw new Error('The model of the Translation API is not implemented. Please check your configuration in chrome://flags/#translation-api');
+      throw new Error(ERROR_CODES.NO_TRANSLATION_API);
    }
 }
 
