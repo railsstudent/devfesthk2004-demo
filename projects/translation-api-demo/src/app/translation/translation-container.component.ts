@@ -16,7 +16,7 @@ import { LanguagePairAvailable } from '../ai/types/language-pair.type';
       <app-language-detection (nextStep)="updateCanTranslate($event)" />
       @let inputText = sample().inputText;
       @if (sample().sourceLanguage && inputText) {
-        <app-translate-text [languagePairs]="languagePairs" [inputText]="inputText" />
+        <app-translate-text [languagePairs]="languagePairs()" [inputText]="inputText" />
       } @else if (inputText) {
         <p>{{ inputText }} cannot be translated.</p>
       }
@@ -26,17 +26,16 @@ import { LanguagePairAvailable } from '../ai/types/language-pair.type';
 })
 export class TranslationContainerComponent {
   translationService = inject(TranslationService);
-  languagePairs: LanguagePairAvailable[] = []
+  languagePairs = signal<LanguagePairAvailable[]>([]);
 
   sample = signal({ sourceLanguage: '', inputText: '' });
 
   async updateCanTranslate(allowTranslation: AllowTranslation) {
-    this.languagePairs = [];
+    this.languagePairs.set([]);
     this.sample.set({ sourceLanguage: '', inputText: '' });
     if (allowTranslation && allowTranslation.toTranslate) {
       const { code: sourceLanguage, inputText } = allowTranslation;
-      this.languagePairs = await this.translationService.createLanguagePairs(sourceLanguage);
-      console.log('this.languagePairs', this.languagePairs);
+      this.languagePairs.set(await this.translationService.createLanguagePairs(sourceLanguage));
       this.sample.set({ sourceLanguage, inputText });
     }
   }

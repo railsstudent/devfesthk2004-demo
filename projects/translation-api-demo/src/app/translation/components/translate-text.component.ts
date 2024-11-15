@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LanguageDetectionService } from '../../ai/services/language-detection.service';
-import { LanguageDetectionWithNameResult } from '../../ai/types/language-detection-result.type';
-import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
 import { CAPABILITIES_AVAILABLE } from '../../ai/enums/capabilities-available.enum';
 import { TranslationService } from '../../ai/services/translation.service';
+import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
 
 @Component({
   selector: 'app-translate-text',

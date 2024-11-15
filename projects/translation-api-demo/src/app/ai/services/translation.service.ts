@@ -11,7 +11,7 @@ export class TranslationService  {
     #detector = signal<any | null>(null);
     detector = this.#detector.asReadonly();
 
-    supportedLanguages = ['en', 'es', 'ja', 'zh', 'zh-Hant', 'it', 'fr'];
+    supportedLanguages = ['en', 'es', 'ja', 'zh', 'zh-Hant', 'it', 'fr', 'zz'];
 
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePairAvailable[]> {
         if (!this.#translationAPI) {
