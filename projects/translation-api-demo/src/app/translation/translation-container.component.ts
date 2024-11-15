@@ -27,7 +27,6 @@ import { LanguagePairAvailable } from '../ai/types/language-pair.type';
 export class TranslationContainerComponent {
   translationService = inject(TranslationService);
   languagePairs = signal<LanguagePairAvailable[]>([]);
-
   sample = signal({ sourceLanguage: '', inputText: '' });
 
   async updateCanTranslate(allowTranslation: AllowTranslation) {

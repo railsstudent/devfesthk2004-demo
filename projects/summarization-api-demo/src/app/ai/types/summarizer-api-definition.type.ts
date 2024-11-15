@@ -16,6 +16,8 @@ export interface CapabilitiesApi {
     languageAvailable: (languageFlag: string) => CAPABILITIES_AVAILABLE,
 }
 
+export type UnionCapabilities = OldCapabilitiesApi | CapabilitiesApi;
+
 export interface AISummarizerApi { 
     create: (options?: AISummarizerCreateOptions) => Promise<{ 
         summarize(str: string): Promise<string>,
@@ -25,7 +27,7 @@ export interface AISummarizerApi {
         sharedContext: string
         destroy(): void
     }>, 
-    capabilities: () =>  Promise<OldCapabilitiesApi | CapabilitiesApi>,
+    capabilities: () =>  Promise<UnionCapabilities>,
 }
 
 export type SummarizerApiDefinition = AISummarizerApi | undefined;

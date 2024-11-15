@@ -3,7 +3,7 @@ import { AI_SUMMARIZATION_API_TOKEN } from '../constants/core.constant';
 import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../enums/capabilities-core-options.enum';
 import { AISummarizerCreateOptions } from '../types/create-summarizer-options.type';
-import { CapabilitiesApi, OldCapabilitiesApi } from '../types/summarizer-api-definition.type';
+import { CapabilitiesApi, OldCapabilitiesApi, UnionCapabilities } from '../types/summarizer-api-definition.type';
 import { SummarizerSelectOptions } from '../types/summarizer-select-options.type';
 
 const formats = [AISummarizerFormat.PLAIN_TEXT, AISummarizerFormat.MARKDOWN];
@@ -19,6 +19,11 @@ const lengths = [
     AISummarizerLength.SHORT,
 ];
 
+enum ERROR_CODES {
+    NO_API = `Your browser doesn't support the Summarization API. If you are on Chrome, join the Early Preview Program to enable it.`,
+    NO_CAPABILITIES = 'Capabilities detection is unsupported. Please check your configuration in chrome://flags/#optimization-guide-on-device-model',
+}
+
 @Injectable({
     providedIn: 'root'    
 })
@@ -28,14 +33,24 @@ export class SummarizationService {
     #summaries = signal<string[]>([]);
     summaries = this.#summaries.asReadonly();
 
-    private initCapabilities() {
+    private validateAndReturnApi() {
         if (!this.#summarizationApi) {
-            throw new Error(`Your browser doesn't support the Summarization API. If you are on Chrome, join the Early Preview Program to enable it.`);
+            throw new Error(ERROR_CODES.NO_API);
         } else if (!this.#summarizationApi.capabilities) {
-            throw new Error('Capabilities detection is unsupported. Please check your configuration in chrome://flags/#optimization-guide-on-device-model');
+            throw new Error(ERROR_CODES.NO_CAPABILITIES);
         }
 
-        return this.#summarizationApi.capabilities();
+        return this.#summarizationApi;
+    }
+
+    private initCapabilities() {
+        const api = this.validateAndReturnApi();
+        return api.capabilities();
+    }
+
+    private initSession(options: AISummarizerCreateOptions) {
+        const api = this.validateAndReturnApi();
+        return api.create(options);
     }
 
     async checkSummarizerFormats(): Promise<string[]> {
@@ -94,22 +109,11 @@ export class SummarizationService {
 
     async languageAvailable(languageFlags: string[]): Promise<string[]> {
         const capabilities = await this.initCapabilities();
-
-        const results = languageFlags.map((flag) => 
-            `capabilities.languageAvailable(${flag}) = ${capabilities.languageAvailable(flag)}`);
-        return results;
+        return languageFlags.map((flag) => 
+            `capabilities.languageAvailable(${flag}) = ${capabilities.languageAvailable(flag)}`
+        );
     }
     
-    private initSession(options: AISummarizerCreateOptions) {
-        if (!this.#summarizationApi) {
-            throw new Error(`Your browser doesn't support the Summarization API. If you are on Chrome, join the Early Preview Program to enable it.`);
-        } else if (!this.#summarizationApi.capabilities) {
-            throw new Error('Capabilities detection is unsupported. Please check your configuration in chrome://flags/#optimization-guide-on-device-model');
-        }
-
-        return this.#summarizationApi.create(options);
-    }
-
     async summarize(options: AISummarizerCreateOptions, ...texts: string[]) {
         this.#summaries.set([]);
         const session = await this.initSession({ ...options, signal: this.#abortController.signal });
@@ -125,7 +129,6 @@ export class SummarizationService {
     }
 
     async populateSelectOptions(): Promise<SummarizerSelectOptions> {
-
         const capabilities = await this.initCapabilities();
         const newCallOptions = this.populateCreateOptionValues(capabilities);
         if (newCallOptions) {
@@ -140,15 +143,9 @@ export class SummarizationService {
         throw new Error('There is no method to populate the select options');
     }
 
-    private populateSupportValues(capabilities: OldCapabilitiesApi | CapabilitiesApi): 
+    private populateSupportValues(capabilities: UnionCapabilities): 
         SummarizerSelectOptions | undefined {
         
-        const result = {
-            formatValues: [] as string[],
-            lengthValues: [] as string[],
-            typeValues: [] as string[],
-        };
-
         if ((capabilities as OldCapabilitiesApi).supportsFormat && 
             (capabilities as OldCapabilitiesApi).supportsType &&
             (capabilities as OldCapabilitiesApi).supportsLength
@@ -178,7 +175,7 @@ export class SummarizationService {
         return undefined;
     }
 
-    private populateCreateOptionValues(capabilities: OldCapabilitiesApi | CapabilitiesApi) : 
+    private populateCreateOptionValues(capabilities: UnionCapabilities) : 
         SummarizerSelectOptions | undefined {
         
         if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
