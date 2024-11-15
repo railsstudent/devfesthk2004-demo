@@ -4,6 +4,8 @@ import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 import { LanguagePair, LanguagePairAvailable } from '../types/language-pair.type';
 
+const TRANSKIT_LANGUAGES = ['en', 'es', 'ja', 'zh', 'zh-Hant', 'it', 'fr', 'zz'];
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,19 +14,17 @@ export class TranslationService  {
     #detector = signal<any | null>(null);
     detector = this.#detector.asReadonly();
 
-    supportedLanguages = ['en', 'es', 'ja', 'zh', 'zh-Hant', 'it', 'fr', 'zz'];
-
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePairAvailable[]> {
         if (!this.#translationAPI) {
             throw new Error(ERROR_CODES.NO_API);
         }
 
         const results: LanguagePairAvailable[] = [];
-        const api = this.#translationAPI;
-        for (const targetLanguage of this.supportedLanguages) {
+        for (const targetLanguage of TRANSKIT_LANGUAGES) {
             if (sourceLanguage !== targetLanguage) {
-                const available = await api.canTranslate({ sourceLanguage, targetLanguage }) as CAPABILITIES_AVAILABLE;
-                results.push({ sourceLanguage, targetLanguage, available });
+                const pair = { sourceLanguage, targetLanguage }
+                const available = await this.#translationAPI.canTranslate(pair);
+                results.push({ ...pair, available });
             }
         }
 

@@ -19,7 +19,7 @@ export class LanguageDetectionService  {
 
         const detector = this.detector();
         if (!detector) {
-            throw new Error('Failed to create a language detector.');
+            throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
         }
 
         const results = (await detector.detect(query)) as LanguageDetectionResult[];
@@ -41,7 +41,7 @@ export class LanguageDetectionService  {
 
         const canCreatStatus = (await this.#translationAPI?.canDetect()) === CAPABILITIES_AVAILABLE.READILY;
         if (!canCreatStatus) {
-            throw new Error('Built-in Language Detector is not available.');
+            throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
         }
         const newDetector = await this.#translationAPI?.createDetector();
         this.#detector.set(newDetector);
