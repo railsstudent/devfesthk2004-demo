@@ -18,7 +18,7 @@ import { ZeroPromptComponent } from './components/zero-prompt.component';
     <app-capability [defaultCapabilities]="defaultCapabilities()" />
     <label>Demo: </label>
     <select [(ngModel)]="selectedDemo" style="margin-bottom: 1rem;">
-      @for (demo of demos(); track $index) {
+      @for (demo of demos(); track demo) {
         <option [ngValue]="demo">{{ demo }}</option>
       }
     </select>
