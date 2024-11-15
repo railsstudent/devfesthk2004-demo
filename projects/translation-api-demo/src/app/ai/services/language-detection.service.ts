@@ -1,7 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
-import { LanguageDetectionResult, LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
+import { ERROR_CODES } from '../enums/error-codes.enum';
+import { LanguageDetectionResult, LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class LanguageDetectionService  {
 
     async detect(query: string, minConfidence = 0.6): Promise<LanguageDetectionWithNameResult | undefined> {
         if (!this.#translationAPI) {
-            throw new Error(`Your browser doesn't support the Translation API. If you are on Chrome, join the Early Preview Program to enable it.`);
+            throw new Error(ERROR_CODES.NO_API);
         }
 
         const detector = this.detector();

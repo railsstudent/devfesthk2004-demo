@@ -1,11 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
 import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
+import { ERROR_CODES } from '../enums/error-codes.enum';
 import { LanguagePair, LanguagePairAvailable } from '../types/language-pair.type';
-
-enum ERROR_CODES {
-    NO_API = `Your browser doesn't support the Translation API. If you are on Chrome, join the Early Preview Program to enable it.`,
-}
 
 @Injectable({
   providedIn: 'root'
