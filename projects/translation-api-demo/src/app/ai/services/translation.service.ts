@@ -62,14 +62,16 @@ export class TranslationService  {
             }
             
             const translator = await this.#translationAPI.createTranslator(languagePair);
+            const available = translator ? CAPABILITIES_AVAILABLE.READILY : CAPABILITIES_AVAILABLE.NO;
+
             if (translator.destroy) {
                 translator.destroy();
             }
 
-            return { ...languagePair, available: CAPABILITIES_AVAILABLE.READILY };
+            return { ...languagePair, available };
         } catch (e) {
             console.error(e);
-            return undefined;
+            return { ...languagePair, available: CAPABILITIES_AVAILABLE.NO };;
         }
     }
 }
