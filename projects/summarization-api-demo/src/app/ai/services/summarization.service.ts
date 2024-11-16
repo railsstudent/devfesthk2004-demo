@@ -5,7 +5,7 @@ import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../enu
 import { isCapabilitiesApi } from '../guards/capabilities-api.guard';
 import { isOldCapabilitiesApi } from '../guards/old-capabilities-api.guard';
 import { AISummarizerCreateOptions } from '../types/create-summarizer-options.type';
-import { CapabilitiesApi, OldCapabilitiesApi, UnionCapabilities } from '../types/summarizer-api-definition.type';
+import { UnionCapabilities } from '../types/summarizer-api-definition.type';
 import { SummarizerSelectOptions } from '../types/summarizer-select-options.type';
 
 const formats = [AISummarizerFormat.PLAIN_TEXT, AISummarizerFormat.MARKDOWN];
