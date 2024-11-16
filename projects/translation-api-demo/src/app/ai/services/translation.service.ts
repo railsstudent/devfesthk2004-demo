@@ -24,7 +24,9 @@ export class TranslationService  {
             if (sourceLanguage !== targetLanguage) {
                 const pair = { sourceLanguage, targetLanguage }
                 const available = await this.#translationAPI.canTranslate(pair);
-                results.push({ ...pair, available });
+                if (available !== CAPABILITIES_AVAILABLE.NO) {
+                    results.push({ ...pair, available });
+                }
             }
         }
 

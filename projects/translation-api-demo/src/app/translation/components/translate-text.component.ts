@@ -10,7 +10,7 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
   imports: [FormsModule],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem; display: flex;">
-        <div style="margin-right: 0.5rem;">
+        <div style="margin-right: 0.5rem; flex-basis: 50%;">
             @for(pair of languagePairs(); track $index) {
                 <p>canTranslate('{{ pair.sourceLanguage }}', '{{ pair.targetLanguage}}') = {{ pair.available }}</p>
             }

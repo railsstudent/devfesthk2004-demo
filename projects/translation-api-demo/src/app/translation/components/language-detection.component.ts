@@ -28,12 +28,10 @@ export class LanguageDetectionComponent {
   detectedLanguage = signal<LanguageDetectionWithNameResult | undefined>(undefined);
 
   detector = this.service.detector;
-
   isDisableDetectLanguage = computed(() => !this.detector() || this.inputText().trim() === '');
-
   nextStep = output<AllowTranslation>();
 
-  minConfidence = 0.6
+  minConfidence = 0.6;
 
   async setup() {
     await this.service.createDetector();
