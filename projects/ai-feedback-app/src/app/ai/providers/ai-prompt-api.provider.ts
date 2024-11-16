@@ -11,10 +11,9 @@ export function provideLanguageModel(): EnvironmentProviders {
                 const objWindow = isPlatformBrowser(platformId) ? window : undefined;
                 if (objWindow && 'ai' in objWindow) {
                     const ai = objWindow.ai as any;
-                    if (ai.assistant) {
-                        return ai.assistant;
-                    } else if (ai.languageModel) {
-                        return ai.languageModel;
+                    const languageModel = ai.assistant || ai.languageModel;
+                    if (languageModel) {
+                        return languageModel;
                     }
                 }
                 return undefined;
