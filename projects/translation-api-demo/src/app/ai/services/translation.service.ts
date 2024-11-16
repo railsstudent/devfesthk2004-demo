@@ -71,7 +71,7 @@ export class TranslationService  {
             return { ...languagePair, available };
         } catch (e) {
             console.error(e);
-            return { ...languagePair, available: CAPABILITIES_AVAILABLE.NO };;
+            return { ...languagePair, available: CAPABILITIES_AVAILABLE.NO };
         }
     }
 }

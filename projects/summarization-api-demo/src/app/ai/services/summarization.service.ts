@@ -58,14 +58,14 @@ export class SummarizationService {
     async checkSummarizerFormats(): Promise<string[]> {
         const capabilities = await this.initCapabilities();
 
-        if ((capabilities as OldCapabilitiesApi).supportsFormat) {
+        if (isOldCapabilitiesApi(capabilities)) {
             return formats.map((format) => {
-                const result = (capabilities as OldCapabilitiesApi).supportsFormat(format);
+                const result = capabilities.supportsFormat(format);
                 return `supportsFormat(${format}) = ${result}`
             });
-        } else if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
+        } else if (isCapabilitiesApi(capabilities)) {
             return formats.map((format) => {
-                const result = (capabilities as CapabilitiesApi).createOptionsAvailable({ format });
+                const result = capabilities.createOptionsAvailable({ format });
                 return `createOptionsAvailable({ ${format} }) = ${result}`
             });
         }
@@ -76,14 +76,14 @@ export class SummarizationService {
     async checkSummarizerTypes(): Promise<string[]> {
         const capabilities = await this.initCapabilities(); 
 
-        if ((capabilities as OldCapabilitiesApi).supportsType) {
+        if (isOldCapabilitiesApi(capabilities)) {
             return types.map((type) => {
-                const typeStatus = (capabilities as OldCapabilitiesApi).supportsType(type);
+                const typeStatus = capabilities.supportsType(type);
                 return `supportsType(${type}) = ${typeStatus}`;    
             });
-        } else if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
+        } else if (isCapabilitiesApi(capabilities)) {
             return types.map((type) => {
-                const typeStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ type });
+                const typeStatus = capabilities.createOptionsAvailable({ type });
                 return `createOptionsAvailable({ ${type} }) = ${typeStatus}`;   
             });
         }
@@ -94,14 +94,14 @@ export class SummarizationService {
     async checkSummarizerLengths(): Promise<string[]> {
         const capabilities = await this.initCapabilities();
 
-        if ((capabilities as OldCapabilitiesApi).supportsLength) {
+        if (isOldCapabilitiesApi(capabilities)) {
             return lengths.map((length) => {
-                const lengthStatus = (capabilities as OldCapabilitiesApi).supportsLength(length);
+                const lengthStatus = capabilities.supportsLength(length);
                 return `supportsLength(${length}) = ${lengthStatus}`;    
             });
-        } else if ((capabilities as CapabilitiesApi).createOptionsAvailable) {
+        } else if (isCapabilitiesApi(capabilities)) {
             return lengths.map((length) => {
-                const lengthStatus = (capabilities as CapabilitiesApi).createOptionsAvailable({ length });
+                const lengthStatus = capabilities.createOptionsAvailable({ length });
                 return `createOptionsAvailable({ ${length} }) = ${lengthStatus}`;    
             });
         }
