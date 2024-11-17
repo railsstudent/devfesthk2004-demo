@@ -20,10 +20,9 @@ const INITIAL_PROMPTS: LanguageInitialPrompt[] = [
 export class PromptService {
   #promptApi = inject(AI_PROMPT_API_TOKEN);
   #session = signal<any | null>(null);
-  session = this.#session.asReadonly();
   #controller = new AbortController();
   
-  async createSession(initialPrompts: LanguageInitialPrompt[]) {
+  private async createSession(initialPrompts: LanguageInitialPrompt[]) {
     this.destroySession();
 
     const newSession = await this.#promptApi?.create({ initialPrompts }, { signal: this.#controller.signal });
@@ -35,11 +34,11 @@ export class PromptService {
       throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
     }
 
-    if (!this.session()) {
+    if (!this.#session()) {
       await this.createSession(INITIAL_PROMPTS);
     }
 
-    const session = this.session();
+    const session = this.#session();
     if (!session) {
       throw new Error('Failed to create a Prompt session.');
     }
@@ -48,7 +47,7 @@ export class PromptService {
   }
 
   destroySession() {
-      const session = this.session();
+      const session = this.#session();
 
       if (session && session.destroy) {
           session.destroy();

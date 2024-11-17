@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, Injector, OnDestroy, OnInit, output, Signal, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, Injector, OnDestroy, OnInit, output, Signal, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, filter, fromEvent, map, merge, of, switchMap } from 'rxjs';
-import { PromptService } from '../../ai/services/prompt.service';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
+import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
+import { SentimentLanguage } from '../types/sentiment-language.type';
 
 @Component({
   selector: 'app-feedback-sentiment',
@@ -12,23 +13,29 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Customer's Feedback</h3>
-      @let myState = state();
+      @let isLoading = this.isLoading();
+      @let status = isLoading ? 'Processing...' : 'Idle';
       <div>
-        <span class="label">Status: </span><span>{{ myState.status }}</span>
+        <span class="label">Status: </span><span>{{ status }}</span>
       </div>
       <div>
         <span class="label" for="input">Input: </span>
         <textarea id="input" name="input" rows="3"  
-          [(ngModel)]="query" [disabled]="myState.disabled" #inputFeedback></textarea>
+          [(ngModel)]="query" [disabled]="isLoading" #inputFeedback></textarea>
       </div>
-      <div>
-        <span class="label">Sentiment: </span>
-        <span [innerHTML]="sentiment() | lineBreak"></span>
-      </div>
-      <div>
-        <span class="label">Language: </span>
-        <span [innerHTML]="sentiment() | lineBreak"></span>
-      </div>
+      @let data = sentiment();
+      @if (data) {
+        <div style="display: flex;">
+            <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
+                <span class="label">Sentiment: </span>
+                <span [innerHTML]="data.sentiment | lineBreak"></span>
+            </p>
+            <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
+                <span class="label">Language: </span>
+                <span [innerHTML]="data.language | lineBreak"></span>
+            </p>
+        </div>
+      }
       @if (error()) {
         <div>
           <span class="label">Error: </span>
@@ -40,7 +47,7 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeedbackSentimentComponent implements OnDestroy, OnInit {
-  promptService = inject(PromptService);
+  sentimentService = inject(FeedbackSentimentService);
   injector = inject(Injector);
 
   textArea = viewChild.required<ElementRef<HTMLTextAreaElement>>('inputFeedback');
@@ -48,45 +55,39 @@ export class FeedbackSentimentComponent implements OnDestroy, OnInit {
   isLoading = signal(false);
   error = signal('');
   query = signal('La comida es buena y el servicio es excelente.');
-  sentiment!: Signal<string>;
+  sentiment!: Signal<SentimentLanguage | undefined>;
 
-  state = computed(() => {
-    const isLoading = this.isLoading();
-    return {
-        status: isLoading ? 'Processing...' : 'Idle',
-        disabled: isLoading,
-    }
-  });
-
-  inputEntered = output<{ sentiment: string; language: string }>();
+  sentimentLanguageEvaluated = output<SentimentLanguage  | undefined>();
 
   ngOnInit(): void {
     const inputFeedback$ = fromEvent(this.textArea().nativeElement, 'input')
-      .pipe(
-        debounceTime(1000),
-        filter((evt) => !!evt.target),
-        map((target) => 'value' in target ? target.value as string : ''),      
-      );
+        .pipe(
+            debounceTime(1000),
+            filter((evt) => !!evt.target),
+            map((evt) => evt.target && 'value' in evt.target ? evt.target.value as string : ''),      
+        );
 
     const sentiment$ = merge(inputFeedback$, of(this.query()))
       .pipe(
-        switchMap((query) => {
-          this.isLoading.set(true);
-          this.error.set('');
-          return this.promptService.prompt(query)
-            .catch((e) => {
-              const errMsg = e instanceof Error ? e.message : 'Error in finding the sentiment.';
-              this.error.set(errMsg);
-              return 'error';
-            })  
-            .finally(() => this.isLoading.set(false));
-        }),
-      );
+            switchMap((query) => {
+                this.isLoading.set(true);
+                this.error.set('');
+                return this.sentimentService.detectSentimentAndLanguage(query)
+                    .then((result) => {
+                        this.sentimentLanguageEvaluated.emit(result);
+                        return result;
+                    })
+                    .catch((e: Error) => {
+                        this.error.set(e.message);
+                        return undefined;
+                    })  
+                    .finally(() => this.isLoading.set(false));
+            }));
     
-      this.sentiment = toSignal(sentiment$, { injector: this.injector, initialValue: '' });
-  }
+        this.sentiment = toSignal(sentiment$, { injector: this.injector, initialValue: undefined });
+    }
 
-  ngOnDestroy(): void {
-    this.promptService.destroySession();
-  }
+    ngOnDestroy(): void {
+        this.sentimentService.destroySessions();
+    }
 }
