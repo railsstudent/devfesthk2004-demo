@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { EnvironmentProviders, inject, makeEnvironmentProviders, PLATFORM_ID } from '@angular/core';
 import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
+import { PromptApiDefinitions } from '../interfaces/prompt-definitions.interface';
 
 export function provideLanguageModel(): EnvironmentProviders {
     return makeEnvironmentProviders([
@@ -13,7 +14,7 @@ export function provideLanguageModel(): EnvironmentProviders {
                     const ai = objWindow.ai as any;
                     const languageModel = ai.assistant || ai.languageModel;
                     if (languageModel) {
-                        return languageModel;
+                        return languageModel as PromptApiDefinitions;
                     }
                 }
                 return undefined;
