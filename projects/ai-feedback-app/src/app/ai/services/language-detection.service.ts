@@ -11,7 +11,7 @@ export class LanguageDetectionService  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
     #detector = signal<any | null>(null);
 
-    async detect(query: string): Promise<string | undefined> {
+    async detect(query: string): Promise<{ code: string; name: string } | undefined> {
         if (!this.#translationAPI) {
             throw new Error(TRANSLATION_ERROR_CODES.NO_API);
         }
@@ -30,7 +30,11 @@ export class LanguageDetectionService  {
             return undefined;
         }
 
-        return this.languageTagToHumanReadable(results[0].detectedLanguage);
+        const code = results[0].detectedLanguage;
+        return { 
+            code, 
+            name: this.languageTagToHumanReadable(code) 
+        };
     }
 
     private async createDetector() {

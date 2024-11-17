@@ -19,7 +19,8 @@ export class FeedbackSentimentService {
                 && languageResult.value) {
                 return {
                     sentiment: promptResult.value,
-                    language: languageResult.value,
+                    code: languageResult.value.code,
+                    language: languageResult.value.name,
                 }
             }
             return undefined

@@ -1,1 +1,5 @@
-export type SentimentLanguage = { sentiment: string, language: string };
+export type SentimentLanguage = { 
+    sentiment: string;
+    code: string;
+    language: string 
+};
