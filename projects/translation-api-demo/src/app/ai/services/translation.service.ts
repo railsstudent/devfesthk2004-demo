@@ -11,8 +11,6 @@ const TRANSKIT_LANGUAGES = ['en', 'es', 'ja', 'zh', 'zh-Hant', 'it', 'fr', 'zz']
 })
 export class TranslationService  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
-    #detector = signal<any | null>(null);
-    detector = this.#detector.asReadonly();
 
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePairAvailable[]> {
         if (!this.#translationAPI) {
