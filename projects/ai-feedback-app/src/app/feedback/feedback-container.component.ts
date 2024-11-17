@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FeedbackService } from './services/feedback.service';
+import { FeedbackSentimentComponent } from './components/feedback-sentiment.component';
 
 @Component({
-  selector: 'app-feedback-input',
+  selector: 'app-feedback-container',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, FeedbackSentimentComponent],
   template: `
+    <app-feedback-sentiment />
     <!-- <label class="label" for="input">Input customer feedback: </label>
     <textarea rows="8" id="input" name="input" [(ngModel)]="feedback"></textarea>
     <button (click)="submit()" [disabled]="buttonState().disabled">{{ buttonState().text }}</button>
@@ -46,7 +48,7 @@ import { FeedbackService } from './services/feedback.service';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeedbackInputComponent {
+export class FeedbackContainerComponent {
   feedbackService = inject(FeedbackService);
 
   feedback = signal('', { equal: () => false });

@@ -1,18 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { isPromptApiSupported } from './ai/utils/prompt-api-detection';
-import { FeedbackInputComponent } from './feedback/feedback-input.component';
+import { FeedbackContainerComponent } from './feedback/feedback-container.component';
 import { isTranslationApiSupported } from './ai/utils/translation-api-detection';
 
 @Component({
   selector: 'app-detect-ai',
   standalone: true,
-  imports: [FeedbackInputComponent],
+  imports: [FeedbackContainerComponent],
   template: `
     <div>
       @let errors = hasCapabilities();
       @if (!errors.length) {
-        <app-feedback-input />
+        <app-feedback-container />
       } @else if (errors.includes('unknown')) {
         <p>If you're on Chrome, join the Early Preview Program to enable it.</p>
       } @else {
