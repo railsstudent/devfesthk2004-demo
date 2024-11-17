@@ -5,6 +5,7 @@ import { debounceTime, filter, fromEvent, map, merge, of, switchMap } from 'rxjs
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
 import { SentimentLanguage } from '../types/sentiment-language.type';
+import { TranslationInput } from '../types/translation-input.type';
 
 @Component({
   selector: 'app-feedback-sentiment',
@@ -57,7 +58,7 @@ export class FeedbackSentimentComponent implements OnDestroy, OnInit {
   query = signal('La comida es buena y el servicio es excelente.');
   sentiment!: Signal<SentimentLanguage | undefined>;
 
-  sentimentLanguageEvaluated = output<{ code: string; query: string }>();
+  sentimentLanguageEvaluated = output<TranslationInput>();
 
   ngOnInit(): void {
     const inputFeedback$ = fromEvent(this.textArea().nativeElement, 'input')
@@ -77,6 +78,7 @@ export class FeedbackSentimentComponent implements OnDestroy, OnInit {
                         if (result) {
                           this.sentimentLanguageEvaluated.emit({
                             code: result.code,
+                            sentiment: result.sentiment,
                             query
                           });
                         }

@@ -9,7 +9,7 @@ import { TranslationInput } from './types/translation-input.type';
   standalone: true,
   imports: [FeedbackSentimentComponent, FeedbackTranslationComponent],
   template: `
-    <app-feedback-sentiment (sentimentLanguageEvaluated)="handleSentimentLanguage($event)" />
+    <app-feedback-sentiment (sentimentLanguageEvaluated)="translationInput.set($event)" />
     @if (translationInput()) {
       <app-feedback-translation [translationInput]="translationInput()" />
     }
@@ -18,9 +18,4 @@ import { TranslationInput } from './types/translation-input.type';
 })
 export class FeedbackContainerComponent {
   translationInput = signal<TranslationInput | undefined>(undefined);
-
-  handleSentimentLanguage(result: TranslationInput) {
-    this.translationInput.set(result);
-    console.log(result);
-  }
 }

@@ -1,4 +1,5 @@
 export type TranslationInput = { 
     code: string; 
-    query: string 
+    query: string;
+    sentiment: string;
 }
