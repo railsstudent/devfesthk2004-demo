@@ -17,7 +17,7 @@ const INITIAL_PROMPTS: LanguageInitialPrompt[] = [
 @Injectable({
   providedIn: 'root'
 })
-export class PromptService {
+export class NShotPromptService {
   #promptApi = inject(AI_PROMPT_API_TOKEN);
   #session = signal<any | null>(null);
   #controller = new AbortController();

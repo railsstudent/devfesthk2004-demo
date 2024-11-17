@@ -57,7 +57,7 @@ export class FeedbackSentimentComponent implements OnDestroy, OnInit {
   query = signal('La comida es buena y el servicio es excelente.');
   sentiment!: Signal<SentimentLanguage | undefined>;
 
-  sentimentLanguageEvaluated = output<SentimentLanguage  | undefined>();
+  sentimentLanguageEvaluated = output<{ code: string; query: string }>();
 
   ngOnInit(): void {
     const inputFeedback$ = fromEvent(this.textArea().nativeElement, 'input')
@@ -74,20 +74,23 @@ export class FeedbackSentimentComponent implements OnDestroy, OnInit {
                 this.error.set('');
                 return this.sentimentService.detectSentimentAndLanguage(query)
                     .then((result) => {
-                        this.sentimentLanguageEvaluated.emit(result);
+                        if (result) {
+                          this.sentimentLanguageEvaluated.emit({
+                            code: result.code,
+                            query
+                          });
+                        }
                         return result;
-                    })
-                    .catch((e: Error) => {
-                        this.error.set(e.message);
-                        return undefined;
-                    })  
-                    .finally(() => this.isLoading.set(false));
+                    }).catch((e: Error) => {
+                      this.error.set(e.message);
+                      return undefined;
+                    }).finally(() => this.isLoading.set(false));
             }));
     
         this.sentiment = toSignal(sentiment$, { injector: this.injector, initialValue: undefined });
     }
 
     ngOnDestroy(): void {
-        this.sentimentService.destroySessions();
+      this.sentimentService.destroySessions();
     }
 }

@@ -1,17 +1,14 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
 import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { TRANSLATION_ERROR_CODES } from '../enums/translation-error-codes.enum';
 import { LanguagePair } from '../types/language-pair.type';
-
-const TRANSKIT_LANGUAGES = ['en', 'es', 'zh-Hant'];
 
 @Injectable({
   providedIn: 'root'
 })
 export class TranslationService  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
-    #detector = signal<any | null>(null);
     
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePair[]> {
         if (!this.#translationAPI) {
@@ -19,13 +16,12 @@ export class TranslationService  {
         }
 
         const results: LanguagePair[] = [];
-        for (const targetLanguage of TRANSKIT_LANGUAGES) {
-            if (sourceLanguage !== targetLanguage) {
-                const pair = { sourceLanguage, targetLanguage }
-                const available = await this.#translationAPI.canTranslate(pair);
-                if (available !== CAPABILITIES_AVAILABLE.NO) {
-                    results.push(pair);
-                }
+        const targetLanguage = 'en';
+        if (sourceLanguage !== targetLanguage) {
+            const pair = { sourceLanguage, targetLanguage }
+            const available = await this.#translationAPI.canTranslate(pair);
+            if (available !== CAPABILITIES_AVAILABLE.NO) {
+                results.push(pair);
             }
         }
 

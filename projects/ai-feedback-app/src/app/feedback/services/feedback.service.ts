@@ -1,12 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { FeedbackType } from '../types/feedback-state.type';
-import { PromptService } from '../../ai/services/prompt.service';
+import { NShotPromptService } from '../../ai/services/n-shot-prompt.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FeedbackService {
-  promptService = inject(PromptService);
+  promptService = inject(NShotPromptService);
 
   state = signal<FeedbackType>({
     language: '',

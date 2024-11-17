@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { PromptService } from '../../ai/services/prompt.service';
+import { NShotPromptService } from '../../ai/services/n-shot-prompt.service';
 import { LanguageDetectionService } from '../../ai/services/language-detection.service';
 import { SentimentLanguage } from '../types/sentiment-language.type';
 
@@ -7,7 +7,7 @@ import { SentimentLanguage } from '../types/sentiment-language.type';
     providedIn: 'root'
 })
 export class FeedbackSentimentService {
-    promptService = inject(PromptService);
+    promptService = inject(NShotPromptService);
     languageDetectionService = inject(LanguageDetectionService);
 
     detectSentimentAndLanguage(query: string): Promise<SentimentLanguage | undefined> {
