@@ -32,6 +32,7 @@ export class SystemPromptService {
 
     const responsePrompt = `
       The customer wrote a ${sentiment} feedback. Please draft the response in one paragraph, 200 words max.
+      The response must be in formal English and do not use contractions such as "We're" and "I'm".
       Feedback: ${query} 
     `;
 

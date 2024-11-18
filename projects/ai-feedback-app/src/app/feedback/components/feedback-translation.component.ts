@@ -28,12 +28,12 @@ import { ResponseWriterComponent } from './response-writer.component';
           <p><span class="label">Original text: </span> {{ originalText() }}</p>
         </div>
       }
-      <app-response-writer [feedback]="feedback()" [sentiment]="translationInput()?.sentiment || ''"  />
+      <app-response-writer [translationInput]="writerInput()"  />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeedbackTranslationComponent {
-  translationInput = input.required<TranslationInput | undefined>();
+  translationInput = input.required<TranslationInput>();
   translationService = inject(FeedbackTranslationService);
   translation = signal('');
   isLoading = signal(false);
@@ -44,6 +44,13 @@ export class FeedbackTranslationComponent {
 
   originalText = computed(() => this.translationInput()?.query || '');
   feedback = computed(() => this.languagePairs().length ? this.translation() : this.originalText());
+  writerInput = computed<TranslationInput>(() => {
+    return {
+      code: this.translationInput().code, 
+      query: this.feedback(),
+      sentiment: this.translationInput().sentiment,
+    }
+  })
 
   async translate(pair: LanguagePair) {
     try {

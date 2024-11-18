@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FeedbackSentimentComponent } from './components/feedback-sentiment.component';
 import { FeedbackTranslationComponent } from './components/feedback-translation.component';
 import { TranslationInput } from './types/translation-input.type';
@@ -10,8 +9,9 @@ import { TranslationInput } from './types/translation-input.type';
   imports: [FeedbackSentimentComponent, FeedbackTranslationComponent],
   template: `
     <app-feedback-sentiment (sentimentLanguageEvaluated)="translationInput.set($event)" />
-    @if (translationInput()) {
-      <app-feedback-translation [translationInput]="translationInput()" />
+    @let input = translationInput();
+    @if (input) {
+      <app-feedback-translation [translationInput]="input" />
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
