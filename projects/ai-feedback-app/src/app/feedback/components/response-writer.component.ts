@@ -70,7 +70,8 @@ export class ResponseWriterComponent implements OnDestroy {
     }
 
     fakeSubmit() {
-        alert('Submit ' + this.stringifyDraft() + " to the backend.");
+        const stringifyDraft = JSON.stringify(this.isNonEnglish() ? this.translatedDraft() : this.draft());
+        alert('Submit ' + stringifyDraft + " to the backend.");
     }
 
     ngOnDestroy(): void {
