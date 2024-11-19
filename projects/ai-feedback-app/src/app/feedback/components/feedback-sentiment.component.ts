@@ -6,24 +6,21 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
 import { SentimentLanguage } from '../types/sentiment-language.type';
 import { TranslationInput } from '../types/translation-input.type';
-import { ErrorComponent } from './error.component';
+import { FeedbackErrorComponent } from './feedback-error.component';
+import { FeedbackLoadingComponent } from './feeback-loading.componen';
 
 @Component({
   selector: 'app-feedback-sentiment',
   standalone: true,
-  imports: [FormsModule, LineBreakPipe, ErrorComponent],
+  imports: [FormsModule, LineBreakPipe, FeedbackErrorComponent, FeedbackLoadingComponent],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Customer's Feedback</h3>
-      @let isLoading = this.isLoading();
-      @let status = isLoading ? 'Processing...' : 'Idle';
-      <div>
-        <span class="label">Status: </span><span>{{ status }}</span>
-      </div>
+      <app-feedback-loading [isLoading]="isLoading()">Processing</app-feedback-loading>
       <div>
         <span class="label" for="input">Input: </span>
         <textarea id="input" name="input" rows="5"  
-          [(ngModel)]="query" [disabled]="isLoading" #inputFeedback></textarea>
+          [(ngModel)]="query" [disabled]="isLoading()" #inputFeedback></textarea>
       </div>
       @let data = sentiment();
       @if (data) {

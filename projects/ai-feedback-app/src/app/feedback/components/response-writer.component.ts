@@ -3,28 +3,25 @@ import { FormsModule } from '@angular/forms';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { ResponseWriterService } from '../services/response-writer.service';
 import { TranslationInput } from '../types/translation-input.type';
-import { ErrorComponent } from './error.component';
+import { FeedbackErrorComponent } from './feedback-error.component';
+import { FeedbackLoadingComponent } from './feeback-loading.componen';
 
 @Component({
   selector: 'app-response-writer',
   standalone: true,
-  imports: [FormsModule, LineBreakPipe, ErrorComponent],
+  imports: [FormsModule, LineBreakPipe, FeedbackErrorComponent, FeedbackLoadingComponent],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Write a response</h3>
       @let disabled = isLoading() || feedback() === '' || sentiment() === '';
       @let disableSubmit = isLoading() || draft().trim() === '';
-      @if (isLoading()) {
-        <div>
-            <span class="label">Status: </span><span>Generating...</span>
-        </div>
-      }
+      <app-feedback-loading [isLoading]="isLoading()">Generating...</app-feedback-loading>
       <div style="margin-bottom: 0.5rem;">
         <textarea id="input" name="input" rows="7" [(ngModel)]="draft" [disabled]="isLoading()" #response></textarea>
         <button style="margin-right: 0.5rem;" (click)="generateDraft()" [disabled]="disabled">Generate a draft</button>
         <button [disabled]="disableSubmit" (click)="fakeSubmit()">Fake submit</button>
       </div>
-      @if (isNonEnglish()) {
+      @if (isNonEnglish() && translatedDraft()) {
         <div>
             <h3>Translate back to original language</h3>
             <p [innerHTML]="translatedDraft() | lineBreak"></p>
