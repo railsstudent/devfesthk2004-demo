@@ -51,7 +51,7 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
 
   sentimentLanguageEvaluated = output<TranslationInput>();
 
-  sentiment$ = merge(toObservable(this.query).pipe(debounceTime(1000)), of(this.query()))
+  private sentiment$ = merge(toObservable(this.query).pipe(debounceTime(1000)), of(this.query()))
     .pipe(
       switchMap((query) => {
         this.isLoading.set(true);
@@ -70,7 +70,7 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
               this.error.set(e.message);
               return undefined;
             }).finally(() => this.isLoading.set(false));
-    }));
+      }));
   sentiment = toSignal(this.sentiment$, { injector: this.injector, initialValue: undefined });
 
   ngOnDestroy(): void {
