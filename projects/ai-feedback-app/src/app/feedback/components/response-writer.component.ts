@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, Injector, input, OnDestroy, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { ResponseWriterService } from '../services/response-writer.service';
 import { TranslationInput } from '../types/translation-input.type';
-import { FeedbackErrorComponent } from './feedback-error.component';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
+import { FeedbackErrorComponent } from './feedback-error.component';
 
 @Component({
   selector: 'app-response-writer',
@@ -17,7 +17,7 @@ import { FeedbackLoadingComponent } from './feeback-loading.componen';
       @let disableSubmit = isLoading() || draft().trim() === '';
       <app-feedback-loading [isLoading]="isLoading()">Generating...</app-feedback-loading>
       <div style="margin-bottom: 0.5rem;">
-        <textarea id="input" name="input" rows="7" [(ngModel)]="draft" [disabled]="isLoading()" #response></textarea>
+        <textarea id="input" name="input" rows="7" [(ngModel)]="draft" [disabled]="isLoading()"></textarea>
         <button style="margin-right: 0.5rem;" (click)="generateDraft()" [disabled]="disabled">Generate a draft</button>
         <button [disabled]="disableSubmit" (click)="fakeSubmit()">Fake submit</button>
       </div>
@@ -39,9 +39,6 @@ export class ResponseWriterComponent implements OnDestroy {
       }) 
     });
     writerService = inject(ResponseWriterService);
-    injector = inject(Injector);
-
-    textArea = viewChild.required<ElementRef<HTMLTextAreaElement>>('response');
 
     isLoading = signal(false);
     error = signal('');
@@ -51,7 +48,6 @@ export class ResponseWriterComponent implements OnDestroy {
     feedback = computed(() => this.translationInput().query.trim());
     sentiment = computed(() => this.translationInput().sentiment);
     isNonEnglish = computed(() => this.translationInput().code !== 'en');
-    stringifyDraft = computed(() => JSON.stringify(this.isNonEnglish() ? this.translatedDraft() : this.draft()));
     
     async generateDraft() {
         try {

@@ -1,13 +1,12 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, Injector, OnDestroy, OnInit, output, Signal, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, Injector, OnDestroy, output, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, filter, fromEvent, map, merge, of, switchMap } from 'rxjs';
+import { debounceTime, merge, of, switchMap } from 'rxjs';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
-import { SentimentLanguage } from '../types/sentiment-language.type';
 import { TranslationInput } from '../types/translation-input.type';
-import { FeedbackErrorComponent } from './feedback-error.component';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
+import { FeedbackErrorComponent } from './feedback-error.component';
 
 @Component({
   selector: 'app-feedback-sentiment',
@@ -19,8 +18,7 @@ import { FeedbackLoadingComponent } from './feeback-loading.componen';
       <app-feedback-loading [isLoading]="isLoading()">Processing</app-feedback-loading>
       <div>
         <span class="label" for="input">Input: </span>
-        <textarea id="input" name="input" rows="5"  
-          [(ngModel)]="query" [disabled]="isLoading()" #inputFeedback></textarea>
+        <textarea id="input" name="input" rows="5" [(ngModel)]="query" [disabled]="isLoading()"></textarea>
       </div>
       @let data = sentiment();
       @if (data) {
@@ -40,11 +38,9 @@ import { FeedbackLoadingComponent } from './feeback-loading.componen';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeedbackSentimentComponent implements OnDestroy, OnInit {
+export class FeedbackSentimentComponent implements OnDestroy {
   sentimentService = inject(FeedbackSentimentService);
   injector = inject(Injector);
-
-  textArea = viewChild.required<ElementRef<HTMLTextAreaElement>>('inputFeedback');
 
   isLoading = signal(false);
   error = signal('');
@@ -52,43 +48,32 @@ export class FeedbackSentimentComponent implements OnDestroy, OnInit {
 Mientras servía nuestra bebida, derramó el líquido sobre mi abrigo y ni siquiera ofreció papel toalla para secarlo. Me pareció una falta total de atención al cliente.
 Por si fuera poco, el baño estaba en condiciones horribles: olía mal y no había papel higiénico en la cabina.
 En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la limpieza son aspectos que definitivamente necesitan mejorar. No volveré.`);
-  sentiment!: Signal<SentimentLanguage | undefined>;
 
   sentimentLanguageEvaluated = output<TranslationInput>();
 
-  ngOnInit(): void {
-    const inputFeedback$ = fromEvent(this.textArea().nativeElement, 'input')
-        .pipe(
-            debounceTime(1000),
-            filter((evt) => !!evt.target),
-            map((evt) => evt.target && 'value' in evt.target ? evt.target.value as string : ''),      
-        );
+  sentiment$ = merge(toObservable(this.query).pipe(debounceTime(1000)), of(this.query()))
+    .pipe(
+      switchMap((query) => {
+        this.isLoading.set(true);
+        this.error.set('');
+        return this.sentimentService.detectSentimentAndLanguage(query)
+            .then((result) => {
+                if (result) {
+                  this.sentimentLanguageEvaluated.emit({
+                    code: result.code,
+                    sentiment: result.sentiment,
+                    query
+                  });
+                }
+                return result;
+            }).catch((e: Error) => {
+              this.error.set(e.message);
+              return undefined;
+            }).finally(() => this.isLoading.set(false));
+    }));
+  sentiment = toSignal(this.sentiment$, { injector: this.injector, initialValue: undefined });
 
-    const sentiment$ = merge(inputFeedback$, of(this.query()))
-      .pipe(
-            switchMap((query) => {
-                this.isLoading.set(true);
-                this.error.set('');
-                return this.sentimentService.detectSentimentAndLanguage(query)
-                    .then((result) => {
-                        if (result) {
-                          this.sentimentLanguageEvaluated.emit({
-                            code: result.code,
-                            sentiment: result.sentiment,
-                            query
-                          });
-                        }
-                        return result;
-                    }).catch((e: Error) => {
-                      this.error.set(e.message);
-                      return undefined;
-                    }).finally(() => this.isLoading.set(false));
-            }));
-    
-        this.sentiment = toSignal(sentiment$, { injector: this.injector, initialValue: undefined });
-    }
-
-    ngOnDestroy(): void {
-      this.sentimentService.destroySessions();
-    }
+  ngOnDestroy(): void {
+    this.sentimentService.destroySessions();
+  }
 }
