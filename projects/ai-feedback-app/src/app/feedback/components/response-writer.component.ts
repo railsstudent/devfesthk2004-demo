@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, Injector, input, OnDestroy, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
-import { FeedbackTranslationService } from '../services/feedback-translation.service';
 import { ResponseWriterService } from '../services/response-writer.service';
 import { TranslationInput } from '../types/translation-input.type';
+import { ErrorComponent } from './error.component';
 
 @Component({
   selector: 'app-response-writer',
   standalone: true,
-  imports: [FormsModule, LineBreakPipe],
+  imports: [FormsModule, LineBreakPipe, ErrorComponent],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Write a response</h3>
@@ -25,25 +25,23 @@ import { TranslationInput } from '../types/translation-input.type';
         <button [disabled]="disableSubmit" (click)="fakeSubmit()">Fake submit</button>
       </div>
       @if (isNonEnglish()) {
-      <div>
+        <div>
             <h3>Translate back to original language</h3>
             <p [innerHTML]="translatedDraft() | lineBreak"></p>
-      </div>
-      }
-      @if (error()) {
-        <div>
-          <span class="label">Error: </span>
-          <p>{{ error() }}</p>
         </div>
       }
+      <app-feedback-error [error]="error()" />
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResponseWriterComponent implements OnDestroy {
-    translationInput = input.required<TranslationInput>();
+    translationInput = input.required<TranslationInput, TranslationInput>({ transform: (x) => ({ 
+        ...x,
+        query: x.query.trim(),
+      }) 
+    });
     writerService = inject(ResponseWriterService);
-    translationService = inject(FeedbackTranslationService);
     injector = inject(Injector);
 
     textArea = viewChild.required<ElementRef<HTMLTextAreaElement>>('response');
@@ -62,15 +60,11 @@ export class ResponseWriterComponent implements OnDestroy {
         try {
             this.isLoading.set(true);
             this.error.set('');
-            const text = await this.writerService.generateDraft(this.feedback(), this.sentiment());
-            this.draft.set(text);
-            if (this.isNonEnglish()) {
-                const translation = await this.translationService.translate(text, {
-                    sourceLanguage: 'en',
-                    targetLanguage: this.translationInput().code
-                });
-                this.translatedDraft.set(translation);
-            }
+            this.draft.set('');
+            this.translatedDraft.set('');
+            const { firstDraft, translation = '' } = await this.writerService.generateDraft(this.translationInput());
+            this.draft.set(firstDraft);
+            this.translatedDraft.set(translation);
         } catch (e) {
             this.error.set((e as Error).message);
         } finally {

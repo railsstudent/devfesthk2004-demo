@@ -6,11 +6,12 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
 import { SentimentLanguage } from '../types/sentiment-language.type';
 import { TranslationInput } from '../types/translation-input.type';
+import { ErrorComponent } from './error.component';
 
 @Component({
   selector: 'app-feedback-sentiment',
   standalone: true,
-  imports: [FormsModule, LineBreakPipe],
+  imports: [FormsModule, LineBreakPipe, ErrorComponent],
   template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Customer's Feedback</h3>
@@ -21,7 +22,7 @@ import { TranslationInput } from '../types/translation-input.type';
       </div>
       <div>
         <span class="label" for="input">Input: </span>
-        <textarea id="input" name="input" rows="3"  
+        <textarea id="input" name="input" rows="5"  
           [(ngModel)]="query" [disabled]="isLoading" #inputFeedback></textarea>
       </div>
       @let data = sentiment();
@@ -37,12 +38,7 @@ import { TranslationInput } from '../types/translation-input.type';
             </p>
         </div>
       }
-      @if (error()) {
-        <div>
-          <span class="label">Error: </span>
-          <p>{{ error() }}</p>
-        </div>
-      }
+      <app-feedback-error [error]="error()" />
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -55,7 +51,10 @@ export class FeedbackSentimentComponent implements OnDestroy, OnInit {
 
   isLoading = signal(false);
   error = signal('');
-  query = signal('La comida es buena y el servicio es excelente.');
+  query = signal(`Tuve una experiencia muy mala en este restaurante. La comida llegó fría, lo cual fue decepcionante. Además, el camarero fue grosero durante toda la cena, lo que hizo que la situación fuera aún más incómoda.
+Mientras servía nuestra bebida, derramó el líquido sobre mi abrigo y ni siquiera ofreció papel toalla para secarlo. Me pareció una falta total de atención al cliente.
+Por si fuera poco, el baño estaba en condiciones horribles: olía mal y no había papel higiénico en la cabina.
+En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la limpieza son aspectos que definitivamente necesitan mejorar. No volveré.`);
   sentiment!: Signal<SentimentLanguage | undefined>;
 
   sentimentLanguageEvaluated = output<TranslationInput>();
