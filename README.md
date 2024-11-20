@@ -10,6 +10,9 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 - https://railsstudent.github.io/devfesthk2004-demo/translation-api-demo/
 
+- https://railsstudent.github.io/devfesthk2004-demo/summarization-api-demo/
+
+- https://railsstudent.github.io/devfesthk2004-demo/ai-feedback-app/
 
 ## Development server
 
