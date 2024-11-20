@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, resource, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { debounceTime } from 'rxjs';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
-import { ResponseWriterService } from '../services/response-writer.service';
+import { ENGLISH_CODE, ResponseWriterService } from '../services/response-writer.service';
 import { TranslationInput } from '../types/translation-input.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { FeedbackErrorComponent } from './feedback-error.component';
@@ -23,10 +25,11 @@ const transformTranslationInput = (x: TranslationInput) => ({ ...x, query: x.que
         <button style="margin-right: 0.5rem;" (click)="generateDraft()" [disabled]="disabled">Generate a draft</button>
         <button [disabled]="disableSubmit" (click)="fakeSubmit()">Fake submit</button>
       </div>
-      @if (isNonEnglish() && translatedDraft()) {
+      @let translatedDraftValue = translatedDraft.value();
+      @if (isNonEnglish() && translatedDraftValue) {
         <div>
             <h3>Translate back to original language</h3>
-            <p [innerHTML]="translatedDraft() | lineBreak"></p>
+            <p [innerHTML]="translatedDraftValue | lineBreak"></p>
         </div>
       }
       <app-feedback-error [error]="error()" />
@@ -41,10 +44,17 @@ export class ResponseWriterComponent implements OnDestroy {
     isLoading = signal(false);
     error = signal('');
     draft = signal('');
-    translatedDraft = signal('');
+    debounceDraft = toSignal(toObservable(this.draft).pipe(debounceTime(1000)), { initialValue: '' });
 
-    isNonEnglish = computed(() => this.translationInput().code !== 'en');
-    
+    translatedDraft = resource({
+      request: () => this.debounceDraft(),
+      loader: ({ request: draft, abortSignal }) => {
+        return this.writerService.translateDraft(draft, this.translationInput().code);
+      } 
+    });
+
+    isNonEnglish = computed(() => this.translationInput().code !== ENGLISH_CODE);
+  
     async generateDraft() {
         try {
             this.isLoading.set(true);
@@ -62,7 +72,7 @@ export class ResponseWriterComponent implements OnDestroy {
     }
 
     fakeSubmit() {
-        const stringifyDraft = JSON.stringify(this.isNonEnglish() ? this.translatedDraft() : this.draft());
+        const stringifyDraft = JSON.stringify(this.isNonEnglish() ? this.translatedDraft.value() : this.draft());
         alert('Submit ' + stringifyDraft + " to the backend.");
     }
 
