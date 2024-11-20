@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { SystemPromptService } from '../../ai/services/system-prompts.service';
-import { FeedbackTranslationService } from './feedback-translation.service';
 import { TranslationInput } from '../types/translation-input.type';
+import { FeedbackTranslationService } from './feedback-translation.service';
 
 export const ENGLISH_CODE = 'en';
 
