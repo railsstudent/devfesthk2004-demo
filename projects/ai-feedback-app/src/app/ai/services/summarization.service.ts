@@ -18,8 +18,6 @@ enum ERROR_CODES {
 export class SummarizationService {
     #summarizationApi = inject(AI_SUMMARIZATION_API_TOKEN);
     #abortController = new AbortController();
-    #summary = signal<string>('');
-    summary = this.#summary.asReadonly();
     languageDetectionService = inject(LanguageDetectionService);
 
     private validateAndReturnApi() {
@@ -48,8 +46,6 @@ export class SummarizationService {
     }
     
     async summarize(options: AISummarizerCreateOptions, text: string) {
-        this.#summary.set('');
-
         const languageDected = await this.languageDetectionService.detect(text);
         if (!languageDected) {
             throw new Error('Failed to detect the language of the text.');
@@ -69,8 +65,8 @@ export class SummarizationService {
         const session = await this.initSession({ ...options, signal: this.#abortController.signal });        
         const result = await session.summarize(text);
 
-        this.#summary.set(result);
         session.destroy();
+        return result;
     }
 
     private async validateCreateOptionsNew(options: AISummarizerCreateOptions, capabilities: CapabilitiesApi) {

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Injector, input, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { filter, switchMap } from 'rxjs';
 import { LanguagePair } from '../../ai/types/language-pair.type';
 import { FeedbackTranslationService } from '../services/feedback-translation.service';
 import { TranslationInput } from '../types/translation-input.type';
@@ -19,15 +20,11 @@ import { ResponseWriterComponent } from './response-writer.component';
         }
       </div>
 
-      @if (languagePairs().length) {
-        <div style="margin-bottom: 0.5rem;">
-          <p><span class="label">Translation: </span> {{ translation() }}</p>
-        </div>
-      } @else {
-        <div>
-          <p><span class="label">Original text: </span> {{ originalText() }}</p>
-        </div>
-      }
+      @let labelText = this.languagePairs().length ? 'Translation: ' : 'Original Text: ';
+      <div style="margin-bottom: 0.5rem;">
+        <p><span class="label">{{ labelText }}</span> {{ feedback() }}</p>
+        <p><span class="label">Summary: </span> {{ summary() }}</p>
+      </div>
       <app-response-writer [translationInput]="writerInput()"  />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -51,6 +48,13 @@ export class FeedbackTranslationComponent {
       sentiment: this.translationInput().sentiment,
     }
   })
+
+  summary = toSignal(toObservable(this.feedback)
+    .pipe(
+      filter((value) => !!value),
+      switchMap((value: string) => this.translationService.summarize(value))
+    ), { initialValue: '' }
+  );
 
   async translate(pair: LanguagePair) {
     try {
