@@ -28,6 +28,12 @@ ng serve --project=language-detector-demo
 
 // Translation API Demo
 ng serve --project=translation-api-demo
+
+// Summarization API Demo
+ng serve --project=summarization-api-demo
+
+// AI Feedback Demo
+ng serve --project=ai-feedback-app
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
