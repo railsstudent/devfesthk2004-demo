@@ -44,14 +44,19 @@ export class SummarizationService {
         const capabilities = await this.initCapabilities();
         return capabilities.languageAvailable(languageFlag);
     }
-    
-    async summarize(options: AISummarizerCreateOptions, text: string) {
+
+    async canSummarize(text: string): Promise<boolean> {
         const languageDected = await this.languageDetectionService.detect(text);
         if (!languageDected) {
             throw new Error('Failed to detect the language of the text.');
         }
 
-        if (!(await this.languageAvailable(languageDected.code))) {
+        const availableStatus = await this.languageAvailable(languageDected.code);
+        return availableStatus === CAPABILITIES_AVAILABLE.READILY;
+    }
+    
+    async summarize(options: AISummarizerCreateOptions, text: string) {
+        if (!this.canSummarize(text)) {
             throw new Error('The summarization API does not support the language of the text.');
         }
 

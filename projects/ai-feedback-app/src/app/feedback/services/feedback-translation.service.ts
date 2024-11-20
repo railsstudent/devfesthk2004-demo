@@ -1,11 +1,11 @@
 import { inject, Injectable, Injector, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, switchMap } from 'rxjs';
+import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../../ai/enums/summarizer-capabilities-options.enum';
+import { SummarizationService } from '../../ai/services/summarization.service';
 import { TranslationService } from '../../ai/services/translation.service';
 import { LanguagePair } from '../../ai/types/language-pair.type';
 import { TranslationInput } from './../types/translation-input.type';
-import { SummarizationService } from '../../ai/services/summarization.service';
-import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../../ai/enums/summarizer-capabilities-options.enum';
 
 @Injectable({
     providedIn: 'root'
@@ -37,17 +37,22 @@ export class FeedbackTranslationService {
         }
     }
 
+    async canSummarize(query: string): Promise<boolean> {
+        return this.#summarizationService.canSummarize(query);
+    }
+
     async summarize(query: string): Promise<string> {
         try {
             if (!query) {
                 return '';
             }
 
-            const sharedContext = `You are an expert that can summarize a customer's feedback`;
+            const sharedContext = `You are an expert that can summarize a customer's feedback. 
+            If the text is not in English, please return a blank string.`;
             return await this.#summarizationService.summarize({
-                type: AISummarizerType.TLDR,
+                type: AISummarizerType.HEADLINE,
                 format: AISummarizerFormat.PLAIN_TEXT,
-                length: AISummarizerLength.MEDIUM,
+                length: AISummarizerLength.SHORT,
                 sharedContext,
             }, query);
         } catch (e) {
