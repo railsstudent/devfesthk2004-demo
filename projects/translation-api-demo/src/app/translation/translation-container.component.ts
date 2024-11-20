@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TranslationService } from '../ai/services/translation.service';
-import { LanguagePair, LanguagePairAvailable } from '../ai/types/language-pair.type';
+import { LanguagePairAvailable } from '../ai/types/language-pair.type';
 import { LanguageDetectionComponent } from './components/language-detection.component';
 import { TranslateTextComponent } from './components/translate-text.component';
 import { AllowTranslation } from './types/allow-translation.type';
