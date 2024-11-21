@@ -5,7 +5,7 @@ import { getChromVersion, isChromeBrowser } from './user-agent-data';
 
 const CHROME_VERSION = 129
 
-async function checkChromeBuiltInAI(): Promise<string> {
+async function checkChromeSummarizationApi(): Promise<string> {
    if (!isChromeBrowser()) {
       throw new Error('Your browser is not supported. Please use Google Chrome Dev or Canary.');
    }
@@ -32,7 +32,7 @@ async function checkChromeBuiltInAI(): Promise<string> {
 }
 
 export function isSummarizationAPISupported(): Observable<string> {
-   return from(checkChromeBuiltInAI()).pipe(
+   return from(checkChromeSummarizationApi()).pipe(
       catchError(
          (e) => {
             console.error(e);
