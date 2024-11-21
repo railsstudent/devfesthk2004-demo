@@ -5,7 +5,6 @@ import { LanguageAvailable } from '../ai/types/language-available.type';
 import { LanguageDetectionWithNameResult } from '../ai/types/language-detection-result.type';
 import { LanguageAvailabledComponent } from './components/language-available.component';
 import { LanguageDetectionResultComponent } from './components/language-detection-result.component';
-import { CAPABILITIES_AVAILABLE } from '../ai/enums/capabilities-available.enum';
 
 @Component({
   selector: 'app-language-detection',
@@ -40,7 +39,7 @@ export class LanguageDetectionComponent {
   capabilities = this.service.capabilities;
   detector = this.service.detector;
 
-  isUnavailable = computed(() => !this.capabilities() || this.capabilities().available !== CAPABILITIES_AVAILABLE.READILY);
+  isUnavailable = computed(() => !this.capabilities() || this.capabilities()?.available !== 'readily');
   isDisableDetectLanguage = computed(() => this.isUnavailable() || !this.detector() || this.inputText().trim() === '');
 
   async setup() {
@@ -49,7 +48,7 @@ export class LanguageDetectionComponent {
     const languages = this.languagesAvailable().map(({ code }) => ({
       code,
       name: this.service.languageTagToHumanReadable(code),
-      available: this.capabilities().languageAvailable(code),
+      available: this.capabilities()?.languageAvailable(code) || 'no',
     }));
     this.languagesAvailable.set(languages);
   }
@@ -60,7 +59,7 @@ export class LanguageDetectionComponent {
     const languages = this.languagesAvailable().map(({ code }) => ({
       code,
       name: this.service.languageTagToHumanReadable(code),
-      available: 'no',
+      available: 'no' as AICapabilityAvailability,
     }));
     this.languagesAvailable.set(languages);
   }

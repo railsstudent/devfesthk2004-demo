@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { AI_LANGUAGE_DETECTION_API_TOKEN } from '../constants/core.constant';
+import { AI_LANGUAGE_DETECTION_API_TOKEN, AILanguageDetectorCapabilities } from '../constants/core.constant';
 import { LanguageDetectionResult, LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 
 const MAX_LANGUAGE_RESULTS = 111;
@@ -13,7 +13,7 @@ export class LanguageDetectionService  {
     #languageDetectionAPI = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
     #detector = signal<any | null>(null);
     detector = this.#detector.asReadonly();
-    #capabilities = signal<any | null>(null);
+    #capabilities = signal<AILanguageDetectorCapabilities | null>(null);
     capabilities = this.#capabilities.asReadonly();
 
     async createCapabilities() {
