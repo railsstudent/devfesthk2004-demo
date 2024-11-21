@@ -18,7 +18,7 @@ const INITIAL_PROMPTS: LanguageInitialPrompt = [
 })
 export class NShotPromptService {
   #promptApi = inject(AI_PROMPT_API_TOKEN);
-  #session = signal<any | null>(null);
+  #session = signal<AILanguageModel | undefined>(undefined);
   #controller = new AbortController();
   
   private async createSession(initialPrompts: LanguageInitialPrompt) {
@@ -48,9 +48,9 @@ export class NShotPromptService {
   destroySession() {
       const session = this.#session();
 
-      if (session && session.destroy) {
-          session.destroy();
-          this.#session.set(null);
+      if (session) {
+        session.destroy();
+        this.#session.set(undefined);
       }
   }
 }

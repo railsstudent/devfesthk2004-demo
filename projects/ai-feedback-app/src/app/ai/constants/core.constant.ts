@@ -6,3 +6,5 @@ export const AI_PROMPT_API_TOKEN = new InjectionToken<AILanguageModelFactory | u
 export const AI_TRANSLATION_API_TOKEN = new InjectionToken<TranslationApi>('AI_TRANSLATION_API_TOKEN');
 
 export const AI_SUMMARIZATION_API_TOKEN = new InjectionToken<AISummarizerFactory | undefined>('AI_SUMMARIZATION_API_TOKEN');
+
+export const AI_WRITER_API_TOKEN = new InjectionToken<AIWriterFactory | undefined>('AI_WRITER_API_TOKEN');

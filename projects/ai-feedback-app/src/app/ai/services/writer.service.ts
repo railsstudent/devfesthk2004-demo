@@ -1,28 +1,28 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
+import { AI_WRITER_API_TOKEN } from '../constants/core.constant';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SystemPromptService {
-  #promptApi = inject(AI_PROMPT_API_TOKEN);
-  #session = signal<any | null>(null);
+export class WriterService {
+  #writerApi = inject(AI_WRITER_API_TOKEN);
+  #session = signal<AIWriter | undefined>(undefined);
   #controller = new AbortController();
 
-  private async createSession(systemPrompt: string) {
+  private async createSession(options?: AIWriterCreateOptions) {
     this.destroySession();
     
-    const newSession = await this.#promptApi?.create({ systemPrompt, signal: this.#controller.signal });
+    const newSession = await this.#writerApi?.create({ ...options, signal: this.#controller.signal });
     this.#session.set(newSession);
   }
 
-  async prompt(query: string, sentiment: string): Promise<string> {
-    if (!this.#promptApi) {
+  async generateDraft(query: string, sentiment: string): Promise<string> {
+    if (!this.#writerApi) {
       throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
     }
 
     if (!this.#session()) {
-      await this.createSession('You are a professional writer who drafts a response for feedback in English.');
+      await this.createSession({ sharedContext: 'You are a professional public relation who drafts a response for feedback in English.' });
     }
 
     const session = this.#session();
@@ -36,15 +36,15 @@ export class SystemPromptService {
       Feedback: ${query} 
     `;
 
-    return session.prompt(responsePrompt);
+    return session.write(responsePrompt);
   }
 
   destroySession() {
     const session = this.#session();
 
-    if (session && session.destroy) {
+    if (session) {
         session.destroy();
-        this.#session.set(null);
+        this.#session.set(undefined);
     }
   }
 }

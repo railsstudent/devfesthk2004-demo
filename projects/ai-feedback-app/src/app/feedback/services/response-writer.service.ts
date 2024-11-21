@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { SystemPromptService } from '../../ai/services/system-prompts.service';
+import { WriterService } from '../../ai/services/writer.service';
 import { TranslationInput } from '../types/translation-input.type';
 import { FeedbackTranslationService } from './feedback-translation.service';
 
@@ -9,12 +9,12 @@ export const ENGLISH_CODE = 'en';
     providedIn: 'root'
 })
 export class ResponseWriterService {
-    #promptService = inject(SystemPromptService);
+    #writerService = inject(WriterService);
     #translationService = inject(FeedbackTranslationService);
 
     async generateDraft({ query, sentiment, code } : TranslationInput): Promise<{ firstDraft: string, translation?: string }> {
         try {
-            const firstDraft = await this.#promptService.prompt(query, sentiment);
+            const firstDraft = await this.#writerService.generateDraft(query, sentiment);
             if (code !== ENGLISH_CODE) {
                 const translation = await this.#translationService.translate(firstDraft, {
                     sourceLanguage: ENGLISH_CODE,
@@ -51,6 +51,6 @@ export class ResponseWriterService {
     }
 
     destroySessions() {
-        this.#promptService.destroySession();
+        this.#writerService.destroySession();
     }
 }
