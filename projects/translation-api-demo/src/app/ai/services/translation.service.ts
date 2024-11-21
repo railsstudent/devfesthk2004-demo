@@ -41,10 +41,9 @@ export class TranslationService  {
                 return '';
             }
 
-            const result = await translator.translate(inputText);
-            if (translator.destroy) {
-                translator.destroy();
-            }
+            const result = await translator.translate(inputText);            
+            translator.destroy();
+
             return result;
         } catch (e) {
             console.error(e);
