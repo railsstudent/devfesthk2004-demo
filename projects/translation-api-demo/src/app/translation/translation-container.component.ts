@@ -32,7 +32,7 @@ export class TranslationContainerComponent {
   async updateCanTranslate(allowTranslation: AllowTranslation) {
     this.languagePairs.set([]);
     this.sample.set({ sourceLanguage: '', inputText: '' });
-    if (allowTranslation && allowTranslation.toTranslate) {
+    if (allowTranslation?.toTranslate) {
       const { code: sourceLanguage, inputText } = allowTranslation;
       this.languagePairs.set(await this.translationService.createLanguagePairs(sourceLanguage));
       this.sample.set({ sourceLanguage, inputText });

@@ -31,13 +31,7 @@ export class SummarizationService {
     }
 
     private initCapabilities() {
-        const api = this.validateAndReturnApi();
-        return api.capabilities();
-    }
-
-    private initSession(options: AISummarizerCreateOptions) {
-        const api = this.validateAndReturnApi();
-        return api.create(options);
+        return this.validateAndReturnApi().capabilities();
     }
 
     async checkSummarizerFormats(): Promise<string[]> {
@@ -73,18 +67,35 @@ export class SummarizationService {
             `capabilities.languageAvailable(${flag}) = ${(capabilities as any).languageAvailable(flag)}`
         );
     }
+
+    private async createOptionsAvalable({ format, type, length }: AISummarizerCreateOptions): Promise<boolean> {
+        const capabilities = await this.initCapabilities();
+        if (!format || !type || !length) {
+            return false;
+        } 
+
+        return capabilities.supportsFormat(format) === 'readily' &&
+            capabilities.supportsType(type) === 'readily' &&
+            capabilities.supportsLength(length) === 'readily';
+    }
     
     async summarize(options: AISummarizerCreateOptions, ...texts: string[]) {
         this.#summaries.set([]);
-        const session = await this.initSession({ ...options, signal: this.#abortController.signal });
+
+        const session = await this.validateAndReturnApi().create({ ...options, 
+            signal: this.#abortController.signal })
         
-        const summaries: string[] = [];
+        const isAvailable = await this.createOptionsAvalable(options);
+        if (!isAvailable) {
+            return;
+        }
+        
+        const summarizedTexts: string[] = [];
         for (const text of texts) {
-            const result = await session.summarize(text);
-            summaries.push(result);
+            summarizedTexts.push(await session.summarize(text));
         }
 
-        this.#summaries.set(summaries);
+        this.#summaries.set(summarizedTexts);
         session.destroy();
     }
 
