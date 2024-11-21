@@ -123,33 +123,4 @@ export class SummarizationService {
             lengthValues,
         };
     }
-
-    // private populateCreateOptionValues(capabilities: UnionCapabilities) : 
-    //     SummarizerSelectOptions | undefined {
-        
-    //     if (isCapabilitiesApi(capabilities)) {
-    //         const formatValues = formats.reduce((acc, format) => {
-    //             const result = capabilities.createOptionsAvailable({ format });
-    //             return result === CAPABILITIES_AVAILABLE.READILY ? acc.concat(format) : acc;
-    //         }, [] as string[]);
-
-    //         const typeValues = types.reduce((acc, type) => {
-    //             const typeStatus = capabilities.createOptionsAvailable({ type });
-    //             return typeStatus === CAPABILITIES_AVAILABLE.READILY ? acc.concat(type) : acc;
-    //         }, [] as string[]);
-
-    //         const lengthValues = lengths.reduce((acc, length) => {
-    //             const lengthStatus = capabilities.createOptionsAvailable({ length });
-    //             return lengthStatus === CAPABILITIES_AVAILABLE.READILY ? acc.concat(length) : acc;
-    //         }, [] as string[]);
-
-    //         return {
-    //             formatValues,
-    //             lengthValues,
-    //             typeValues,
-    //         };
-    //     }
-
-    //     return undefined;
-    // }
 }

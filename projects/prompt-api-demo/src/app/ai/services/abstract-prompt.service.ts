@@ -4,12 +4,12 @@ import { Tokenization } from '../types/prompt.type';
 
 export abstract class AbstractPromptService {
     promptApi = inject(AI_PROMPT_API_TOKEN);
-    #session = signal<any | null>(null);
+    #session = signal<AILanguageModel | undefined>(undefined);
     session = this.#session.asReadonly();
     #tokenContext = signal<Tokenization | null>(null);
     tokenContext = this.#tokenContext.asReadonly();
 
-    resetSession(newSession: any) {
+    resetSession(newSession: AILanguageModel | undefined) {
         this.#session.set(newSession);
         this.#tokenContext.set(null);
     }
@@ -36,12 +36,12 @@ export abstract class AbstractPromptService {
     }
 
     countNumTokens(query: string): Promise<number> {
-        if (!this.#session) {
+        const session = this.#session();
+        if (!session) {
             return Promise.resolve(0);
         }
 
-        const session = this.#session();
-        return session.countPromptTokens(query) as Promise<number>;
+        return session.countPromptTokens(query);
     }
 
     destroySession() {
@@ -50,7 +50,7 @@ export abstract class AbstractPromptService {
         if (session) {
             session.destroy();
             console.log('Destroy the prompt session.');
-            this.resetSession(null);
+            this.resetSession(undefined);
         }
     }
 }

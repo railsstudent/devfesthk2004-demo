@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import { firstValueFrom, from } from 'rxjs';
-import { SessionConfiguration } from '../types/prompt.type';
 import { AbstractPromptService } from './abstract-prompt.service';
 
 @Injectable({
@@ -8,10 +7,10 @@ import { AbstractPromptService } from './abstract-prompt.service';
 })
 export class ZeroPromptService extends AbstractPromptService  {
   #controller = new AbortController();
-  #perSession = signal<{ topK: number, temperature: number } | undefined>(undefined);
+  #perSession = signal<Pick<AILanguageModel, 'topK' | 'temperature'> | undefined>(undefined);
   perSession = this.#perSession.asReadonly();
 
-  async createSession(isPerSession: boolean, configuration: SessionConfiguration) {
+  async createSession(isPerSession: boolean, configuration: Pick<AILanguageModel, "temperature" | "topK">) {
     this.destroySession();
     
     const capabilities = await firstValueFrom(this.getCapabilities());
