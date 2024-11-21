@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { LanguageInitialPrompt } from '../types/language-initial-prompt.type';
 import { AbstractPromptService } from './abstract-prompt.service';
+import { LanguageInitialPrompt } from '../types/prompt.type';
 
 @Injectable({
   providedIn: 'root'
@@ -8,10 +8,10 @@ import { AbstractPromptService } from './abstract-prompt.service';
 export class NShotsPromptService extends AbstractPromptService  {
   #controller = new AbortController();
 
-  async createSession(initialPrompts: LanguageInitialPrompt[]) {
+  async createSession(initialPrompts: LanguageInitialPrompt) {
     this.destroySession();
 
-    const newSession = await this.promptApi?.create({ initialPrompts }, { signal: this.#controller.signal });
+    const newSession = await this.promptApi?.create({ initialPrompts, signal: this.#controller.signal });
     this.resetSession(newSession);
   }
 }

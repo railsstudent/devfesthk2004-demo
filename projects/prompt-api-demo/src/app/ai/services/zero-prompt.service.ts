@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import { firstValueFrom, from } from 'rxjs';
-import { LanguageModelCapabilities } from '../types/language-model-capabilties.type';
 import { SessionConfiguration } from '../types/prompt.type';
 import { AbstractPromptService } from './abstract-prompt.service';
 
@@ -17,7 +16,7 @@ export class ZeroPromptService extends AbstractPromptService  {
     
     const capabilities = await firstValueFrom(this.getCapabilities());
     const temperature = Math.min(configuration.temperature, 3);
-    const topK = Math.floor(Math.min(configuration.topK, capabilities.maxTopK));
+    const topK = Math.floor(Math.min(configuration.topK, capabilities.maxTopK || 0));
     const createOptions = isPerSession ? {
       signal: this.#controller.signal,
       temperature,
@@ -41,6 +40,6 @@ export class ZeroPromptService extends AbstractPromptService  {
       throw new Error('Capabilities detection is unsupported. Please check your configuration in chrome://flags/#optimization-guide-on-device-model');
     }
 
-    return from(this.promptApi.capabilities() as Promise<LanguageModelCapabilities>);
+    return from(this.promptApi.capabilities() as Promise<AILanguageModelCapabilities>);
   }
 }

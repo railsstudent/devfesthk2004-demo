@@ -9,14 +9,16 @@ export function provideLanguageModel(): EnvironmentProviders {
             useFactory: () => {
                 const platformId = inject(PLATFORM_ID);
                 const objWindow = isPlatformBrowser(platformId) ? window : undefined;
-                if (objWindow && 'ai' in objWindow) {
-                    const ai = objWindow.ai as any;
-                    if (ai.assistant) {
-                        return ai.assistant;
-                    } else if (ai.languageModel) {
-                        return ai.languageModel;
-                    }
+                if (!objWindow || !objWindow.ai) {
+                    return undefined;
                 }
+                
+                if (objWindow.ai.languageModel) {
+                    return objWindow.ai.languageModel
+                } else if ((objWindow.ai as any).assistant) {
+                    return (objWindow.ai as any).assistant;
+                }
+
                 return undefined;
             },
         }

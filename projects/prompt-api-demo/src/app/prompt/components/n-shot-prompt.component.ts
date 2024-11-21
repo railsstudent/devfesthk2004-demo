@@ -2,12 +2,11 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { NShotsPromptService } from '../../ai/services/n-shots-prompt.service';
 import { BasePromptComponent } from './base-prompt.component';
-import { LanguageInitialPrompt } from '../../ai/types/language-initial-prompt.type';
-import { AILanguageModelInitialPromptRole } from '../../ai/enums/initial-prompt-role.enum';
 import { FormsModule } from '@angular/forms';
 import { TokenizationComponent } from './tokenization.component';
 import { InitialPromptComponent } from './initial-prompt.component';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
+import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
 
 @Component({
   selector: 'app-n-shot-prompt',
@@ -52,17 +51,17 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NShotPromptComponent extends BasePromptComponent {
-  initialPrompts = signal<LanguageInitialPrompt[]>([
-    { role: AILanguageModelInitialPromptRole.SYSTEM, content: `You are an expert in determine the sentiment of a text. 
+  initialPrompts = signal<LanguageInitialPrompt>([
+    { role: 'system', content: `You are an expert in determine the sentiment of a text. 
     If it is positive, say 'positive'. If it is negative, say 'negative'. If you are not sure, then say 'not sure'` },
-    { role: AILanguageModelInitialPromptRole.USER, content: "The food is affordable and delicious, and the venue is close to the train station." },
-    { role: AILanguageModelInitialPromptRole.ASSISTANT, content: "positive" },
-    { role: AILanguageModelInitialPromptRole.USER, content: "The waiters are very rude, the food is salty, and the drinks are sour." },
-    { role: AILanguageModelInitialPromptRole.ASSISTANT, content: "negative" },
-    { role: AILanguageModelInitialPromptRole.USER, content: "Google is a comany" },
-    { role: AILanguageModelInitialPromptRole.ASSISTANT, content: "not sure" },
-    { role: AILanguageModelInitialPromptRole.USER, content: "The weather is hot and sunny today." },
-    { role: AILanguageModelInitialPromptRole.ASSISTANT, content: "postive" }
+    { role: 'user', content: "The food is affordable and delicious, and the venue is close to the train station." },
+    { role: 'assistant', content: "positive" },
+    { role: 'user', content: "The waiters are very rude, the food is salty, and the drinks are sour." },
+    { role: 'assistant', content: "negative" },
+    { role: 'user', content: "Google is a comany" },
+    { role: 'assistant', content: "not sure" },
+    { role: 'user', content: "The weather is hot and sunny today." },
+    { role: 'assistant', content: "postive" }
   ]);
   tokenContext = this.promptService.tokenContext;
 

@@ -4,7 +4,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
-import { LanguageModelCapabilities } from '../ai/types/language-model-capabilties.type';
 import { CapabilityComponent } from './components/capability.component';
 import { NShotPromptComponent } from './components/n-shot-prompt.component';
 import { SystemPromptsComponent } from './components/system-prompts.component';
@@ -71,5 +70,5 @@ export class PromptShowcaseComponent {
   });
  
   defaultCapabilities = toSignal(this.promptService.getCapabilities(), 
-    { initialValue: INIT_CAPABILITIES as LanguageModelCapabilities });
+    { initialValue: INIT_CAPABILITIES as AILanguageModelCapabilities });
 }

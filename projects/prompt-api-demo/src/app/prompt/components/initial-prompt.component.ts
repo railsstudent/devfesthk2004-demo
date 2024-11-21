@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Tokenization } from '../../ai/types/prompt.type';
-import { LanguageInitialPrompt } from '../../ai/types/language-initial-prompt.type';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
 
 @Component({
   selector: 'app-initial-prompt',
@@ -21,5 +20,5 @@ import { LanguageInitialPrompt } from '../../ai/types/language-initial-prompt.ty
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InitialPromptComponent {
-    initialPrompts = input<LanguageInitialPrompt[]>([]);
+    initialPrompts = input<LanguageInitialPrompt>([]);
 }

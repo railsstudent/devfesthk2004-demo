@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { CAPABILITIES_AVAILABLE } from '../../ai/enums/capabilities-available.enum';
-import { LanguageModelCapabilities } from '../../ai/types/language-model-capabilties.type';
 
 @Component({
   selector: 'app-capability',
@@ -23,7 +21,7 @@ import { LanguageModelCapabilities } from '../../ai/types/language-model-capabil
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CapabilityComponent {
-  defaultCapabilities = input.required<LanguageModelCapabilities>();
+  defaultCapabilities = input.required<AILanguageModelCapabilities>();
   
-  isReady = computed(() => this.defaultCapabilities().available === CAPABILITIES_AVAILABLE.READILY);
+  isReady = computed(() => this.defaultCapabilities().available === 'readily');
 }
