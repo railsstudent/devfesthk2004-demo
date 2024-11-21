@@ -21,7 +21,7 @@ export class LanguageDetectionService  {
             throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
         }
 
-        const results = (await detector.detect(query)) as LanguageDetectionResult[];
+        const results = await detector.detect(query);
         if (!results.length) {
             return undefined;
         }
