@@ -1,10 +1,5 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AI_SUMMARIZATION_API_TOKEN } from '../constants/core.constant';
-import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
-import { isCapabilitiesApi } from '../guards/capabilities-api.guard';
-import { isOldCapabilitiesApi } from '../guards/old-capabilities-api.guard';
-import { AISummarizerCreateOptions } from '../types/create-summarizer-options.type';
-import { CapabilitiesApi, OldCapabilitiesApi } from '../types/summarizer-api-definition.type';
 import { LanguageDetectionService } from './language-detection.service';
 
 enum ERROR_CODES {
@@ -40,9 +35,9 @@ export class SummarizationService {
         return api.create(options);
     }
 
-    private async languageAvailable(languageFlag: string): Promise<CAPABILITIES_AVAILABLE> {
+    private async languageAvailable(languageFlag: string): Promise<AICapabilityAvailability> {
         const capabilities = await this.initCapabilities();
-        return capabilities.languageAvailable(languageFlag);
+        return (capabilities as any).languageAvailable(languageFlag);
     }
 
     async canSummarize(text: string): Promise<boolean> {
@@ -52,7 +47,7 @@ export class SummarizationService {
         }
 
         const availableStatus = await this.languageAvailable(languageDected.code);
-        return availableStatus === CAPABILITIES_AVAILABLE.READILY;
+        return availableStatus === 'readily';
     }
     
     async summarize(options: AISummarizerCreateOptions, text: string) {
@@ -61,11 +56,7 @@ export class SummarizationService {
         }
 
         const capabilities = await this.initCapabilities();
-        if (isOldCapabilitiesApi(capabilities)) {
-            await this.validateCreateOptionsOld(options, capabilities);
-        } else if (isCapabilitiesApi(capabilities)) {
-            await this.validateCreateOptionsNew(options, capabilities);
-        }
+        await this.validateCreateOptions(options, capabilities);
         
         const session = await this.initSession({ ...options, signal: this.#abortController.signal });        
         const result = await session.summarize(text);
@@ -74,53 +65,24 @@ export class SummarizationService {
         return result;
     }
 
-    private async validateCreateOptionsNew(options: AISummarizerCreateOptions, capabilities: CapabilitiesApi) {
-        if (options.format) {
-            const formatStatus = await capabilities.createOptionsAvailable({
-                format: options.format
-            });
-            if (formatStatus !== CAPABILITIES_AVAILABLE.READILY) {
-                throw new Error(`Summarization API does not ${options.format} format`);
-            }
-        }
-
-        if (options.length) {
-            const lengthStatus = await capabilities.createOptionsAvailable({
-                length: options.length
-            });
-            if (lengthStatus !== CAPABILITIES_AVAILABLE.READILY) {
-                throw new Error(`Summarization API does not ${options.length} format`);
-            }
-        }
-
-        if (options.type) {
-            const typeStatus = await capabilities.createOptionsAvailable({
-                type: options.type
-            });
-            if (typeStatus !== CAPABILITIES_AVAILABLE.READILY) {
-                throw new Error(`Summarization API does not ${options.type} format`);
-            }
-        }
-    }
-
-    private async validateCreateOptionsOld(options: AISummarizerCreateOptions, capabilities: OldCapabilitiesApi) {
+    private async validateCreateOptions(options: AISummarizerCreateOptions, capabilities: AISummarizerCapabilities) {
         if (options.format) {
             const formatStatus = await capabilities.supportsFormat(options.format);
-            if (formatStatus !== CAPABILITIES_AVAILABLE.READILY) {
+            if (formatStatus !== 'readily') {
                 throw new Error(`Summarization API does not ${options.format} format`);
             }
         }
 
         if (options.length) {
             const lengthStatus = await capabilities.supportsLength(options.length);
-            if (lengthStatus !== CAPABILITIES_AVAILABLE.READILY) {
+            if (lengthStatus !== 'readily') {
                 throw new Error(`Summarization API does not ${options.length} format`);
             }
         }
 
         if (options.type) {
             const typeStatus = await capabilities.supportsType(options.type);
-            if (typeStatus !== CAPABILITIES_AVAILABLE.READILY) {
+            if (typeStatus !== 'readily') {
                 throw new Error(`Summarization API does not ${options.type} format`);
             }
         }

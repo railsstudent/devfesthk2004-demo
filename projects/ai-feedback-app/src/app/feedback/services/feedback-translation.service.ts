@@ -1,7 +1,6 @@
 import { inject, Injectable, Injector, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, switchMap } from 'rxjs';
-import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../../ai/enums/summarizer-capabilities-options.enum';
 import { SummarizationService } from '../../ai/services/summarization.service';
 import { TranslationService } from '../../ai/services/translation.service';
 import { LanguagePair } from '../../ai/types/language-pair.type';
@@ -50,9 +49,9 @@ export class FeedbackTranslationService {
             const sharedContext = `You are an expert that can summarize a customer's feedback. 
             If the text is not in English, please return a blank string.`;
             return await this.#summarizationService.summarize({
-                type: AISummarizerType.HEADLINE,
-                format: AISummarizerFormat.PLAIN_TEXT,
-                length: AISummarizerLength.SHORT,
+                type: 'headline',
+                format: 'plain-text',
+                length: 'short',
                 sharedContext,
             }, query);
         } catch (e) {

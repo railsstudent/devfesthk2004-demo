@@ -1,6 +1,3 @@
-import { AILanguageModelInitialPromptRole } from '../enums/initial-prompt-role.enum';
-
-export type LanguageInitialPrompt = { 
-    role: AILanguageModelInitialPromptRole;
-    content: string 
-}
+export type LanguageInitialPrompt =     
+    [AILanguageModelSystemPrompt, ...Array<AILanguageModelAssistantPrompt | AILanguageModelUserPrompt>]
+    | Array<AILanguageModelAssistantPrompt | AILanguageModelUserPrompt>;

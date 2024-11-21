@@ -12,7 +12,7 @@ export class SystemPromptService {
   private async createSession(systemPrompt: string) {
     this.destroySession();
     
-    const newSession = await this.#promptApi?.create({ systemPrompt }, { signal: this.#controller.signal });
+    const newSession = await this.#promptApi?.create({ systemPrompt, signal: this.#controller.signal });
     this.#session.set(newSession);
   }
 

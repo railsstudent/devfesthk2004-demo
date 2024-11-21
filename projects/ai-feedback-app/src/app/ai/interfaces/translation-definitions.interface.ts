@@ -1,6 +1,6 @@
 export interface TranslationApiDefinition { 
-    canDetect: Function, 
-    canTranslate: Function,
+    canDetect: (...args: unknown[]) => Promise<AICapabilityAvailability>, 
+    canTranslate: (...args: unknown[]) => Promise<AICapabilityAvailability>,
     createDetector: Function,
     createTranslator: Function,
 }

@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { catchError, from, Observable, of } from 'rxjs';
 import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
-import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { getChromVersion, isChromeBrowser } from './user-agent-data';
 
 const CHROME_VERSION = 128
@@ -32,9 +31,9 @@ async function checkChromePromptApi(): Promise<string> {
    const status = (await languageModel?.capabilities())?.available;
    if (!status) { 
       throw new Error(PROMPT_AI_ERROR_CODES.API_NOT_READY);
-   } else if (status === CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
+   } else if (status === 'after-download') {
       throw new Error(PROMPT_AI_ERROR_CODES.AFTER_DOWNLOAD);
-   } else if (status === CAPABILITIES_AVAILABLE.NO) {
+   } else if (status === 'no') {
       throw new Error(PROMPT_AI_ERROR_CODES.NO_LARGE_LANGUAGE_MODEL);
    }
 

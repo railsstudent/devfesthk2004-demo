@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
-import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { TRANSLATION_ERROR_CODES } from '../enums/translation-error-codes.enum';
 import { LanguagePair } from '../types/language-pair.type';
 
@@ -20,7 +19,7 @@ export class TranslationService  {
         if (sourceLanguage !== targetLanguage) {
             const pair = { sourceLanguage, targetLanguage }
             const available = await this.#translationAPI.canTranslate(pair);
-            if (available !== CAPABILITIES_AVAILABLE.NO) {
+            if (available !==  'no') {
                 results.push(pair);
             }
         }

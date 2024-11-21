@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AISummarizerFormat, AISummarizerLength, AISummarizerType } from '../../ai/enums/capabilities-core-options.enum';
 import { SummarizationService } from '../../ai/services/summarization.service';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
