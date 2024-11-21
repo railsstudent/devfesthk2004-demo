@@ -11,7 +11,7 @@ import { SetupComponent } from './prompt/components/setup.component';
     <h3>Use ai.assistant (Pre-131.0.6776.0) or ai.languageModel (Post-131.0.6776.0) to prompt model to generate texts.</h3>
     <div style="margin-bottom: 0.5rem;">
       @let btnSetupText = showSetup() ? 'Hide Setup' : 'Show Setup';
-      @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show Setup';
+      @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show User Agent';
       <button style="margin-right: 0.25rem;" (click)="showSetup.set(!showSetup())">{{ btnSetupText }}</button>
       <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText }}</button>
     </div>

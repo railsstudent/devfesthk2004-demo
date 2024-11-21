@@ -8,9 +8,11 @@ import { SetupComponent } from './language-detection/components/setup.component'
   imports: [DetectAIComponent, SetupComponent],
   template: `
     <h2>Chrome Built-in Language Detection API </h2>
+    @let btnSetupText = showSetup() ? 'Hide Setup' : 'Show Setup';
+    @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show User Agent';
     <div style="margin-bottom: 0.5rem;">
-      <button style="margin-right: 0.25rem;" (click)="showSetup.set(!showSetup())">{{ btnSetupText() }}</button>
-      <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText() }}</button>
+      <button style="margin-right: 0.25rem;" (click)="showSetup.set(!showSetup())">{{ btnSetupText }}</button>
+      <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText }}</button>
     </div>
     @if (showSetup()) {
       <app-setup />
@@ -30,5 +32,5 @@ export class AppComponent {
   showSetup = signal(false);
   showUserAgent = signal(false);
   btnSetupText = computed(() => this.showSetup() ? 'Hide Setup' : 'Show Setup');
-  btnUserAgentText = computed(() => this.showUserAgent() ? 'Hide User Agent' : 'Show Setup');
+  btnUserAgentText = computed(() => this.showUserAgent() ? 'Hide User Agent' : 'Show User Agent');
 }

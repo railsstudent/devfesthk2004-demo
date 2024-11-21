@@ -4,6 +4,7 @@ import { isPromptApiSupported } from './ai/utils/prompt-api-detection';
 import { FeedbackContainerComponent } from './feedback/feedback-container.component';
 import { isTranslationApiSupported } from './ai/utils/translation-api-detection';
 import { isSummarizationAPISupported } from './ai/utils/summarization-api-detection';
+import { isWriterAPISupported } from './ai/utils/writer-api-detection';
 
 @Component({
   selector: 'app-detect-ai',
@@ -45,10 +46,15 @@ export class DetectAIComponent {
   hasPromptCapabilities = toSignal(isPromptApiSupported(), { initialValue: '' });
   hasTranlsationCapabilities = toSignal(isTranslationApiSupported(), { initialValue: '' });
   hasSummarizationCapabilities = toSignal(isSummarizationAPISupported(), { initialValue: '' });
+  hasWriterCapabilities = toSignal(isWriterAPISupported(), { initialValue: '' });
 
   hasCapabilities = computed(() => {
-    const allCapabilities = [ this.hasPromptCapabilities(), this.hasTranlsationCapabilities(), 
-      this.hasSummarizationCapabilities()];
+    const allCapabilities = [ 
+      this.hasPromptCapabilities(), 
+      this.hasTranlsationCapabilities(), 
+      this.hasSummarizationCapabilities(), 
+      this.hasWriterCapabilities()
+    ];
     return allCapabilities.reduce((acc, text) => text !== '' ? acc.concat(text) : acc, [] as string[]);
   });
 }

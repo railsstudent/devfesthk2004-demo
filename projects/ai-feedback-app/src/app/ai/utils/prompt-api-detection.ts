@@ -5,7 +5,7 @@ import { getChromVersion, isChromeBrowser } from './user-agent-data';
 
 const CHROME_VERSION = 128
 
-enum PROMPT_AI_ERROR_CODES {
+enum PROMPT_API_ERROR_CODES {
    NOT_CHROME_BROWSER = 'Your browser is not supported. Please use Google Chrome Dev or Canary.',
    OLD_BROWSER = `Please upgrade the Chrome version to at least ${CHROME_VERSION} to support Prompt API.`,
    NO_PROMPT_API = 'Prompt API is not available, check your configuration in chrome://flags/#prompt-api-for-gemini-nano',
@@ -16,25 +16,25 @@ enum PROMPT_AI_ERROR_CODES {
 
 async function checkChromePromptApi(): Promise<string> {
    if (!isChromeBrowser()) {
-      throw new Error(PROMPT_AI_ERROR_CODES.NOT_CHROME_BROWSER);
+      throw new Error(PROMPT_API_ERROR_CODES.NOT_CHROME_BROWSER);
    }
 
    if (getChromVersion() < CHROME_VERSION) {
-      throw new Error(PROMPT_AI_ERROR_CODES.OLD_BROWSER);
+      throw new Error(PROMPT_API_ERROR_CODES.OLD_BROWSER);
    }
 
    if (!('ai' in globalThis)) {
-      throw new Error(PROMPT_AI_ERROR_CODES.NO_PROMPT_API);
+      throw new Error(PROMPT_API_ERROR_CODES.NO_PROMPT_API);
    }
 
    const languageModel = inject(AI_PROMPT_API_TOKEN);
    const status = (await languageModel?.capabilities())?.available;
    if (!status) { 
-      throw new Error(PROMPT_AI_ERROR_CODES.API_NOT_READY);
+      throw new Error(PROMPT_API_ERROR_CODES.API_NOT_READY);
    } else if (status === 'after-download') {
-      throw new Error(PROMPT_AI_ERROR_CODES.AFTER_DOWNLOAD);
+      throw new Error(PROMPT_API_ERROR_CODES.AFTER_DOWNLOAD);
    } else if (status === 'no') {
-      throw new Error(PROMPT_AI_ERROR_CODES.NO_LARGE_LANGUAGE_MODEL);
+      throw new Error(PROMPT_API_ERROR_CODES.NO_LARGE_LANGUAGE_MODEL);
    }
 
    return '';
