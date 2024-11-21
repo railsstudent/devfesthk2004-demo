@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { catchError, from, Observable, of } from 'rxjs';
 import { AI_TRANSLATION_API_TOKEN, TranslationApiDefinition } from '../constants/core.constant';
-import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { getChromVersion, isChromeBrowser } from './user-agent-data';
 
 const CHROME_VERSION = 131
@@ -37,9 +36,9 @@ async function validateLanguageTranslator(translation: TranslationApiDefinition 
    const canTranslateStatus = await translation?.canTranslate({ sourceLanguage: 'en', targetLanguage: 'es' });
    if (!canTranslateStatus) {
       throw new Error(ERROR_CODES.NO_TRANSLATOR);
-   } else if (canTranslateStatus == CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
+   } else if (canTranslateStatus == 'after-download') {
       throw new Error(ERROR_CODES.TRANSLATION_AFTER_DOWNLLOAD);
-   } else if (canTranslateStatus === CAPABILITIES_AVAILABLE.NO) {
+   } else if (canTranslateStatus === 'no') {
       throw new Error(ERROR_CODES.NO_TRANSLATION_API);
    }
 }
@@ -48,9 +47,9 @@ async function validateLanguageDetector(translation: TranslationApiDefinition | 
    const canDetectStatus = await translation?.canDetect();
    if (!canDetectStatus) {
       throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
-   } else if (canDetectStatus == CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
+   } else if (canDetectStatus == 'after-download') {
       throw new Error(ERROR_CODES.TRANSLATION_AFTER_DOWNLLOAD);
-   } else if (canDetectStatus === CAPABILITIES_AVAILABLE.NO) {
+   } else if (canDetectStatus === 'no') {
       throw new Error(ERROR_CODES.NO_TRANSLATION_API);
    }
 }

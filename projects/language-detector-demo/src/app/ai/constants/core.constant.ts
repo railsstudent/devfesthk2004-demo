@@ -1,6 +1,11 @@
 import { InjectionToken } from '@angular/core';
 import { LanguageDetectionResult } from '../types/language-detection-result.type';
 
+export type LanguageDetectionResult = {
+    confidence: number;
+    detectedLanguage: string;
+}
+
 export type AILanguageDetectorCapabilities = {
     available: AICapabilityAvailability;
     languageAvailable: (code: string) => AICapabilityAvailability;

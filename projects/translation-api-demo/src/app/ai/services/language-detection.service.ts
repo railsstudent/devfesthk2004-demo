@@ -1,6 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
-import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
+import { AI_TRANSLATION_API_TOKEN, LanguageDetector } from '../constants/core.constant';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 import { LanguageDetectionResult, LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 
@@ -9,7 +8,7 @@ import { LanguageDetectionResult, LanguageDetectionWithNameResult } from '../typ
 })
 export class LanguageDetectionService  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
-    #detector = signal<any | null>(null);
+    #detector = signal<LanguageDetector | undefined>(undefined);
     detector = this.#detector.asReadonly();
 
     async detect(query: string, minConfidence = 0.6): Promise<LanguageDetectionWithNameResult | undefined> {
@@ -40,7 +39,7 @@ export class LanguageDetectionService  {
             return;
         }
 
-        const canCreatStatus = (await this.#translationAPI?.canDetect()) === CAPABILITIES_AVAILABLE.READILY;
+        const canCreatStatus = (await this.#translationAPI?.canDetect()) === 'readily';
         if (!canCreatStatus) {
             throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
         }

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CAPABILITIES_AVAILABLE } from '../../ai/enums/capabilities-available.enum';
 import { TranslationService } from '../../ai/services/translation.service';
 import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
 
@@ -43,9 +42,9 @@ export class TranslateTextComponent {
 
     canTranslateButtons = computed(() =>
         this.languagePairs().reduce((acc, pair) => {
-            if (pair.available === CAPABILITIES_AVAILABLE.READILY) {
+            if (pair.available === 'readily') {
                 return acc.concat({ ...pair, text: `${pair.sourceLanguage} to ${pair.targetLanguage}` })
-            } else if (pair.available === CAPABILITIES_AVAILABLE.AFTER_DOWNLOAD) {
+            } else if (pair.available === 'after-download') {
                 return acc.concat({ ...pair, text: `Download ${pair.targetLanguage}` })
             }
             return acc;
@@ -61,7 +60,7 @@ export class TranslateTextComponent {
     async download(languagePair: LanguagePair) {
         try {
          const result = await this.service.downloadLanguagePackage(languagePair);
-         if (result?.available === CAPABILITIES_AVAILABLE.READILY) {
+         if (result?.available === 'readily') {
             this.downloadSuccess.emit(result);
          }
         } catch (e) {

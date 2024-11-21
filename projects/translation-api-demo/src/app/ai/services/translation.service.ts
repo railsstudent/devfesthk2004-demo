@@ -1,6 +1,5 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
-import { CAPABILITIES_AVAILABLE } from '../enums/capabilities-available.enum';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 import { LanguagePair, LanguagePairAvailable } from '../types/language-pair.type';
 
@@ -22,7 +21,7 @@ export class TranslationService  {
             if (sourceLanguage !== targetLanguage) {
                 const pair = { sourceLanguage, targetLanguage }
                 const available = await this.#translationAPI.canTranslate(pair);
-                if (available !== CAPABILITIES_AVAILABLE.NO) {
+                if (available !== 'no') {
                     results.push({ ...pair, available });
                 }
             }
@@ -42,7 +41,7 @@ export class TranslationService  {
                 return '';
             }
 
-            const result = await translator.translate(inputText) as Promise<string>;
+            const result = await translator.translate(inputText);
             if (translator.destroy) {
                 translator.destroy();
             }
@@ -60,16 +59,14 @@ export class TranslationService  {
             }
             
             const translator = await this.#translationAPI.createTranslator(languagePair);
-            const available = translator ? CAPABILITIES_AVAILABLE.READILY : CAPABILITIES_AVAILABLE.NO;
+            const available = translator ? 'readily' as AICapabilityAvailability : 'no' as AICapabilityAvailability;
 
-            if (translator.destroy) {
-                translator.destroy();
-            }
-
+            translator.destroy();
+ 
             return { ...languagePair, available };
         } catch (e) {
             console.error(e);
-            return { ...languagePair, available: CAPABILITIES_AVAILABLE.NO };
+            return { ...languagePair, available: 'no' as AICapabilityAvailability };
         }
     }
 }
