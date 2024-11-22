@@ -70,13 +70,9 @@ export class SummarizationService {
 
     private async createOptionsAvalable({ format, type, length }: AISummarizerCreateOptions): Promise<boolean> {
         const capabilities = await this.initCapabilities();
-        if (!format || !type || !length) {
-            return false;
-        } 
-
-        return capabilities.supportsFormat(format) === 'readily' &&
-            capabilities.supportsType(type) === 'readily' &&
-            capabilities.supportsLength(length) === 'readily';
+        return (!format || capabilities.supportsFormat(format) === 'readily') &&
+            (!type || capabilities.supportsType(type) === 'readily') &&
+            (!length || capabilities.supportsLength(length) === 'readily');
     }
     
     async summarize(options: AISummarizerCreateOptions, ...texts: string[]) {
