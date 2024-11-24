@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { catchError, from, Observable, of } from 'rxjs';
-import { AI_TRANSLATION_API_TOKEN, TranslationApiDefinition } from '../constants/core.constant';
+import { AI_LANGUAGE_DETECTION_API_TOKEN, AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
 import { getChromVersion, isChromeBrowser } from './user-agent-data';
 
 const CHROME_VERSION = 131
@@ -25,29 +25,32 @@ export async function checkChromeBuiltInAI(): Promise<string> {
       throw new Error('Translation API is not available, check your configuration in chrome://flags/#translation-api');
    }
 
+   const languageDetection = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
    const translation = inject(AI_TRANSLATION_API_TOKEN);
-   await validateLanguageDetector(translation);
+   await validateLanguageDetector(languageDetection);
    await validateLanguageTranslator(translation);
 
    return '';
 }
 
-async function validateLanguageTranslator(translation: TranslationApiDefinition | undefined) {
-   const canTranslateStatus = await translation?.canTranslate({ sourceLanguage: 'en', targetLanguage: 'es' });
-   if (!canTranslateStatus) {
-      throw new Error(ERROR_CODES.NO_TRANSLATOR);
-   } else if (canTranslateStatus == 'after-download') {
-      throw new Error(ERROR_CODES.TRANSLATION_AFTER_DOWNLLOAD);
-   } else if (canTranslateStatus === 'no') {
-      throw new Error(ERROR_CODES.NO_TRANSLATION_API);
+async function validateLanguageTranslator(translation: AITranslatorFactory | undefined) {
+   if (translation && 'capabilities' in translation) {
+      const canTranslateStatus = (await translation.capabilities()).available;
+      if (!canTranslateStatus) {
+         throw new Error(ERROR_CODES.NO_TRANSLATOR);
+      } else if (canTranslateStatus == 'after-download') {
+         throw new Error(ERROR_CODES.TRANSLATION_AFTER_DOWNLLOAD);
+      } else if (canTranslateStatus === 'no') {
+         throw new Error(ERROR_CODES.NO_TRANSLATION_API);
+      }
    }
 }
 
-async function validateLanguageDetector(translation: TranslationApiDefinition | undefined) {
-   const canDetectStatus = await translation?.canDetect();
+async function validateLanguageDetector(languageDetector: AILanguageDetectorFactory | undefined) {
+   const canDetectStatus = (await languageDetector?.capabilities())?.available;
    if (!canDetectStatus) {
       throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
-   } else if (canDetectStatus == 'after-download') {
+   } else if (canDetectStatus === 'after-download') {
       throw new Error(ERROR_CODES.TRANSLATION_AFTER_DOWNLLOAD);
    } else if (canDetectStatus === 'no') {
       throw new Error(ERROR_CODES.NO_TRANSLATION_API);

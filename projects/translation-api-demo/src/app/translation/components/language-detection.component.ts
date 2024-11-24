@@ -41,7 +41,7 @@ export class LanguageDetectionComponent {
     const result = await this.service.detect(inputText, this.minConfidence);
     this.detectedLanguage.set(result);
 
-    if (result) {
+    if (result?.detectedLanguage) {
       this.nextStep.emit({
         code: result.detectedLanguage,
         toTranslate: result.confidence >= this.minConfidence,

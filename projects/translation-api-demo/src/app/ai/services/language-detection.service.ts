@@ -1,14 +1,15 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { AI_TRANSLATION_API_TOKEN, LanguageDetector } from '../constants/core.constant';
+import { AI_LANGUAGE_DETECTION_API_TOKEN, AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
 import { ERROR_CODES } from '../enums/error-codes.enum';
-import { LanguageDetectionResult, LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
+import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LanguageDetectionService  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
-    #detector = signal<LanguageDetector | undefined>(undefined);
+    #languageDetectionAPI = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
+    #detector = signal<AILanguageDetector | undefined>(undefined);
     detector = this.#detector.asReadonly();
 
     async detect(query: string, minConfidence = 0.6): Promise<LanguageDetectionWithNameResult | undefined> {
@@ -39,16 +40,20 @@ export class LanguageDetectionService  {
             return;
         }
 
-        const canCreatStatus = (await this.#translationAPI?.canDetect()) === 'readily';
+        const canCreatStatus = (await this.#languageDetectionAPI?.capabilities())?.available === 'readily';
         if (!canCreatStatus) {
             throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
         }
-        const newDetector = await this.#translationAPI?.createDetector();
+        const newDetector = await this.#languageDetectionAPI?.create();
         this.#detector.set(newDetector);
     }
 
-    languageTagToHumanReadable(languageTag: string, targetLanguage = 'en') {
+    languageTagToHumanReadable(languageTag: string | null, targetLanguage = 'en') {
         const displayNames = new Intl.DisplayNames([targetLanguage], { type: 'language' });
+
+        if (!languageTag) { 
+            return 'NA';
+        }
         return displayNames.of(languageTag) || 'NA';
     }
 }

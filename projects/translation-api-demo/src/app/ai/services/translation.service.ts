@@ -10,6 +10,7 @@ const TRANSKIT_LANGUAGES = ['en', 'es', 'ja', 'zh', 'zh-Hant', 'it', 'fr', 'zz']
 })
 export class TranslationService  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
+    #controller = new AbortController();
 
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePairAvailable[]> {
         if (!this.#translationAPI) {
@@ -19,14 +20,14 @@ export class TranslationService  {
         const results: LanguagePairAvailable[] = [];
         for (const targetLanguage of TRANSKIT_LANGUAGES) {
             if (sourceLanguage !== targetLanguage) {
-                const pair = { sourceLanguage, targetLanguage }
-                const available = await this.#translationAPI.canTranslate(pair);
-                if (available !== 'no') {
-                    results.push({ ...pair, available });
+                if ('capabilities' in this.#translationAPI) {
+                    const available = (await this.#translationAPI.capabilities()).canTranslate(sourceLanguage, targetLanguage);
+                    if (available !== 'no') {
+                        results.push({ sourceLanguage, targetLanguage, available });
+                    }
                 }
             }
         }
-
         return results;
     }
 
@@ -36,7 +37,7 @@ export class TranslationService  {
                 throw new Error(ERROR_CODES.NO_API);
             }
 
-            const translator = await this.#translationAPI.createTranslator(languagePair);
+            const translator = await this.#translationAPI.create({ ...languagePair, signal: this.#controller.signal });
             if (!translator) {
                 return '';
             }
@@ -57,7 +58,7 @@ export class TranslationService  {
                 throw new Error(ERROR_CODES.NO_API);
             }
             
-            const translator = await this.#translationAPI.createTranslator(languagePair);
+            const translator = await this.#translationAPI.create({ ...languagePair, signal: this.#controller.signal });
             const available = translator ? 'readily' as AICapabilityAvailability : 'no' as AICapabilityAvailability;
 
             translator.destroy();
