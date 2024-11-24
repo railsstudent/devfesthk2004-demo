@@ -6,10 +6,9 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { SummarizerOptionsComponent } from './summarizer-oprions.component';
 
 @Component({
-  selector: 'app-summarizer',
-  standalone: true,
-  imports: [FormsModule, SummarizerOptionsComponent, LineBreakPipe],
-  template: `
+    selector: 'app-summarizer',
+    imports: [FormsModule, SummarizerOptionsComponent, LineBreakPipe],
+    template: `
     <app-summarizer-options [selectOptions]="selectOptions()"
       [(selectedFormat)]="selectedFormat" [(selectedType)]="selectedType" [(selectedLength)]="selectedLength"
     />
@@ -29,12 +28,12 @@ import { SummarizerOptionsComponent } from './summarizer-oprions.component';
       <div [innerHTML]="content | lineBreak"></div>
     }
   `,
-  styles: `
+    styles: `
     input {
       width: 100%;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SummarizerComponent {
   summarizationService = inject(SummarizationService);

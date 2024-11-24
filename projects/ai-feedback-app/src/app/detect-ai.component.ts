@@ -7,10 +7,9 @@ import { isSummarizationAPISupported } from './ai/utils/summarization-api-detect
 import { isWriterAPISupported } from './ai/utils/writer-api-detection';
 
 @Component({
-  selector: 'app-detect-ai',
-  standalone: true,
-  imports: [FeedbackContainerComponent],
-  template: `
+    selector: 'app-detect-ai',
+    imports: [FeedbackContainerComponent],
+    template: `
     <div>
       @let errors = hasCapabilities();
       @if (!errors.length) {
@@ -27,7 +26,7 @@ import { isWriterAPISupported } from './ai/utils/writer-api-detection';
       }
     </div>
   `,
-  styles: `
+    styles: `
     .error {
       text-decoration: underline; 
       color: black; 
@@ -40,7 +39,7 @@ import { isWriterAPISupported } from './ai/utils/writer-api-detection';
       line-height: 1.15rem;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
   hasPromptCapabilities = toSignal(isPromptApiSupported(), { initialValue: '' });

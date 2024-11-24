@@ -5,10 +5,9 @@ import { isLanguageDetectionAPISupported } from './ai/utils/ai-detection';
 import { LanguageDetectionComponent } from './language-detection/language-detection.component';
 
 @Component({
-  selector: 'app-detect-ai',
-  standalone: true,
-  imports: [UserAgentComponent, LanguageDetectionComponent],
-  template: `
+    selector: 'app-detect-ai',
+    imports: [UserAgentComponent, LanguageDetectionComponent],
+    template: `
     @if (showUserAgent()) {
       <app-user-agent />
     }
@@ -25,7 +24,7 @@ import { LanguageDetectionComponent } from './language-detection/language-detect
       }
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
   showUserAgent = input(false);

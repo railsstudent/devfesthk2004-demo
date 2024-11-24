@@ -5,10 +5,9 @@ import { SummarizerCapabilitiesComponent } from './components/summarizer-capabil
 import { SummarizerComponent } from './components/summarizer.component';
 
 @Component({
-  selector: 'app-summarizer-container',
-  standalone: true,
-  imports: [SummarizerCapabilitiesComponent, SummarizerComponent],
-  template: `
+    selector: 'app-summarizer-container',
+    imports: [SummarizerCapabilitiesComponent, SummarizerComponent],
+    template: `
     <div>
       <h3>Summarization API Demo</h3>
       <app-summarizer-capabilities [supportedFormats]="supportedFormats()"
@@ -19,7 +18,7 @@ import { SummarizerComponent } from './components/summarizer.component';
       <app-summarizer [selectOptions]="selectOptions()" />
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SummarizerContainerComponent {
   summarizationService = inject(SummarizationService);

@@ -4,10 +4,9 @@ import { TranslationService } from '../../ai/services/translation.service';
 import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
 
 @Component({
-  selector: 'app-translate-text',
-  standalone: true,
-  imports: [FormsModule],
-  template: `
+    selector: 'app-translate-text',
+    imports: [FormsModule],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem; display: flex;">
         <div style="margin-right: 0.5rem; flex-basis: 50%;">
             @for(pair of languagePairs(); track $index) {
@@ -31,7 +30,7 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
         </div>
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranslateTextComponent {
     service = inject(TranslationService);

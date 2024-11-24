@@ -11,10 +11,9 @@ import { FeedbackErrorComponent } from './feedback-error.component';
 const transformTranslationInput = (x: TranslationInput) => ({ ...x, query: x.query.trim() });
 
 @Component({
-  selector: 'app-response-writer',
-  standalone: true,
-  imports: [FormsModule, LineBreakPipe, FeedbackErrorComponent, FeedbackLoadingComponent],
-  template: `
+    selector: 'app-response-writer',
+    imports: [FormsModule, LineBreakPipe, FeedbackErrorComponent, FeedbackLoadingComponent],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Write a response</h3>
       @let disabled = isLoading() || translationInput().query === '' || translationInput().sentiment === '';
@@ -35,7 +34,7 @@ const transformTranslationInput = (x: TranslationInput) => ({ ...x, query: x.que
       <app-feedback-error [error]="error()" />
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResponseWriterComponent implements OnDestroy {
     translationInput = input.required<TranslationInput, TranslationInput>({ transform: transformTranslationInput });

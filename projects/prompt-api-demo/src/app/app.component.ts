@@ -3,10 +3,9 @@ import { DetectAIComponent } from './detect-ai.component';
 import { SetupComponent } from './prompt/components/setup.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [DetectAIComponent, SetupComponent],
-  template: `
+    selector: 'app-root',
+    imports: [DetectAIComponent, SetupComponent],
+    template: `
     <h2>Chrome Built-in Prompt API</h2>
     <h3>Use ai.assistant (Pre-131.0.6776.0) or ai.languageModel (Post-131.0.6776.0) to prompt model to generate texts.</h3>
     <div style="margin-bottom: 0.5rem;">
@@ -20,14 +19,14 @@ import { SetupComponent } from './prompt/components/setup.component';
     }
     <app-detect-ai [showUserAgent]="showUserAgent()" />
   `,
-  styles: `
+    styles: `
     :host {
       display: block;
       padding-left: 1rem;
       padding-right: 1rem;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   showSetup = signal(false);

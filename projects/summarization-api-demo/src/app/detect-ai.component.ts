@@ -5,10 +5,9 @@ import { isSummarizationAPISupported } from './ai/utils/ai-detection';
 import { SummarizerContainerComponent } from './summarization/summarizer-container.component';
 
 @Component({
-  selector: 'app-detect-ai',
-  standalone: true,
-  imports: [UserAgentComponent, SummarizerContainerComponent],
-  template: `
+    selector: 'app-detect-ai',
+    imports: [UserAgentComponent, SummarizerContainerComponent],
+    template: `
     @if (showUserAgent()) {
       <app-user-agent />
     }
@@ -26,7 +25,7 @@ import { SummarizerContainerComponent } from './summarization/summarizer-contain
       }
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
   officialDemo = 'https://chrome.dev/web-ai-demos/summarization-api-playground/';

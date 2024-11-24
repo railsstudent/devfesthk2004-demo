@@ -10,10 +10,9 @@ import { SystemPromptsComponent } from './components/system-prompts.component';
 import { ZeroPromptComponent } from './components/zero-prompt.component';
 
 @Component({
-  selector: 'app-prompt-showcase',
-  standalone: true,
-  imports: [FormsModule, CapabilityComponent, NgComponentOutlet],
-  template: `
+    selector: 'app-prompt-showcase',
+    imports: [FormsModule, CapabilityComponent, NgComponentOutlet],
+    template: `
     <app-capability [defaultCapabilities]="defaultCapabilities()" />
     <label>Demo: </label>
     <select [(ngModel)]="selectedDemo" style="margin-bottom: 1rem;">
@@ -24,7 +23,7 @@ import { ZeroPromptComponent } from './components/zero-prompt.component';
     @let outlet = componentOutlet();
     <ng-container [ngComponentOutlet]="outlet.component" [ngComponentOutletInputs]="outlet.inputs" />
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PromptShowcaseComponent {
   ZeroPromptComponent = ZeroPromptComponent;

@@ -2,17 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { Tokenization } from '../../ai/types/prompt.type';
 
 @Component({
-  selector: 'app-tokenization',
-  standalone: true,
-  imports: [],
-  template: `
+    selector: 'app-tokenization',
+    imports: [],
+    template: `
     <div>
       <p><span class="label">Number of Prompt tokens: </span><span>{{ numTokens() }}</span></p>
       <p><span class="label">Tokens: </span><span>{{ tokenStr() }}</span></p>
     </div>
   `,
-  styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    styles: ``,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TokenizationComponent {
   numTokens = input.required<number>({ alias: 'numPromptTokens' });

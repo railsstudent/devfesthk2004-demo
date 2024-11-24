@@ -7,10 +7,9 @@ import { LanguageAvailabledComponent } from './components/language-available.com
 import { LanguageDetectionResultComponent } from './components/language-detection-result.component';
 
 @Component({
-  selector: 'app-language-detection',
-  standalone: true,
-  imports: [FormsModule, LanguageAvailabledComponent, LanguageDetectionResultComponent],
-  template: `
+    selector: 'app-language-detection',
+    imports: [FormsModule, LanguageAvailabledComponent, LanguageDetectionResultComponent],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Language Detection Demo</h3>
       <app-language-available [languagesAvailable]="languagesAvailable()" />
@@ -24,7 +23,7 @@ import { LanguageDetectionResultComponent } from './components/language-detectio
       <app-language-detection-result [detectedLanguages]="detectedLanguages()" />
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageDetectionComponent {
   service = inject(LanguageDetectionService);

@@ -9,10 +9,9 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
 
 @Component({
-  selector: 'app-n-shot-prompt',
-  standalone: true,
-  imports: [FormsModule, TokenizationComponent, InitialPromptComponent, LineBreakPipe],
-  template: `
+    selector: 'app-n-shot-prompt',
+    imports: [FormsModule, TokenizationComponent, InitialPromptComponent, LineBreakPipe],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>N-shots prompting</h3>
       <app-initial-prompt [initialPrompts]="initialPrompts()" />      
@@ -41,14 +40,14 @@ import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
       }
     </div>
   `,
-  styleUrl: './prompt.component.css',
-  providers: [
-    {
-      provide: AbstractPromptService,
-      useClass: NShotsPromptService,
-    }
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrl: './prompt.component.css',
+    providers: [
+        {
+            provide: AbstractPromptService,
+            useClass: NShotsPromptService,
+        }
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NShotPromptComponent extends BasePromptComponent {
   initialPrompts = signal<LanguageInitialPrompt>([

@@ -7,10 +7,9 @@ import { TokenizationComponent } from './tokenization.component';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 
 @Component({
-  selector: 'app-system-prompt',
-  standalone: true,
-  imports: [FormsModule, TokenizationComponent, LineBreakPipe],
-  template: `
+    selector: 'app-system-prompt',
+    imports: [FormsModule, TokenizationComponent, LineBreakPipe],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>System Prompts</h3>
       @let myState = state();
@@ -42,14 +41,14 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
       }
     </div>
   `,
-  styleUrl: './prompt.component.css',
-  providers: [
-    {
-      provide: AbstractPromptService,
-      useClass: SystemPromptService,
-    }
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrl: './prompt.component.css',
+    providers: [
+        {
+            provide: AbstractPromptService,
+            useClass: SystemPromptService,
+        }
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SystemPromptsComponent extends BasePromptComponent {
   systemPrompt = signal(`You are an expert that knows the official languages of a location. State the languages, separated by commas, and no historic background. If you don't know the answer, then say "Sorry, it is not a country. Please answer in English"`);

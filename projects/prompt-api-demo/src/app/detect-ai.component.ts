@@ -5,10 +5,9 @@ import { isPromptAPISupported } from './ai/utils/ai-detection';
 import { PromptShowcaseComponent } from './prompt/prompt-showcase.component';
 
 @Component({
-  selector: 'app-detect-ai',
-  standalone: true,
-  imports: [PromptShowcaseComponent, UserAgentComponent],
-  template: `
+    selector: 'app-detect-ai',
+    imports: [PromptShowcaseComponent, UserAgentComponent],
+    template: `
     @if (showUserAgent()) {
       <app-user-agent />
     }
@@ -25,7 +24,7 @@ import { PromptShowcaseComponent } from './prompt/prompt-showcase.component';
       }
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
   showUserAgent = input(false);

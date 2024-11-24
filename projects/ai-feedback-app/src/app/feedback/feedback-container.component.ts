@@ -4,17 +4,16 @@ import { FeedbackTranslationComponent } from './components/feedback-translation.
 import { TranslationInput } from './types/translation-input.type';
 
 @Component({
-  selector: 'app-feedback-container',
-  standalone: true,
-  imports: [FeedbackSentimentComponent, FeedbackTranslationComponent],
-  template: `
+    selector: 'app-feedback-container',
+    imports: [FeedbackSentimentComponent, FeedbackTranslationComponent],
+    template: `
     <app-feedback-sentiment (sentimentLanguageEvaluated)="translationInput.set($event)" />
     @let input = translationInput();
     @if (input) {
       <app-feedback-translation [translationInput]="input" />
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeedbackContainerComponent {
   translationInput = signal<TranslationInput | undefined>(undefined);

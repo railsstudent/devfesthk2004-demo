@@ -7,10 +7,9 @@ import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { ResponseWriterComponent } from './response-writer.component';
 
 @Component({
-  selector: 'app-feedback-translation',
-  standalone: true,
-  imports: [ResponseWriterComponent, FeedbackLoadingComponent],
-  template: `
+    selector: 'app-feedback-translation',
+    imports: [ResponseWriterComponent, FeedbackLoadingComponent],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <app-feedback-loading [isLoading]="isLoading()">Translating...</app-feedback-loading>
       <div style="margin-bottom: 0.5rem;">
@@ -28,7 +27,7 @@ import { ResponseWriterComponent } from './response-writer.component';
       </div>
       <app-response-writer [translationInput]="writerInput()"  />
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeedbackTranslationComponent {
   translationInput = input.required<TranslationInput>();

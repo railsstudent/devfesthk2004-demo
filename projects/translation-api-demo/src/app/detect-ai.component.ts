@@ -5,10 +5,9 @@ import { isTranslationApiSupported } from './ai/utils/ai-detection';
 import { TranslationContainerComponent } from './translation/translation-container.component';
 
 @Component({
-  selector: 'app-detect-ai',
-  standalone: true,
-  imports: [TranslationContainerComponent, UserAgentComponent],
-  template: `
+    selector: 'app-detect-ai',
+    imports: [TranslationContainerComponent, UserAgentComponent],
+    template: `
     @if (showUserAgent()) {
       <app-user-agent />
     }
@@ -26,7 +25,7 @@ import { TranslationContainerComponent } from './translation/translation-contain
       }
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
   glitchDemo = 'https://translation-demo.glitch.me/';

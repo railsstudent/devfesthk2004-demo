@@ -7,10 +7,9 @@ import { TokenizationComponent } from './tokenization.component';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 
 @Component({
-  selector: 'app-zero-prompt',
-  standalone: true,
-  imports: [FormsModule, TokenizationComponent, LineBreakPipe],
-  template: `
+    selector: 'app-zero-prompt',
+    imports: [FormsModule, TokenizationComponent, LineBreakPipe],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Zero-shot prompting</h3>
       <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
@@ -56,14 +55,14 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
       }
     </div>
   `,
-  styleUrl: './prompt.component.css',
-  providers: [
-    {
-      provide: AbstractPromptService,
-      useClass: ZeroPromptService,
-    }
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrl: './prompt.component.css',
+    providers: [
+        {
+            provide: AbstractPromptService,
+            useClass: ZeroPromptService,
+        }
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZeroPromptComponent extends BasePromptComponent {
   isPerSession = input(false);

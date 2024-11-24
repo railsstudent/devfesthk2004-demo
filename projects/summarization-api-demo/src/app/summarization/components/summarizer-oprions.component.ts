@@ -3,10 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
 
 @Component({
-  selector: 'app-summarizer-options',
-  standalone: true,
-  imports: [FormsModule],
-  template: `
+    selector: 'app-summarizer-options',
+    imports: [FormsModule],
+    template: `
     <div class="options-container">
       @let formatOptions = selectOptions().formatValues;
       @let typeOptions = selectOptions().typeValues;
@@ -40,7 +39,7 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
     </div>
     <hr />
   `,
-  styles: `
+    styles: `
     .options-container {
       display: flex;
       flex-wrap: wrap;
@@ -60,7 +59,7 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
       font-style: italic;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SummarizerOptionsComponent {
     selectOptions = input.required<SummarizerSelectOptions>();

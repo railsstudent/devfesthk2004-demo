@@ -9,10 +9,9 @@ import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { FeedbackErrorComponent } from './feedback-error.component';
 
 @Component({
-  selector: 'app-feedback-sentiment',
-  standalone: true,
-  imports: [FormsModule, LineBreakPipe, FeedbackErrorComponent, FeedbackLoadingComponent],
-  template: `
+    selector: 'app-feedback-sentiment',
+    imports: [FormsModule, LineBreakPipe, FeedbackErrorComponent, FeedbackLoadingComponent],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Customer's Feedback</h3>
       <app-feedback-loading [isLoading]="isLoading()">Processing</app-feedback-loading>
@@ -36,7 +35,7 @@ import { FeedbackErrorComponent } from './feedback-error.component';
       <app-feedback-error [error]="error()" />
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeedbackSentimentComponent implements OnDestroy {
   sentimentService = inject(FeedbackSentimentService);

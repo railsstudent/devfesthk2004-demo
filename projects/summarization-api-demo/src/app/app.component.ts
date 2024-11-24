@@ -3,10 +3,9 @@ import { DetectAIComponent } from './detect-ai.component';
 import { SetupComponent } from './summarization/components/setup.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [DetectAIComponent, SetupComponent],
-  template: `
+    selector: 'app-root',
+    imports: [DetectAIComponent, SetupComponent],
+    template: `
     <h2>Chrome Built-in Summarization API </h2>
     <div style="margin-bottom: 0.5rem;">
       @let btnSetupText = showSetup() ? 'Hide Setup' : 'Show Setup';
@@ -19,14 +18,14 @@ import { SetupComponent } from './summarization/components/setup.component';
     }
     <app-detect-ai [showUserAgent]="showUserAgent()" />
   `,
-  styles: `
+    styles: `
     :host {
       display: block;
       padding-left: 1rem;
       padding-right: 1rem;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   showSetup = signal(false);

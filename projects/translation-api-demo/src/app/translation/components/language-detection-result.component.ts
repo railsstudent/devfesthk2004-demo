@@ -3,10 +3,9 @@ import { LanguageDetectionWithNameResult } from '../../ai/types/language-detecti
 import { ConfidencePipe } from '../pipes/confidence.pipe';
 
 @Component({
-  selector: 'app-language-detection-result',
-  imports: [ConfidencePipe],
-  standalone: true,
-  template: `
+    selector: 'app-language-detection-result',
+    imports: [ConfidencePipe],
+    template: `
     <div>
         <span class="label">Response: </span>
         @let language = detectedLanguage();
@@ -19,7 +18,7 @@ import { ConfidencePipe } from '../pipes/confidence.pipe';
         }
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageDetectionResultComponent {
     detectedLanguage = input.required<LanguageDetectionWithNameResult | undefined>();

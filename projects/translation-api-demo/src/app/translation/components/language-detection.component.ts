@@ -6,10 +6,9 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
 import { AllowTranslation } from '../types/allow-translation.type';
 
 @Component({
-  selector: 'app-language-detection',
-  standalone: true,
-  imports: [FormsModule, LanguageDetectionResultComponent],
-  template: `
+    selector: 'app-language-detection',
+    imports: [FormsModule, LanguageDetectionResultComponent],
+    template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <div>
         <span class="label" for="input">Input text: </span>
@@ -20,7 +19,7 @@ import { AllowTranslation } from '../types/allow-translation.type';
       <app-language-detection-result [detectedLanguage]="detectedLanguage()" [minConfidence]="minConfidence" />
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageDetectionComponent {
   service = inject(LanguageDetectionService);

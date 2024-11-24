@@ -6,10 +6,9 @@ import { TranslateTextComponent } from './components/translate-text.component';
 import { AllowTranslation } from './types/allow-translation.type';
 
 @Component({
-  selector: 'app-translation-container',
-  standalone: true,
-  imports: [LanguageDetectionComponent, TranslateTextComponent],
-  template: `
+    selector: 'app-translation-container',
+    imports: [LanguageDetectionComponent, TranslateTextComponent],
+    template: `
     <div>
       <h3>Translation API Demo</h3>
       <app-language-detection (nextStep)="updateCanTranslate($event)" />
@@ -22,7 +21,7 @@ import { AllowTranslation } from './types/allow-translation.type';
       }
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranslationContainerComponent {
   translationService = inject(TranslationService);
