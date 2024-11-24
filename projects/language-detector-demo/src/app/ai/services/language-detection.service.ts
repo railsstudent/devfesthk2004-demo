@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { AI_LANGUAGE_DETECTION_API_TOKEN, AILanguageDetector, AILanguageDetectorCapabilities } from '../constants/core.constant';
-import { LanguageDetectionResult, LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
+import { AI_LANGUAGE_DETECTION_API_TOKEN } from '../constants/core.constant';
+import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 
 const MAX_LANGUAGE_RESULTS = 111;
 
@@ -60,8 +60,12 @@ export class LanguageDetectionService  {
         this.#detector.set(newDetector);
     }
 
-    languageTagToHumanReadable(languageTag: string, targetLanguage = 'en') {
+    languageTagToHumanReadable(languageTag: string | null, targetLanguage = 'en') {
         const displayNames = new Intl.DisplayNames([targetLanguage], { type: 'language' });
-        return displayNames.of(languageTag) || 'NA';
+        if (languageTag) {
+            return displayNames.of(languageTag) || 'NA';
+        }
+
+        return 'NA';
     }
 }

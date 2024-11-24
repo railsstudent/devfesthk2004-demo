@@ -44,11 +44,18 @@ export class LanguageDetectionComponent {
   async setup() {
     await this.service.createCapabilities();
     await this.service.createDetector();
-    const languages = this.languagesAvailable().map(({ code }) => ({
-      code,
-      name: this.service.languageTagToHumanReadable(code),
-      available: this.capabilities()?.languageAvailable(code) || 'no',
-    }));
+    const languages = this.languagesAvailable().map(({ code }) => {
+      const capabilities = this.capabilities();
+      let available = 'no' as AICapabilityAvailability;
+      if (capabilities && 'languageAvailable' in capabilities) {
+        available = (capabilities as any).languageAvailable(code) || 'no';
+      }
+      return {
+        code,
+        name: this.service.languageTagToHumanReadable(code),
+        available,
+      }
+    });
     this.languagesAvailable.set(languages);
   }
 
