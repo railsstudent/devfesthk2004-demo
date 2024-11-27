@@ -5,9 +5,11 @@ import { LanguageAvailable } from '../../ai/types/language-available.type';
   selector: 'app-language-available',
   standalone: true,
   template: `
-    <div>
+    <div style="display: flex; flex-wrap: wrap;">
     @for (language of languagesAvailable(); track language.code) {
-        <p>Is {{ language.name }} available? {{language.available }}</p>
+        <p style="flex-basis: calc(100% / 3); flex-shrink: 1;">
+          Is {{ language.name }} available? {{language.available }}
+        </p>
     }
     </div>
   `,

@@ -29,7 +29,7 @@ export class LanguageDetectionComponent {
   service = inject(LanguageDetectionService);
   inputText = signal('');
   detectedLanguages = signal<LanguageDetectionWithNameResult[]>([]);
-  languagesAvailable = signal<LanguageAvailable[]>(['en', 'zh', 'es', 'it'].map((code) => ({
+  languagesAvailable = signal<LanguageAvailable[]>(['en', 'zh', 'es', 'it', 'de'].map((code) => ({
     code,
     name: this.service.languageTagToHumanReadable(code) || 'NA',
     available: 'no'
@@ -44,16 +44,12 @@ export class LanguageDetectionComponent {
   async setup() {
     await this.service.createCapabilities();
     await this.service.createDetector();
+    const capabilities = this.capabilities();
     const languages = this.languagesAvailable().map(({ code }) => {
-      const capabilities = this.capabilities();
-      let available = 'no' as AICapabilityAvailability;
-      if (capabilities && 'languageAvailable' in capabilities) {
-        available = (capabilities as any).languageAvailable(code) || 'no';
-      }
       return {
         code,
         name: this.service.languageTagToHumanReadable(code),
-        available,
+        available: capabilities?.languageAvailable(code) || 'no',
       }
     });
     this.languagesAvailable.set(languages);
