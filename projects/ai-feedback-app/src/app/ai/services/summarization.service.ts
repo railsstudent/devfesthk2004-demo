@@ -37,7 +37,7 @@ export class SummarizationService {
 
     private async languageAvailable(languageFlag: string): Promise<AICapabilityAvailability> {
         const capabilities = await this.initCapabilities();
-        return (capabilities as any).languageAvailable(languageFlag);
+        return capabilities.languageAvailable(languageFlag);
     }
 
     async canSummarize(text: string): Promise<boolean> {
