@@ -64,7 +64,7 @@ export class SummarizationService {
     async languageAvailable(languageFlags: string[]): Promise<string[]> {
         const capabilities = await this.initCapabilities();
         return languageFlags.map((flag) => 
-            `capabilities.languageAvailable(${flag}) = ${(capabilities as any).languageAvailable(flag)}`
+            `capabilities.languageAvailable(${flag}) = ${capabilities.languageAvailable(flag)}`
         );
     }
 
