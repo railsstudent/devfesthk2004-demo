@@ -20,11 +20,10 @@ export class TranslationService  {
         const results: LanguagePairAvailable[] = [];
         for (const targetLanguage of TRANSKIT_LANGUAGES) {
             if (sourceLanguage !== targetLanguage) {
-                if ('capabilities' in this.#translationAPI) {
-                    const available = (await this.#translationAPI.capabilities()).canTranslate(sourceLanguage, targetLanguage);
-                    if (available !== 'no') {
-                        results.push({ sourceLanguage, targetLanguage, available });
-                    }
+                const capabilities = await this.#translationAPI.capabilities();
+                const available = capabilities.languagePairAvailable(sourceLanguage, targetLanguage);
+                if (available !== 'no') {
+                    results.push({ sourceLanguage, targetLanguage, available });
                 }
             }
         }
