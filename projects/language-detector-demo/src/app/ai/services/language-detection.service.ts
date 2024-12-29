@@ -16,7 +16,7 @@ export class LanguageDetectionService  {
     #capabilities = signal<AILanguageDetectorCapabilities | null>(null);
     capabilities = this.#capabilities.asReadonly();
 
-    async createCapabilities() {
+    private async createCapabilities() {
         if (!this.#languageDetectionAPI) {
             throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
         }
@@ -24,7 +24,7 @@ export class LanguageDetectionService  {
         this.#capabilities.set(capabilities);
     }
 
-    async destroyCapabilities() {
+    private async destroyCapabilities() {
         this.#capabilities.set(null);
     }
 
@@ -44,7 +44,12 @@ export class LanguageDetectionService  {
         return probablyLanguages.map((item) => ({ ...item, name: this.languageTagToHumanReadable(item.detectedLanguage) }))
     }
 
-    destroyDetector() {
+    async destroyDetector() {
+        await this.destroyCapabilities();
+        this.resetDetector();
+    }
+
+    private resetDetector() {
         const detector = this.detector();
 
         if (detector) {
@@ -54,10 +59,15 @@ export class LanguageDetectionService  {
         }
     }
 
-    async createDetector() {
-        this.destroyDetector();
+    private async recreateDetector() {
+        this.resetDetector();
         const newDetector = await this.#languageDetectionAPI?.create({ signal: this.#controller.signal });
         this.#detector.set(newDetector);
+    }
+
+    async createDetector() {
+        await this.createCapabilities();
+        await this.recreateDetector();
     }
 
     languageTagToHumanReadable(languageTag: string | null, targetLanguage = 'en') {

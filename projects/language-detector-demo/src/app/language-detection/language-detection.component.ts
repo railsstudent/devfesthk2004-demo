@@ -42,7 +42,6 @@ export class LanguageDetectionComponent {
   isDisableDetectLanguage = computed(() => this.isUnavailable() || !this.detector() || this.inputText().trim() === '');
 
   async setup() {
-    await this.service.createCapabilities();
     await this.service.createDetector();
     const capabilities = this.capabilities();
     const languages = this.languagesAvailable().map(({ code }) => {
@@ -56,7 +55,6 @@ export class LanguageDetectionComponent {
   }
 
   async teardown() {
-    await this.service.destroyCapabilities();
     await this.service.destroyDetector();
     const languages = this.languagesAvailable().map(({ code }) => ({
       code,
