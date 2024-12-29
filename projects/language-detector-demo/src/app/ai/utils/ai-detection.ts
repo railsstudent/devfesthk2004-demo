@@ -6,7 +6,7 @@ import { ERROR_CODES } from '../enums/errors.enum';
 
 const CHROME_VERSION = 129
 
-export async function checkChromeBuiltInAI(): Promise<string> {
+async function checkChromeBuiltInAI(): Promise<string> {
    if (!isChromeBrowser()) {
       throw new Error(ERROR_CODES.UNSUPPORTED_BROWSER);
    }
@@ -15,7 +15,6 @@ export async function checkChromeBuiltInAI(): Promise<string> {
       throw new Error(ERROR_CODES.OLD_BROSWER);
    }
 
-   const apiName = 'Language Detection API';
    if (!('ai' in globalThis)) {
       throw new Error(ERROR_CODES.NO_API);
    }
