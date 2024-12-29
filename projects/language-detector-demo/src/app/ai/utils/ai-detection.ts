@@ -2,31 +2,32 @@ import { inject } from '@angular/core';
 import { catchError, from, Observable, of } from 'rxjs';
 import { AI_LANGUAGE_DETECTION_API_TOKEN } from '../constants/core.constant';
 import { getChromVersion, isChromeBrowser } from './user-agent-data';
+import { ERROR_CODES } from '../enums/errors.enum';
 
 const CHROME_VERSION = 129
 
 export async function checkChromeBuiltInAI(): Promise<string> {
    if (!isChromeBrowser()) {
-      throw new Error('Your browser is not supported. Please use Google Chrome Dev or Canary.');
+      throw new Error(ERROR_CODES.UNSUPPORTED_BROWSER);
    }
 
    if (getChromVersion() < CHROME_VERSION) {
-      throw new Error(`Please upgrade the Chrome version to at least ${CHROME_VERSION}.`);
+      throw new Error(ERROR_CODES.OLD_BROSWER);
    }
 
    const apiName = 'Language Detection API';
    if (!('ai' in globalThis)) {
-      throw new Error(`${apiName} is not available, check your configuration in chrome://flags/#language-detection-api`);
+      throw new Error(ERROR_CODES.NO_API);
    }
 
    const languageDetector = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
    const status = (await languageDetector?.capabilities())?.available;
    if (!status) { 
-      throw new Error(`${apiName} not found in window. Please check the Prompt API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#language-detection`);
+      throw new Error(ERROR_CODES.NO_API);
    } else if (status === 'after-download') {
-      throw new Error('Built-in AI is not ready, please go to chrome://components and start downloading the Optimization Guide On Device Model');
+      throw new Error(ERROR_CODES.AFTER_DOWNLOAD);
    } else if (status === 'no') {
-      throw new Error(`The model of ${apiName} is not implemented. Please check your configuration in chrome://flags/#optimization-guide-on-device-model`);
+      throw new Error(ERROR_CODES.NO_GEMINI_NANO);
    }
 
    return '';
