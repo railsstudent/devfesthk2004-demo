@@ -15,7 +15,6 @@ export async function checkChromeBuiltInAI(): Promise<string> {
       throw new Error(ERROR_CODES.OLD_BROSWER);
    }
 
-   const apiName = 'Language Detection API';
    if (!('ai' in globalThis)) {
       throw new Error(ERROR_CODES.NO_API);
    }
