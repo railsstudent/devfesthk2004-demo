@@ -10,19 +10,21 @@ enum ERROR_CODES {
    TRANSLATION_AFTER_DOWNLLOAD = 'Built-in AI is not ready, please go to chrome://components and start downloading the Chrome TranslateKit.',
    NO_TRANSLATION_API = 'The model of the Translation API is not implemented. Please check your configuration in chrome://flags/#translation-api',
    NO_LANGUAGE_DETECTOR = 'Build-in Language Detector not found in window. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation',
+   NO_CHROME = 'Your browser is not supported. Please use Google Chrome Dev or Canary',
+   OLD_CHROME = 'Please upgrade the Chrome version to at least 131'
 }
 
 export async function checkChromeBuiltInAI(): Promise<string> {
    if (!isChromeBrowser()) {
-      throw new Error('Your browser is not supported. Please use Google Chrome Dev or Canary.');
+      throw new Error(ERROR_CODES.NO_CHROME);
    }
 
    if (getChromVersion() < CHROME_VERSION) {
-      throw new Error(`Please upgrade the Chrome version to at least ${CHROME_VERSION}.`);
+      throw new Error(ERROR_CODES.OLD_CHROME);
    }
 
-   if (!('translation' in globalThis)) {
-      throw new Error('Translation API is not available, check your configuration in chrome://flags/#translation-api');
+   if (!('ai' in globalThis)) {
+      throw new Error(ERROR_CODES.NO_TRANSLATION_API);
    }
 
    const languageDetection = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
