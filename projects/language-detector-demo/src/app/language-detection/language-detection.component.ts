@@ -38,8 +38,8 @@ export class LanguageDetectionComponent {
   capabilities = this.service.capabilities;
   detector = this.service.detector;
 
-  isUnavailable = computed(() => !this.capabilities() || this.capabilities()?.available !== 'readily');
-  isDisableDetectLanguage = computed(() => this.isUnavailable() || !this.detector() || this.inputText().trim() === '');
+  isDisableDetectLanguage = computed(() => this.capabilities()?.available !== 'readily' 
+    || !this.detector() || this.inputText().trim() === '');
 
   async setup() {
     await this.service.createDetector();
@@ -54,8 +54,8 @@ export class LanguageDetectionComponent {
     this.languagesAvailable.set(languages);
   }
 
-  async teardown() {
-    await this.service.destroyDetector();
+  teardown() {
+    this.service.destroyDetector();
     const languages = this.languagesAvailable().map(({ code }) => ({
       code,
       name: this.service.languageTagToHumanReadable(code),
