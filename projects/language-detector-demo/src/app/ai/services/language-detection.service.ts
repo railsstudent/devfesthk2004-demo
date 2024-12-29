@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { AI_LANGUAGE_DETECTION_API_TOKEN } from '../constants/core.constant';
 import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
+import { ERROR_CODES } from '../enums/errors.enum';
 
 const MAX_LANGUAGE_RESULTS = 111;
 
@@ -16,21 +17,9 @@ export class LanguageDetectionService  {
     #capabilities = signal<AILanguageDetectorCapabilities | null>(null);
     capabilities = this.#capabilities.asReadonly();
 
-    private async createCapabilities() {
-        if (!this.#languageDetectionAPI) {
-            throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
-        }
-        const capabilities = await this.#languageDetectionAPI.capabilities();
-        this.#capabilities.set(capabilities);
-    }
-
-    private async destroyCapabilities() {
-        this.#capabilities.set(null);
-    }
-
     async detect(query: string, topNResults = 3): Promise<LanguageDetectionWithNameResult[]> {
         if (!this.#languageDetectionAPI) {
-            throw new Error(`Your browser doesn't support the Language Detection API. If you are on Chrome, join the Early Preview Program to enable it.`);
+            throw new Error(ERROR_CODES.NO_API);
         }
 
         const detector = this.detector();
@@ -44,8 +33,8 @@ export class LanguageDetectionService  {
         return probablyLanguages.map((item) => ({ ...item, name: this.languageTagToHumanReadable(item.detectedLanguage) }))
     }
 
-    async destroyDetector() {
-        await this.destroyCapabilities();
+    destroyDetector() {
+        this.#capabilities.set(null);
         this.resetDetector();
     }
 
@@ -59,15 +48,18 @@ export class LanguageDetectionService  {
         }
     }
 
-    private async recreateDetector() {
-        this.resetDetector();
-        const newDetector = await this.#languageDetectionAPI?.create({ signal: this.#controller.signal });
-        this.#detector.set(newDetector);
-    }
-
     async createDetector() {
-        await this.createCapabilities();
-        await this.recreateDetector();
+        if (!this.#languageDetectionAPI) {
+            throw new Error(ERROR_CODES.NO_API);
+        }
+
+        this.resetDetector();
+        const [capabilities, newDetector]  = await Promise.all([
+            this.#languageDetectionAPI.capabilities(),
+            this.#languageDetectionAPI.create({ signal: this.#controller.signal })
+        ]);
+        this.#capabilities.set(capabilities);
+        this.#detector.set(newDetector);
     }
 
     languageTagToHumanReadable(languageTag: string | null, targetLanguage = 'en') {
