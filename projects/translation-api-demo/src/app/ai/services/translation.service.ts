@@ -58,10 +58,11 @@ export class TranslationService  {
             }
             
             const translator = await this.#translationAPI.create({ ...languagePair, signal: this.#controller.signal });
-            const available = translator ? 'readily' as AICapabilityAvailability : 'no' as AICapabilityAvailability;
+            const capabilities = await this.#translationAPI.capabilities();
+            const available = capabilities.languagePairAvailable(languagePair.sourceLanguage, languagePair.targetLanguage)
 
             translator.destroy();
- 
+             
             return { ...languagePair, available };
         } catch (e) {
             console.error(e);
