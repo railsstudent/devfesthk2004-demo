@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { AI_LANGUAGE_DETECTION_API_TOKEN } from '../constants/core.constant';
 import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 import { ERROR_CODES } from '../enums/errors.enum';
@@ -8,7 +8,7 @@ const MAX_LANGUAGE_RESULTS = 111;
 @Injectable({
   providedIn: 'root'
 })
-export class LanguageDetectionService  {
+export class LanguageDetectionService implements OnDestroy  {
     #controller = new AbortController();
 
     #languageDetectionAPI = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
@@ -69,5 +69,12 @@ export class LanguageDetectionService  {
         }
 
         return 'NA';
+    }
+
+    ngOnDestroy(): void {
+        const detector = this.detector();
+        if (detector) {
+            detector.destroy();
+        }
     }
 }

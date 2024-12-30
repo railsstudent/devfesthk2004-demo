@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { AI_LANGUAGE_DETECTION_API_TOKEN, AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
@@ -6,7 +6,7 @@ import { LanguageDetectionWithNameResult } from '../types/language-detection-res
 @Injectable({
   providedIn: 'root'
 })
-export class LanguageDetectionService  {
+export class LanguageDetectionService implements OnDestroy  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
     #languageDetectionAPI = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
     #detector = signal<AILanguageDetector | undefined>(undefined);
@@ -55,5 +55,12 @@ export class LanguageDetectionService  {
             return 'NA';
         }
         return displayNames.of(languageTag) || 'NA';
+    }
+
+    ngOnDestroy(): void {
+        const detector = this.detector();
+        if (detector) {
+            detector.destroy();
+        }
     }
 }
