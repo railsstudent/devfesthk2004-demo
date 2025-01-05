@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { SystemPromptService } from '../../ai/services/system-prompts.service';
+import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { BasePromptComponent } from './base-prompt.component';
 import { TokenizationComponent } from './tokenization.component';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
 
 @Component({
     selector: 'app-system-prompt',
@@ -51,4 +53,23 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
 export class SystemPromptsComponent extends BasePromptComponent {
   systemPrompt = signal(`You are an expert that knows the official languages of a location. State the languages, separated by commas, and no historic background. If you don't know the answer, then say "Sorry, it is not a country. Please answer in English"`);
   tokenContext = this.promptService.tokenContext;
+
+  constructor() {
+    super();
+    this.query.set('China');
+    toObservable(this.systemPrompt) 
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(async (systemPrompt) => {
+
+            this.promptService.destroySession();
+            this.promptService.setPromptOptions({ systemPrompt });
+            await this.promptService.createSessionIfNotExists();
+        })
+      )
+      .subscribe();   
+
+    this.promptService.setPromptOptions({ systemPrompt: this.systemPrompt() });
+  }
 }

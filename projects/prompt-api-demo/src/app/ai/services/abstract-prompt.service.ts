@@ -19,7 +19,7 @@ export abstract class AbstractPromptService {
     shouldCreateSession() {
         const session = this.#session();
         const context = this.#tokenContext();
-        return !session || !context || context.tokensLeft < 500;
+        return !session || (context && context.tokensLeft < 500);
     }
 
     setPromptOptions(options?: PromptOptions) {
