@@ -9,7 +9,7 @@ export function provideAILanguageDetectionAPI(): EnvironmentProviders {
             useFactory: () => {
                 const platformId = inject(PLATFORM_ID);
                 const objWindow = isPlatformBrowser(platformId) ? window : undefined;
-                return objWindow?.ai?.languageDetector ? objWindow?.ai?.languageDetector : undefined;
+                return objWindow?.ai?.languageDetector;
             },
         }
     ]);
