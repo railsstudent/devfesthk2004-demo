@@ -47,7 +47,7 @@ import { TokenizationComponent } from './tokenization.component';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NShotPromptsComponent extends BasePromptComponent {
+export class NShotsPromptComponent extends BasePromptComponent {
   initialPrompts = signal<LanguageInitialPrompt>([
     { role: 'system', content: `You are an expert in determine the sentiment of a text. 
     If it is positive, say 'positive'. If it is negative, say 'negative'. If you are not sure, then say 'not sure'` },
@@ -55,7 +55,7 @@ export class NShotPromptsComponent extends BasePromptComponent {
     { role: 'assistant', content: "positive" },
     { role: 'user', content: "The waiters are very rude, the food is salty, and the drinks are sour." },
     { role: 'assistant', content: "negative" },
-    { role: 'user', content: "Google is a comany" },
+    { role: 'user', content: "Google is a company" },
     { role: 'assistant', content: "not sure" },
     { role: 'user', content: "The weather is hot and sunny today." },
     { role: 'assistant', content: "postive" }
