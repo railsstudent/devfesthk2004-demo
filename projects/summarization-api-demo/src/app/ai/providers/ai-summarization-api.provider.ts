@@ -9,7 +9,7 @@ export function provideSummarizationApi(): EnvironmentProviders {
             useFactory: () => {
                 const platformId = inject(PLATFORM_ID);
                 const objWindow = isPlatformBrowser(platformId) ? window : undefined;
-                return objWindow?.ai?.summarizer ? objWindow.ai.summarizer : undefined;
+                return objWindow?.ai?.summarizer;
             },
         }
     ]);
