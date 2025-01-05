@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
 import { CapabilityComponent } from './components/capability.component';
-import { NShotPromptsComponent } from './components/n-shot-prompts.component';
+import { NShotsPromptComponent } from './components/n-shots-prompt.component';
 import { SystemPromptsComponent } from './components/system-prompts.component';
 import { ZeroPromptComponent } from './components/zero-prompt.component';
 
@@ -60,7 +60,7 @@ export class PromptShowcaseComponent {
       }; 
     }
     return {
-      component: NShotPromptsComponent,
+      component: NShotsPromptComponent,
       inputs: {}
     }
   });
