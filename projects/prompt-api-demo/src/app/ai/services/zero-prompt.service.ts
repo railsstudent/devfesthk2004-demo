@@ -9,8 +9,9 @@ import { AbstractPromptService } from './abstract-prompt.service';
 })
 export class ZeroPromptService extends AbstractPromptService implements OnDestroy {
   #controller = new AbortController();
-  perSession = signal<Pick<AILanguageModel, "temperature" | "topK"> | undefined>(undefined);
   isPerSession = signal(false);
+  topK = signal(3);
+  temperature = signal(1);
 
   getCapabilities() {
     if (!this.promptApi) {
@@ -24,9 +25,8 @@ export class ZeroPromptService extends AbstractPromptService implements OnDestro
 
   override async createPromptSession(options?: PromptOptions): Promise<AILanguageModel | undefined> {
     const capabilities = await this.promptApi?.capabilities();
-    const configurations = this.perSession();
-    const temperature = Math.min(configurations?.temperature || 0, 3);
-    const topK = Math.floor(Math.min(configurations?.topK || 0, capabilities?.maxTopK || 0));
+    const temperature = Math.min(this.temperature(), 3);
+    const topK = Math.floor(Math.min(this.topK(), capabilities?.maxTopK || 0));
     const createOptions = this.isPerSession() ? {
       signal: this.#controller.signal,
       temperature,
