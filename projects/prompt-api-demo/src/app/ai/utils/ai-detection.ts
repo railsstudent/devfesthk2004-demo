@@ -1,18 +1,8 @@
 import { inject } from '@angular/core';
 import { catchError, from, Observable, of } from 'rxjs';
-import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
+import { AI_PROMPT_API_TOKEN, CHROME_VERSION } from '../constants/core.constant';
 import { getChromVersion, isChromeBrowser } from './user-agent-data';
-
-const CHROME_VERSION = 128
-
-enum ERROR_CODES {
-   NOT_CHROME_BROWSER = 'Your browser is not supported. Please use Google Chrome Dev or Canary.',
-   OLD_BROWSER = `Please upgrade the Chrome version to at least ${CHROME_VERSION}.`,
-   NO_PROMPT_API = 'Prompt API is not available, check your configuration in chrome://flags/#prompt-api-for-gemini-nano',
-   API_NOT_READY = 'Build-in Prompt API not found in window. Please check the Prompt API\'s explainer in github.com/explainers-by-googlers/prompt-api',
-   AFTER_DOWNLOAD = 'Built-in AI is not ready, please go to chrome://components and start downloading the Optimization Guide On Device Model',
-   NO_LARGE_LANGUAGE_MODEL = 'The model of the Prompt API is not implemented. Please check your configuration in chrome://flags/#optimization-guide-on-device-model'
-}
+import { ERROR_CODES } from '../enums/error-codes.enum';
 
 export async function checkChromeBuiltInAI(): Promise<string> {
    if (!isChromeBrowser()) {

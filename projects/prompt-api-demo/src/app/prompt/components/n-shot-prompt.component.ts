@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { NShotsPromptService } from '../../ai/services/n-shots-prompt.service';
-import { BasePromptComponent } from './base-prompt.component';
-import { FormsModule } from '@angular/forms';
-import { TokenizationComponent } from './tokenization.component';
-import { InitialPromptComponent } from './initial-prompt.component';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
+import { LineBreakPipe } from '../pipes/line-break.pipe';
+import { BasePromptComponent } from './base-prompt.component';
+import { InitialPromptComponent } from './initial-prompt.component';
+import { TokenizationComponent } from './tokenization.component';
 
 @Component({
     selector: 'app-n-shot-prompt',
@@ -63,6 +63,11 @@ export class NShotPromptComponent extends BasePromptComponent {
     { role: 'assistant', content: "postive" }
   ]);
   tokenContext = this.promptService.tokenContext;
+
+  constructor() {
+    super();
+    this.query.set('The toilet has no toilet papers again.');
+  }
 
   async createSession() {
     try {
