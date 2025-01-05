@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { NShotsPromptService } from '../../ai/services/n-shots-prompt.service';
-import { BasePromptComponent } from './base-prompt.component';
-import { FormsModule } from '@angular/forms';
-import { TokenizationComponent } from './tokenization.component';
-import { InitialPromptComponent } from './initial-prompt.component';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
+import { LineBreakPipe } from '../pipes/line-break.pipe';
+import { BasePromptComponent } from './base-prompt.component';
+import { InitialPromptComponent } from './initial-prompt.component';
+import { TokenizationComponent } from './tokenization.component';
 
 @Component({
     selector: 'app-n-shot-prompt',
@@ -24,8 +24,6 @@ import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
         <span class="label" for="input">Prompt: </span>
         <textarea id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" rows="3"></textarea>
       </div>
-      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
-      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
       <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
@@ -64,16 +62,9 @@ export class NShotPromptComponent extends BasePromptComponent {
   ]);
   tokenContext = this.promptService.tokenContext;
 
-  async createSession() {
-    try {
-      this.isLoading.set(true);
-      const systemPromptService = this.promptService as NShotsPromptService;
-      await systemPromptService.createSession(this.initialPrompts());
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
+  constructor() {
+    super();
+    this.query.set('The toilet has no toilet papers again.');
+    this.promptService.setPromptOptions({ initialPrompts: this.initialPrompts() });
   }
 }

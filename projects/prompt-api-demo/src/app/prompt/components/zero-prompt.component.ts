@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, OnChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { ZeroPromptService } from '../../ai/services/zero-prompt.service';
+import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { BasePromptComponent } from './base-prompt.component';
 import { TokenizationComponent } from './tokenization.component';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
 
 @Component({
     selector: 'app-zero-prompt',
@@ -39,8 +39,6 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
         <textarea id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" 
           rows="3"></textarea>
       </div>
-      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
-      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
       <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
@@ -58,42 +56,28 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
     styleUrl: './prompt.component.css',
     providers: [
         {
-            provide: AbstractPromptService,
-            useClass: ZeroPromptService,
+          provide: AbstractPromptService,
+          useClass: ZeroPromptService,
         }
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ZeroPromptComponent extends BasePromptComponent {
+export class ZeroPromptComponent extends BasePromptComponent implements OnChanges {
   isPerSession = input(false);
+  zeroPromptService = this.promptService as ZeroPromptService;
+  temperature = this.zeroPromptService.temperature;
+  topK = this.zeroPromptService.topK;
+  tokenContext = this.zeroPromptService.tokenContext;
 
-  topK = signal(3);
-  temperature = signal(1);
-  
-  tokenContext = this.promptService.tokenContext;
+  ngOnChanges(): void {
+    this.zeroPromptService.isPerSession.set(this.isPerSession());
+  }
 
   perSessionStr = computed(() => {
-    const zeroPromptService = this.promptService as ZeroPromptService;
-    const perSession = zeroPromptService.perSession()
-    if (perSession) {
-      const { topK, temperature } = perSession;
-      return `\{topK: ${topK}, temperature: ${temperature}\}`;
+    if (this.isPerSession()) {
+      return `\{topK: ${this.topK()}, temperature: ${this.temperature()}\}`;
     }
 
     return '';
-  })
-
-  async createSession() {
-    try {
-      this.isLoading.set(true);
-      const zeroPromptService = this.promptService as ZeroPromptService;
-      await zeroPromptService.createSession(this.isPerSession(), 
-        { topK: this.topK(), temperature: this.temperature() });
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
+  });
 }
