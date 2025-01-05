@@ -28,18 +28,6 @@ export abstract class BasePromptComponent {
         }
     });
 
-    destroySession() {
-      try {
-        this.isLoading.set(true);
-        this.promptService.destroySession();
-      } catch(e) {
-        const errMsg = e instanceof Error ? (e as Error).message : 'Error in destroySession';
-        this.error.set(errMsg);
-      } finally {
-        this.isLoading.set(false);
-      }
-    }
-  
     async countPromptTokens() {
       try {
         this.isLoading.set(true);
