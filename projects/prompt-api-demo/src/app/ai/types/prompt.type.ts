@@ -3,3 +3,5 @@ export type Tokenization = Pick<AILanguageModel, "tokensSoFar" | "tokensLeft" | 
 export type LanguageInitialPrompt = 
     [AILanguageModelSystemPrompt, ...AILanguageModelPrompt[]]
     | AILanguageModelPrompt[];
+    
+export type PromptOptions = AILanguageModelCreateOptionsWithSystemPrompt | AILanguageModelCreateOptionsWithoutSystemPrompt;

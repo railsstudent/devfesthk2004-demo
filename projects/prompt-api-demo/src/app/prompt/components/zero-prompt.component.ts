@@ -39,8 +39,6 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
         <textarea id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" 
           rows="3"></textarea>
       </div>
-      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
-      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
       <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
@@ -74,26 +72,12 @@ export class ZeroPromptComponent extends BasePromptComponent {
 
   perSessionStr = computed(() => {
     const zeroPromptService = this.promptService as ZeroPromptService;
-    const perSession = zeroPromptService.perSession()
+    const perSession = zeroPromptService.perSession();
     if (perSession) {
       const { topK, temperature } = perSession;
       return `\{topK: ${topK}, temperature: ${temperature}\}`;
     }
 
     return '';
-  })
-
-  async createSession() {
-    try {
-      this.isLoading.set(true);
-      const zeroPromptService = this.promptService as ZeroPromptService;
-      await zeroPromptService.createSession(this.isPerSession(), 
-        { topK: this.topK(), temperature: this.temperature() });
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
+  });
 }

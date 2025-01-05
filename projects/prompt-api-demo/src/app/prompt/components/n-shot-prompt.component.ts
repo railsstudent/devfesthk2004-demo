@@ -24,8 +24,6 @@ import { TokenizationComponent } from './tokenization.component';
         <span class="label" for="input">Prompt: </span>
         <textarea id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" rows="3"></textarea>
       </div>
-      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
-      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
       <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
       <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
       <div>
@@ -67,18 +65,6 @@ export class NShotPromptComponent extends BasePromptComponent {
   constructor() {
     super();
     this.query.set('The toilet has no toilet papers again.');
-  }
-
-  async createSession() {
-    try {
-      this.isLoading.set(true);
-      const systemPromptService = this.promptService as NShotsPromptService;
-      await systemPromptService.createSession(this.initialPrompts());
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
+    this.promptService.setPromptOptions({ initialPrompts: this.initialPrompts() });
   }
 }

@@ -17,8 +17,6 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
         <span class="label" for="input">System Prompt: </span>
         <textarea id="input" name="input" [(ngModel)]="systemPrompt" rows="4"></textarea>
       </div>
-      <button (click)="createSession()" [disabled]="myState.disabled">Create session</button>
-      <button (click)="destroySession()" [disabled]="myState.destroyDisabled">Destroy session</button>
       <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
       <div>
         <span class="label">Status: </span><span>{{ myState.status }}</span>
@@ -53,17 +51,4 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
 export class SystemPromptsComponent extends BasePromptComponent {
   systemPrompt = signal(`You are an expert that knows the official languages of a location. State the languages, separated by commas, and no historic background. If you don't know the answer, then say "Sorry, it is not a country. Please answer in English"`);
   tokenContext = this.promptService.tokenContext;
-
-  async createSession() {
-    try {
-      this.isLoading.set(true);
-      const systemPromptService = this.promptService as SystemPromptService;
-      await systemPromptService.createSession(this.systemPrompt());
-    } catch(e) {
-      const errMsg = e instanceof Error ? (e as Error).message : 'Error in createSession';
-      this.error.set(errMsg);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
 }

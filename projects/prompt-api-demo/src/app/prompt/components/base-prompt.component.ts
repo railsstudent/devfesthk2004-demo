@@ -17,14 +17,12 @@ export abstract class BasePromptComponent {
     
     state = computed(() => {
         const isLoading = this.isLoading();
-        const session = this.session();
-        const isNoSessionOrBusy = !this.session() || this.isLoading();
-        const isUnavailableForCall = isNoSessionOrBusy || this.query().trim() === '';
+        const isUnavailableForCall = isLoading || this.query().trim() === '';
         return {
             status: isLoading ? 'Processing...' : 'Idle',
             text: isLoading ? 'Progressing...' : 'Submit',
             disabled: isLoading,
-            destroyDisabled: !session || isLoading,
+            destroyDisabled: isLoading,
             numTokensDisabled: isUnavailableForCall,
             submitDisabled: isUnavailableForCall
         }
