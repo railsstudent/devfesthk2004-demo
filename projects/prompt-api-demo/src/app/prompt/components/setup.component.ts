@@ -24,6 +24,8 @@ export class SetupComponent {
         'Select Enabled BypassPerRequirement.',
         'go to chrome://flags/#prompt-api-for-gemini-nano.',
         'Select Enabled.',
+        '(Local development) go to chrome://flags/#text-safety-classifier',
+        '(Local development) Select Disabled',
         'Relaunch Chrome',
         'Open new tab, go to chrome://components.',
         'Find Optimization Guide On Device Model',
