@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
 import { CapabilityComponent } from './components/capability.component';
-import { NShotPromptComponent } from './components/n-shot-prompt.component';
+import { NShotPromptsComponent } from './components/n-shot-prompts.component';
 import { SystemPromptsComponent } from './components/system-prompts.component';
 import { ZeroPromptComponent } from './components/zero-prompt.component';
 
@@ -26,9 +26,6 @@ import { ZeroPromptComponent } from './components/zero-prompt.component';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PromptShowcaseComponent {
-  ZeroPromptComponent = ZeroPromptComponent;
-  SystemPromptsComponent = SystemPromptsComponent;
-
   promptService = inject(ZeroPromptService);
 
   demos = signal([
@@ -63,7 +60,7 @@ export class PromptShowcaseComponent {
       }; 
     }
     return {
-      component: NShotPromptComponent,
+      component: NShotPromptsComponent,
       inputs: {}
     }
   });
