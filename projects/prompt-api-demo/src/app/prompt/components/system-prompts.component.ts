@@ -1,62 +1,54 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { SystemPromptService } from '../../ai/services/system-prompts.service';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
+import { PromptResponse } from '../types/prompt-response.type';
 import { BasePromptComponent } from './base-prompt.component';
-import { TokenizationComponent } from './tokenization.component';
+import { PromptResponseComponent } from './prompt-response.component';
 
 @Component({
     selector: 'app-system-prompt',
-    imports: [FormsModule, TokenizationComponent, LineBreakPipe],
+    imports: [FormsModule, PromptResponseComponent],
     template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>System Prompts</h3>
-      @let myState = state();
       <div>
         <span class="label" for="input">System Prompt: </span>
-        <textarea id="input" name="input" [(ngModel)]="systemPrompt" rows="4"></textarea>
+        <textarea id="input" name="input" [(ngModel)]="systemPrompt" rows="4" [disabled]="state().disabled"></textarea>
       </div>
-      <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
-      <div>
-        <span class="label">Status: </span><span>{{ myState.status }}</span>
-      </div>
-      <div>
-        <span class="label" for="input">Prompt: </span>
-        <textarea id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" rows="3"></textarea>
-      </div>
-      <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
-      <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
-      <div>
-        <span class="label">Response: </span>
-        <p [innerHTML]="response() | lineBreak"></p>
-      </div>
-      @if (error()) {
-        <div>
-          <span class="label">Error: </span>
-          <p>{{ error() }}</p>
-        </div>
-      }
+      <app-prompt-response [state]="responseState()" 
+        [(query)]="query" 
+        (countPromptTokens)="this.countPromptTokens()"
+        (submitPrompt)="this.submitPrompt()"
+      />
     </div>
   `,
     styleUrl: './prompt.component.css',
     providers: [
-        {
-            provide: AbstractPromptService,
-            useClass: SystemPromptService,
-        }
+      {
+        provide: AbstractPromptService,
+        useClass: SystemPromptService,
+      }
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SystemPromptsComponent extends BasePromptComponent {
-  systemPrompt = signal(`You are an expert that knows the official languages of a location. State the languages, separated by commas, and no historic background. If you don't know the answer, then say "Sorry, it is not a country. Please answer in English"`);
+  systemPrompt = signal(`You are an professional trip planner who helps travelers to plan a trip to a location. When a traveler specifies a country or a city, you have to recommend how to apply travel visa, pack clothes and essentials, and the known attractions to visit each day. It is preferred to visit two to three places each day to maximize the value of the trip. If you don't know the answer, then say "I do not know the answer."`);
   tokenContext = this.promptService.tokenContext;
+  
+  responseState = computed<PromptResponse>(() => ({
+    ...this.state(),
+    numPromptTokens: this.numPromptTokens(),
+    tokenContext: this.tokenContext(),
+    error: this.error(),
+    response: this.response(),
+  }));
 
   constructor() {
     super();
-    this.query.set('China');
+    this.query.set('I will visit from Hong Kong to Taipei between Feb 13th to Feb 19th. Please help me plan the trip and assume I will arrive in the afternoon on day 1.');
     toObservable(this.systemPrompt) 
       .pipe(
         debounceTime(300),
@@ -66,7 +58,8 @@ export class SystemPromptsComponent extends BasePromptComponent {
             this.promptService.destroySession();
             this.promptService.setPromptOptions({ systemPrompt });
             await this.promptService.createSessionIfNotExists();
-        })
+        }),
+        takeUntilDestroyed(),
       )
       .subscribe();   
 
