@@ -3,7 +3,6 @@ import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
 
 @Component({
     selector: 'app-initial-prompt',
-    imports: [],
     template: `
     <div>
         <h3 style="text-decoration: underline;">Initial Prompts</h3>
@@ -19,5 +18,5 @@ import { LanguageInitialPrompt } from '../../ai/types/prompt.type';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InitialPromptComponent {
-    initialPrompts = input<LanguageInitialPrompt>([]);
+  initialPrompts = input<LanguageInitialPrompt>([]);
 }
