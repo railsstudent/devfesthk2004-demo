@@ -12,16 +12,14 @@ import { PromptResponseComponent } from './prompt-response.component';
     selector: 'app-system-prompt',
     imports: [FormsModule, PromptResponseComponent],
     template: `
-    <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
+    <div class="session">
       <h3>System Prompts</h3>
       <div>
         <span class="label" for="input">System Prompt: </span>
         <textarea id="input" name="input" [(ngModel)]="systemPrompt" rows="4" [disabled]="state().disabled"></textarea>
       </div>
-      <app-prompt-response [state]="responseState()" 
-        [(query)]="query" 
-        (countPromptTokens)="this.countPromptTokens()"
-        (submitPrompt)="this.submitPrompt()"
+      <app-prompt-response [state]="responseState()" [(query)]="query" 
+        (countPromptTokens)="countPromptTokens()" (submitPrompt)="submitPrompt()"
       />
     </div>
   `,

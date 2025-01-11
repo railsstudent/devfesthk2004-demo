@@ -24,13 +24,11 @@ const INITIAL_PROMPTS: LanguageInitialPrompt = [
   selector: 'app-n-shot-prompt',
   imports: [FormsModule, InitialPromptComponent, PromptResponseComponent],
   template: `
-  <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
+  <div class="session">
     <h3>N-shots prompting</h3>
     <app-initial-prompt [initialPrompts]="initialPrompts()" /> 
-    <app-prompt-response [state]="responseState()" 
-      [(query)]="query" 
-      (countPromptTokens)="this.countPromptTokens()"
-      (submitPrompt)="this.submitPrompt()"
+    <app-prompt-response [state]="responseState()" [(query)]="query" 
+      (countPromptTokens)="countPromptTokens()" (submitPrompt)="submitPrompt()"
     />
   `,
   styleUrl: './prompt.component.css',

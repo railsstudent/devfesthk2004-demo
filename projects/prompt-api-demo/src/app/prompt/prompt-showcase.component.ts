@@ -38,11 +38,11 @@ export class PromptShowcaseComponent {
   
   componentOutlet = computed(() => {
     const { component, isPerSession = false } = this.selectedDemo();
+    const inputs = component === ZeroPromptComponent ? { isPerSession } : {}
+    
     return { 
       component,
-      inputs: { 
-        isPerSession
-      }
+      inputs
     }; 
   });
  
