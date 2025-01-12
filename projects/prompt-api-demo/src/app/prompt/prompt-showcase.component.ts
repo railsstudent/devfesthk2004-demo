@@ -16,8 +16,8 @@ import { ZeroPromptComponent } from './components/zero-prompt.component';
     <app-capability [defaultCapabilities]="defaultCapabilities()" />
     <label>Demo: </label>
     <select [(ngModel)]="selectedDemo" style="margin-bottom: 1rem;">
-      @for (demo of demos(); track demo) {
-        <option [ngValue]="demo">{{ demo }}</option>
+      @for (demo of demos(); track demo.name) {
+        <option [ngValue]="demo">{{ demo.name }}</option>
       }
     </select>
     @let outlet = componentOutlet();
@@ -29,40 +29,21 @@ export class PromptShowcaseComponent {
   promptService = inject(ZeroPromptService);
 
   demos = signal([
-    'Zero-shot prompting',
-    'Per session Option',
-    'System Prompts',
-    'N-shot prompting',
+    { name: 'Zero-shot prompting', component: ZeroPromptComponent, },
+    { name: 'Per session Option', component: ZeroPromptComponent, isPerSession: true },
+    { name: 'System Prompts', component: SystemPromptsComponent },
+    { name: 'N-shot prompting', component: NShotsPromptComponent },
   ]);
   selectedDemo = signal(this.demos()[0]);
   
   componentOutlet = computed(() => {
-    const selection = this.selectedDemo();
-    const demos = this.demos();
-    if (selection ===  demos[0]) {
-      return { 
-        component: ZeroPromptComponent,
-        inputs: { 
-          isPerSession: false
-        }
-      };
-    } else if (selection === demos[1]) {
-      return { 
-        component: ZeroPromptComponent,
-        inputs: { 
-          isPerSession: true
-        }
-      }; 
-    } else if (selection === demos[2]) {
-      return { 
-        component: SystemPromptsComponent,
-        inputs: {}
-      }; 
-    }
-    return {
-      component: NShotsPromptComponent,
-      inputs: {}
-    }
+    const { component, isPerSession = false } = this.selectedDemo();
+    const inputs = component === ZeroPromptComponent ? { isPerSession } : {}
+    
+    return { 
+      component,
+      inputs
+    }; 
   });
  
   defaultCapabilities = toSignal(this.promptService.getCapabilities(), 

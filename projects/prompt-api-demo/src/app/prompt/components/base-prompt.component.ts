@@ -22,7 +22,6 @@ export abstract class BasePromptComponent {
             status: isLoading ? 'Processing...' : 'Idle',
             text: isLoading ? 'Progressing...' : 'Submit',
             disabled: isLoading,
-            destroyDisabled: isLoading,
             numTokensDisabled: isUnavailableForCall,
             submitDisabled: isUnavailableForCall
         }
