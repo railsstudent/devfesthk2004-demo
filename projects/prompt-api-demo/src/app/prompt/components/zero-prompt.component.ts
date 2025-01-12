@@ -1,56 +1,39 @@
-import { ChangeDetectionStrategy, Component, computed, input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, OnChanges, TemplateRef, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { ZeroPromptService } from '../../ai/services/zero-prompt.service';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
+import { PromptResponse } from '../types/prompt-response.type';
 import { BasePromptComponent } from './base-prompt.component';
-import { TokenizationComponent } from './tokenization.component';
+import { PromptResponseComponent } from './prompt-response.component';
 
 @Component({
     selector: 'app-zero-prompt',
-    imports: [FormsModule, TokenizationComponent, LineBreakPipe],
+    imports: [FormsModule, PromptResponseComponent],
     template: `
-    <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
+    <div class="session">
       <h3>Zero-shot prompting</h3>
-      <app-tokenization [numPromptTokens]="numPromptTokens()" [tokenContext]="tokenContext()" />
-      @let myState = state();
-      <div>
-        <span class="label">Status: </span><span>{{ myState.status }}</span>
-      </div>
-      <div>
-        @if (isPerSession()) {
+      <app-prompt-response [state]="responseState()" [(query)]="query" 
+        (countPromptTokens)="countPromptTokens()" (submitPrompt)="submitPrompt()"
+        [perSessionTemplate]="isPerSession() ? template() : undefined"
+        [perSessionTemplateContext]="templateContext()"
+      />
+      <ng-template #session let-capabilities="capabilities">
+        <div>
           <div>
             <span class="label" for="temp">Temperature: </span>
-            <input type="number" id="temp" name="temp" class="per-session" [(ngModel)]="temperature" max="3" />
+            <input type="number" id="temp" name="temp" class="per-session" [(ngModel)]="capabilities.temperature" max="3" />
             <span class="label"> (Max temperature: 3) </span>          
             <span class="label" for="topK">TopK: </span>
-            <input type="number" id="topK" name="topK" class="per-session" [(ngModel)]="topK" max="8" />
+            <input type="number" id="topK" name="topK" class="per-session" [(ngModel)]="capabilities.topK" max="8" />
           </div>
-        }
-      </div>
-      <div>
-        @if (isPerSession()) {
           <div>
             <span class="label" for="temp">Per Session: </span>
-            <span>{{ this.perSessionStr() }}</span>
+            <span>{{ capabilities.description }}</span>
           </div>
-        }
-        <span class="label" for="input">Prompt: </span>
-        <textarea id="input" name="input" [(ngModel)]="query" [disabled]="myState.disabled" 
-          rows="3"></textarea>
-      </div>
-      <button (click)="countPromptTokens()" [disabled]="myState.numTokensDisabled">Count Prompt Tokens</button>
-      <button (click)="submitPrompt()" [disabled]="myState.submitDisabled">{{ myState.text }}</button>
-      <div>
-        <span class="label">Response: </span>
-        <p [innerHTML]="response() | lineBreak"></p>
-      </div>
-      @if (error()) {
-        <div>
-          <span class="label">Error: </span>
-          <p>{{ error() }}</p>
         </div>
-      }
+      </ng-template>
     </div>
   `,
     styleUrl: './prompt.component.css',
@@ -65,19 +48,51 @@ import { TokenizationComponent } from './tokenization.component';
 export class ZeroPromptComponent extends BasePromptComponent implements OnChanges {
   isPerSession = input(false);
   zeroPromptService = this.promptService as ZeroPromptService;
-  temperature = this.zeroPromptService.temperature;
-  topK = this.zeroPromptService.topK;
-  tokenContext = this.zeroPromptService.tokenContext;
 
-  ngOnChanges(): void {
-    this.zeroPromptService.isPerSession.set(this.isPerSession());
+  responseState = computed<PromptResponse>(() => ({
+    ...this.state(),
+    numPromptTokens: this.numPromptTokens(),
+    tokenContext: this.zeroPromptService.tokenContext(),
+    error: this.error(),
+    response: this.response(),
+  }));
+
+  template = viewChild.required('session', { read: TemplateRef });
+
+  capabilities = computed(() => ({
+    temperature: this.zeroPromptService.temperature(),
+    topK: this.zeroPromptService.topK(),
+  }));
+
+  templateContext = computed(() => this.isPerSession() ? { 
+      capabilities: { 
+        temperature: this.zeroPromptService.temperature,
+        topK: this.zeroPromptService.topK,
+        description: this.zeroPromptService.description(),
+      } 
+    } : undefined
+  );
+
+  constructor() {
+    super();
+    toObservable(this.capabilities) 
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged((a, b) => a.temperature === b.temperature && a.topK === b.topK),
+        switchMap(async ({ topK, temperature }) => {
+          await this.zeroPromptService.resetConfigs({ temperature, topK });
+          await this.zeroPromptService.createSessionIfNotExists();
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe();   
   }
 
-  perSessionStr = computed(() => {
-    if (this.isPerSession()) {
-      return `\{topK: ${this.topK()}, temperature: ${this.temperature()}\}`;
+  async ngOnChanges(): Promise<void> {
+    this.zeroPromptService.isPerSession.set(this.isPerSession());
+    if (!this.isPerSession()) {
+      await this.zeroPromptService.resetConfigs();
+      await this.zeroPromptService.createSessionIfNotExists();
     }
-
-    return '';
-  });
+  }
 }
