@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input, OnChanges, TemplateRef, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, TemplateRef, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { ZeroPromptService } from '../../ai/services/zero-prompt.service';
 import { PromptResponse } from '../types/prompt-response.type';
@@ -45,9 +45,10 @@ import { PromptResponseComponent } from './prompt-response.component';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ZeroPromptComponent extends BasePromptComponent implements OnChanges {
+export class ZeroPromptComponent extends BasePromptComponent {
   isPerSession = input(false);
   zeroPromptService = this.promptService as ZeroPromptService;
+  template = viewChild.required('session', { read: TemplateRef });
 
   responseState = computed<PromptResponse>(() => ({
     ...this.state(),
@@ -56,8 +57,6 @@ export class ZeroPromptComponent extends BasePromptComponent implements OnChange
     error: this.error(),
     response: this.response(),
   }));
-
-  template = viewChild.required('session', { read: TemplateRef });
 
   capabilities = computed(() => ({
     temperature: this.zeroPromptService.temperature(),
@@ -84,15 +83,17 @@ export class ZeroPromptComponent extends BasePromptComponent implements OnChange
           await this.zeroPromptService.createSessionIfNotExists();
         }),
         takeUntilDestroyed(),
-      )
-      .subscribe();   
-  }
+      ).subscribe();
 
-  async ngOnChanges(): Promise<void> {
-    this.zeroPromptService.isPerSession.set(this.isPerSession());
-    if (!this.isPerSession()) {
-      await this.zeroPromptService.resetConfigs();
-      await this.zeroPromptService.createSessionIfNotExists();
-    }
+    toObservable(this.isPerSession).pipe(
+tap(async (isPerSession) => {
+        this.zeroPromptService.isPerSession.set(isPerSession);
+        if (!isPerSession) {
+          await this.zeroPromptService.resetConfigs();
+          await this.zeroPromptService.createSessionIfNotExists();
+        }
+      }),
+      takeUntilDestroyed(),
+    ).subscribe();
   }
 }
