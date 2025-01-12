@@ -1,9 +1,7 @@
 import { computed, Directive, inject, signal } from '@angular/core';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 
-@Directive({
-    standalone: false
-})
+@Directive()
 export abstract class BasePromptComponent {
     promptService = inject(AbstractPromptService);
   

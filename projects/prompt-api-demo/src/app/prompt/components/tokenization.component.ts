@@ -3,14 +3,12 @@ import { Tokenization } from '../../ai/types/prompt.type';
 
 @Component({
     selector: 'app-tokenization',
-    imports: [],
     template: `
     <div>
       <p><span class="label">Number of Prompt tokens: </span><span>{{ numTokens() }}</span></p>
       <p><span class="label">Tokens: </span><span>{{ tokenStr() }}</span></p>
     </div>
-  `,
-    styles: ``,
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TokenizationComponent {

@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 @Component({
   selector: 'app-capability',
-  standalone: true,
   template: `
     @if (isReady()) {
       @let capabilities = defaultCapabilities();

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DetectAIComponent } from './detect-ai.component';
-import { SetupComponent } from './prompt/components/setup.component';
+import { SetupComponent } from './prerequisites/components/setup.component';
 
 @Component({
     selector: 'app-root',
