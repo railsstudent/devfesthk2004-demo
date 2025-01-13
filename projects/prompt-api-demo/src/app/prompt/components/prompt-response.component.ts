@@ -1,9 +1,9 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, model, output, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { PromptResponse } from '../types/prompt-response.type';
 import { TokenizationComponent } from './tokenization.component';
-import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'app-prompt-response',
@@ -41,7 +41,7 @@ import { NgTemplateOutlet } from '@angular/common';
 export class PromptResponseComponent {
   state = input.required<PromptResponse>();
   query = model.required<string>();
-  perSessionTemplate = input.required<TemplateRef<any> | null, TemplateRef<any> | undefined>(
+  perSessionTemplate = input<TemplateRef<any> | null, TemplateRef<any> | undefined>(null,
     { transform: (value) => typeof value === 'undefined' ? null : value} 
   );
   perSessionTemplateContext = input<any | undefined>(undefined);
