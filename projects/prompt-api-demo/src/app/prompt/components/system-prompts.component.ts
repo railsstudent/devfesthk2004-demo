@@ -52,7 +52,6 @@ export class SystemPromptsComponent extends BasePromptComponent {
         debounceTime(300),
         distinctUntilChanged(),
         switchMap(async (systemPrompt) => {
-
             this.promptService.destroySession();
             this.promptService.setPromptOptions({ systemPrompt });
             await this.promptService.createSessionIfNotExists();
