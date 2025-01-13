@@ -1,0 +1,719 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.3.1",
+  "pathMappings": {
+    "my-lib": [
+      "./dist/my-lib"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": ".editorconfig",
+        "hash": "4165385352547808172"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "18168400278403753650"
+      },
+      {
+        "file": ".vscode/extensions.json",
+        "hash": "5331566439708925252"
+      },
+      {
+        "file": ".vscode/launch.json",
+        "hash": "17038929134016848735"
+      },
+      {
+        "file": ".vscode/tasks.json",
+        "hash": "5336636969995539451"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "18009508230440286145"
+      },
+      {
+        "file": "README.md",
+        "hash": "174754426581939497"
+      },
+      {
+        "file": "angular.json",
+        "hash": "7114251507493786983"
+      },
+      {
+        "file": "deploy-github-page.sh",
+        "hash": "9081901913353337654"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "10843807771694096338"
+      },
+      {
+        "file": "package.json",
+        "hash": "14103939784750379555"
+      },
+      {
+        "file": "projects/ai-feedback-app/public/favicon.ico",
+        "hash": "3988961587069885523"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/LICENSE.txt",
+        "hash": "7333558108532691583"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/constants/core.constant.ts",
+        "hash": "10476314064273818654"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/enums/translation-error-codes.enum.ts",
+        "hash": "14893128189554723658"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/interfaces/translation-definitions.interface.ts",
+        "hash": "4582198074531005414"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/providers/ai-built-in-api.provider.ts",
+        "hash": "2733392888945423647"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/services/language-detection.service.ts",
+        "hash": "1492874049267869095"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/services/n-shot-prompt.service.ts",
+        "hash": "4698658235085797644"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/services/summarization.service.ts",
+        "hash": "17380118321793260925"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/services/translation.service.ts",
+        "hash": "1830246867712751254"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/services/writer.service.ts",
+        "hash": "11838312992892461074"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/types/language-detection-result.type.ts",
+        "hash": "2535610998584432567"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/types/language-initial-prompt.type.ts",
+        "hash": "6436744947557551835"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/types/language-pair.type.ts",
+        "hash": "9226361308753240129"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/types/navigation-user-agent-brand.type.ts",
+        "hash": "18434897857268637966"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/types/translation-api.type.ts",
+        "hash": "10549323938060647532"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/utils/prompt-api-detection.ts",
+        "hash": "1624123410189835293"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/utils/summarization-api-detection.ts",
+        "hash": "11970610124687443121"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/utils/translation-api-detection.ts",
+        "hash": "10332365429581095482"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/utils/user-agent-data.ts",
+        "hash": "10357536652369569903"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/ai/utils/writer-api-detection.ts",
+        "hash": "5062308599753480870"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/app.component.ts",
+        "hash": "5256165159237609235"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/app.config.ts",
+        "hash": "191744995481598264"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/detect-ai.component.ts",
+        "hash": "8078272008578962916"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/components/feeback-loading.componen.ts",
+        "hash": "4725645778934547442"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/components/feedback-error.component.ts",
+        "hash": "17810337242193568820"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/components/feedback-sentiment.component.ts",
+        "hash": "16981422722023016529"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/components/feedback-translation.component.ts",
+        "hash": "18036548347363541607"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/components/response-writer.component.ts",
+        "hash": "6605333344535584978"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/feedback-container.component.ts",
+        "hash": "16389435185372185442"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/pipes/line-break.pipe.ts",
+        "hash": "249696721166490889"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/services/feedback-sentiment.service.ts",
+        "hash": "17185228879925478831"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/services/feedback-translation.service.ts",
+        "hash": "1078273522411291129"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/services/response-writer.service.ts",
+        "hash": "12438386497437194461"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/types/feedback-state.type.ts",
+        "hash": "9825292678671985767"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/types/sentiment-language.type.ts",
+        "hash": "14616111661695002624"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/app/feedback/types/translation-input.type.ts",
+        "hash": "5541364349527773157"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/index.html",
+        "hash": "9332618440799232078"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/main.ts",
+        "hash": "1062913563804175747"
+      },
+      {
+        "file": "projects/ai-feedback-app/src/styles.scss",
+        "hash": "1746985565585714841"
+      },
+      {
+        "file": "projects/ai-feedback-app/tsconfig.app.json",
+        "hash": "8785091219065065912"
+      },
+      {
+        "file": "projects/ai-feedback-app/tsconfig.spec.json",
+        "hash": "5249604558649886248"
+      },
+      {
+        "file": "projects/language-detector-demo/public/favicon.ico",
+        "hash": "3988961587069885523"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/constants/core.constant.ts",
+        "hash": "17882883781526816525"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/enums/errors.enum.ts",
+        "hash": "9469826104998337888"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/providers/ai-language-detector.provider.ts",
+        "hash": "13675634153113884940"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/services/language-detection.service.ts",
+        "hash": "17437137941990806701"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/types/language-available.type.ts",
+        "hash": "2489568014702778893"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/types/language-detection-result.type.ts",
+        "hash": "4827109860364863097"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/types/navigation-user-agent-brand.type.ts",
+        "hash": "18434897857268637966"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/user-agent.component.ts",
+        "hash": "8740202596579410781"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/utils/ai-detection.ts",
+        "hash": "10589597075461850430"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/ai/utils/user-agent-data.ts",
+        "hash": "10357536652369569903"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/app.component.ts",
+        "hash": "4983132358873890271"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/app.config.ts",
+        "hash": "11910319170480624728"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/detect-ai.component.ts",
+        "hash": "10274184219789481377"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/language-detection/components/language-available.component.ts",
+        "hash": "3747387222507389477"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/language-detection/components/language-detection-result.component.ts",
+        "hash": "7562922327106278303"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/language-detection/components/setup.component.ts",
+        "hash": "8073027574931865324"
+      },
+      {
+        "file": "projects/language-detector-demo/src/app/language-detection/language-detection.component.ts",
+        "hash": "13266700649691080209"
+      },
+      {
+        "file": "projects/language-detector-demo/src/index.html",
+        "hash": "18394237621412359164"
+      },
+      {
+        "file": "projects/language-detector-demo/src/main.ts",
+        "hash": "1062913563804175747"
+      },
+      {
+        "file": "projects/language-detector-demo/src/styles.scss",
+        "hash": "1746985565585714841"
+      },
+      {
+        "file": "projects/language-detector-demo/tsconfig.app.json",
+        "hash": "8785091219065065912"
+      },
+      {
+        "file": "projects/language-detector-demo/tsconfig.spec.json",
+        "hash": "5249604558649886248"
+      },
+      {
+        "file": "projects/prompt-api-demo/public/favicon.ico",
+        "hash": "3988961587069885523"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/constants/capabilities.constant.ts",
+        "hash": "17303316338790592608"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/constants/core.constant.ts",
+        "hash": "12275881095350685656"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/enums/error-codes.enum.ts",
+        "hash": "3755938931287197685"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/providers/ai-prompt-api.provider.ts",
+        "hash": "7264805448838940998"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/services/abstract-prompt.service.ts",
+        "hash": "4817831692089717617"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/services/n-shots-prompt.service.ts",
+        "hash": "7645598419899490512"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/services/system-prompts.service.ts",
+        "hash": "3661721055618209374"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/services/zero-prompt.service.ts",
+        "hash": "6729556560284400776"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/types/navigation-user-agent-brand.type.ts",
+        "hash": "18434897857268637966"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/types/prompt.type.ts",
+        "hash": "2154121484179701986"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/user-agent.component.ts",
+        "hash": "8740202596579410781"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/utils/ai-detection.ts",
+        "hash": "10607436813344793498"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/ai/utils/user-agent-data.ts",
+        "hash": "10357536652369569903"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/app.component.ts",
+        "hash": "3484807751314068636"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/app.config.ts",
+        "hash": "8526450357790102858"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/detect-ai.component.ts",
+        "hash": "196859408790758091"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/base-prompt.component.ts",
+        "hash": "5008087438842537591"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/capability.component.ts",
+        "hash": "4703562517200292028"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/initial-prompt.component.ts",
+        "hash": "2334263688467658355"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/n-shots-prompt.component.ts",
+        "hash": "15260263736602795623"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/prompt-response.component.ts",
+        "hash": "7875435214138546970"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/prompt.component.css",
+        "hash": "8830822930978356783"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/setup.component.ts",
+        "hash": "3762667227164178699"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/system-prompts.component.ts",
+        "hash": "5990685843587300673"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/tokenization.component.ts",
+        "hash": "8671473124796161187"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/components/zero-prompt.component.ts",
+        "hash": "4514488980217396309"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/pipes/line-break.pipe.ts",
+        "hash": "249696721166490889"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/prompt-showcase.component.ts",
+        "hash": "8824116803167588927"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/app/prompt/types/prompt-response.type.ts",
+        "hash": "13071734903793247038"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/index.html",
+        "hash": "15636704430395953199"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/main.ts",
+        "hash": "1062913563804175747"
+      },
+      {
+        "file": "projects/prompt-api-demo/src/styles.scss",
+        "hash": "1746985565585714841"
+      },
+      {
+        "file": "projects/prompt-api-demo/tsconfig.app.json",
+        "hash": "7624136454057421154"
+      },
+      {
+        "file": "projects/prompt-api-demo/tsconfig.spec.json",
+        "hash": "5249604558649886248"
+      },
+      {
+        "file": "projects/summarization-api-demo/public/favicon.ico",
+        "hash": "3988961587069885523"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/constants/core.constant.ts",
+        "hash": "11208489077509252550"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/providers/ai-summarization-api.provider.ts",
+        "hash": "1140422787905604230"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/services/summarization.service.ts",
+        "hash": "11331626411266236274"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/types/navigation-user-agent-brand.type.ts",
+        "hash": "18434897857268637966"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/types/summarizer-select-options.type.ts",
+        "hash": "6744653282111902890"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/user-agent.component.ts",
+        "hash": "8740202596579410781"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/utils/ai-detection.ts",
+        "hash": "9107125641025251963"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/ai/utils/user-agent-data.ts",
+        "hash": "10357536652369569903"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/app.component.ts",
+        "hash": "8582769074675143464"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/app.config.ts",
+        "hash": "10913561411681610547"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/detect-ai.component.ts",
+        "hash": "5278426340286458615"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/summarization/components/setup.component.ts",
+        "hash": "10772549422291838042"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/summarization/components/summarizer-capabilities.component.ts",
+        "hash": "8150996590187583229"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/summarization/components/summarizer-oprions.component.ts",
+        "hash": "8801147255924033971"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/summarization/components/summarizer.component.ts",
+        "hash": "5630493280025700954"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/summarization/pipes/line-break.pipe.ts",
+        "hash": "249696721166490889"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/app/summarization/summarizer-container.component.ts",
+        "hash": "15426643719751208390"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/index.html",
+        "hash": "13256960570526174400"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/main.ts",
+        "hash": "1062913563804175747"
+      },
+      {
+        "file": "projects/summarization-api-demo/src/styles.scss",
+        "hash": "11022712692264552376"
+      },
+      {
+        "file": "projects/summarization-api-demo/tsconfig.app.json",
+        "hash": "8785091219065065912"
+      },
+      {
+        "file": "projects/summarization-api-demo/tsconfig.spec.json",
+        "hash": "5249604558649886248"
+      },
+      {
+        "file": "projects/translation-api-demo/public/favicon.ico",
+        "hash": "3988961587069885523"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/constants/capabilities.constant.ts",
+        "hash": "5645205719851412626"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/constants/core.constant.ts",
+        "hash": "4079032769866242741"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/enums/error-codes.enum.ts",
+        "hash": "10977969899919494929"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/providers/ai-translation-api.provider.ts",
+        "hash": "9540092841028537838"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/services/language-detection.service.ts",
+        "hash": "2513513519176724710"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/services/translation.service.ts",
+        "hash": "9683472376542626939"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/types/can-translate-status.type.ts",
+        "hash": "18428138788285633135"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/types/language-detection-result.type.ts",
+        "hash": "4827109860364863097"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/types/language-pair.type.ts",
+        "hash": "17795840351286556196"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/types/navigation-user-agent-brand.type.ts",
+        "hash": "18434897857268637966"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/user-agent.component.ts",
+        "hash": "8740202596579410781"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/utils/ai-detection.ts",
+        "hash": "13926820287304831819"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/ai/utils/user-agent-data.ts",
+        "hash": "10357536652369569903"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/app.component.ts",
+        "hash": "10099919681250801988"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/app.config.ts",
+        "hash": "9784654041721660475"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/detect-ai.component.ts",
+        "hash": "15249255988542604477"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/translation/components/language-detection-result.component.ts",
+        "hash": "11362680690372634282"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/translation/components/language-detection.component.ts",
+        "hash": "8593003919342883464"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/translation/components/setup.component.ts",
+        "hash": "16096405017138218968"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/translation/components/translate-text.component.ts",
+        "hash": "518903313708229065"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/translation/pipes/confidence.pipe.ts",
+        "hash": "12522427467553545370"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/translation/translation-container.component.ts",
+        "hash": "8242418935073997955"
+      },
+      {
+        "file": "projects/translation-api-demo/src/app/translation/types/allow-translation.type.ts",
+        "hash": "5121460129017372278"
+      },
+      {
+        "file": "projects/translation-api-demo/src/index.html",
+        "hash": "1220165726172341138"
+      },
+      {
+        "file": "projects/translation-api-demo/src/main.ts",
+        "hash": "1062913563804175747"
+      },
+      {
+        "file": "projects/translation-api-demo/src/styles.scss",
+        "hash": "1746985565585714841"
+      },
+      {
+        "file": "projects/translation-api-demo/tsconfig.app.json",
+        "hash": "8785091219065065912"
+      },
+      {
+        "file": "projects/translation-api-demo/tsconfig.spec.json",
+        "hash": "5249604558649886248"
+      },
+      {
+        "file": "projects/writer-api-demo/public/favicon.ico",
+        "hash": "3988961587069885523"
+      },
+      {
+        "file": "projects/writer-api-demo/src/app/app.component.html",
+        "hash": "5625725754865452477"
+      },
+      {
+        "file": "projects/writer-api-demo/src/app/app.component.scss",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "projects/writer-api-demo/src/app/app.component.spec.ts",
+        "hash": "3311060806674736046"
+      },
+      {
+        "file": "projects/writer-api-demo/src/app/app.component.ts",
+        "hash": "2536051536130053951"
+      },
+      {
+        "file": "projects/writer-api-demo/src/app/app.config.ts",
+        "hash": "5028808807012428138"
+      },
+      {
+        "file": "projects/writer-api-demo/src/app/app.routes.ts",
+        "hash": "12397496131277534773"
+      },
+      {
+        "file": "projects/writer-api-demo/src/index.html",
+        "hash": "1849732810155293069"
+      },
+      {
+        "file": "projects/writer-api-demo/src/main.ts",
+        "hash": "4927504514031276065"
+      },
+      {
+        "file": "projects/writer-api-demo/src/styles.scss",
+        "hash": "5195668842064076916"
+      },
+      {
+        "file": "projects/writer-api-demo/tsconfig.app.json",
+        "hash": "8785091219065065912"
+      },
+      {
+        "file": "projects/writer-api-demo/tsconfig.spec.json",
+        "hash": "5249604558649886248"
+      },
+      {
+        "file": "tsconfig.json",
+        "hash": "16917895603671449627"
+      }
+    ]
+  }
+}
