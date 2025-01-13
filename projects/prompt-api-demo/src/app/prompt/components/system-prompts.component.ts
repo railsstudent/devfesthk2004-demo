@@ -33,7 +33,7 @@ import { PromptResponseComponent } from './prompt-response.component';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SystemPromptsComponent extends BasePromptComponent {
-  systemPrompt = signal(`You are an professional trip planner who helps travelers to plan a trip to a location. When a traveler specifies a country or a city, you have to recommend how to apply travel visa, pack suitable clothes for the weather and essentials, and the known attractions to visit each day. It is preferred to visit two to three attractions each day to maximize the value of the trip. If you don't know the answer, say "I do not know the answer."`);
+  systemPrompt = signal(`You are a professional trip planner who helps travelers to plan a trip to a location. When a traveler specifies a country or a city, you have to recommend how to apply travel visa, pack suitable clothes for the weather and essentials, and the known attractions to visit each day. It is preferred to visit two to three attractions each day to maximize the value of the trip. If you don't know the answer, say "I do not know the answer."`);
   tokenContext = this.promptService.tokenContext;
   
   responseState = computed<PromptResponse>(() => ({
