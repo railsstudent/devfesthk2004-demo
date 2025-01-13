@@ -14,7 +14,9 @@ import { NgTemplateOutlet } from '@angular/common';
     <div>
       <span class="label">Status: </span><span>{{ responseState.status }}</span>
     </div>
-    <ng-container *ngTemplateOutlet="perSessionTemplate() || default; context: perSessionTemplateContext()" />
+    @if (perSessionTemplate()) {
+      <ng-container *ngTemplateOutlet="perSessionTemplate(); context: perSessionTemplateContext()" />
+    }
     <div>
       <span class="label" for="input">Prompt: </span>
       <textarea id="input" name="input" [(ngModel)]="query" [disabled]="responseState.disabled" rows="3"></textarea>
@@ -32,7 +34,6 @@ import { NgTemplateOutlet } from '@angular/common';
         <p>{{ error }}</p>
       </div>
     }
-    <ng-template #default></ng-template>
   `,
   styleUrl: './prompt.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -40,7 +41,9 @@ import { NgTemplateOutlet } from '@angular/common';
 export class PromptResponseComponent {
   state = input.required<PromptResponse>();
   query = model.required<string>();
-  perSessionTemplate = input<TemplateRef<any> | undefined>(undefined);
+  perSessionTemplate = input.required<TemplateRef<any> | null, TemplateRef<any> | undefined>(
+    { transform: (value) => typeof value === 'undefined' ? null : value} 
+  );
   perSessionTemplateContext = input<any | undefined>(undefined);
 
   countPromptTokens = output();
