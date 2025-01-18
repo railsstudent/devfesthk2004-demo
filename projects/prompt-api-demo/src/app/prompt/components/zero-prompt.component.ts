@@ -7,6 +7,9 @@ import { ZeroPromptService } from '../../ai/services/zero-prompt.service';
 import { PromptResponse } from '../types/prompt-response.type';
 import { BasePromptComponent } from './base-prompt.component';
 import { PromptResponseComponent } from './prompt-response.component';
+import { Capability } from '../types/capbilities.type';
+
+const cmpCapabilties = (a: Capability, b: Capability) => a.temperature === b.temperature && a.topK === b.topK;
 
 @Component({
     selector: 'app-zero-prompt',
@@ -76,7 +79,7 @@ export class ZeroPromptComponent extends BasePromptComponent {
     toObservable(this.capabilities) 
       .pipe(
         debounceTime(300),
-        distinctUntilChanged((a, b) => a.temperature === b.temperature && a.topK === b.topK),
+        distinctUntilChanged(cmpCapabilties),
         switchMap(async ({ topK, temperature }) => {
           await this.zeroPromptService.resetConfigs({ temperature, topK });
           await this.zeroPromptService.createSessionIfNotExists();
