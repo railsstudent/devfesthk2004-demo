@@ -9,11 +9,10 @@ import { AbstractPromptService } from './abstract-prompt.service';
 })
 export class ZeroPromptService extends AbstractPromptService implements OnDestroy {
   #controller = new AbortController();
-  isPerSession = signal(false);
   topK = signal(3);
   temperature = signal(1);
 
-  description = computed(() =>
+  configValues = computed(() =>
     `\{topK: ${this.topK()}, temperature: ${this.temperature()}\}`
   );
 

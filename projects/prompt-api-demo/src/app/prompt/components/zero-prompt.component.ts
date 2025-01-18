@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
 import { ZeroPromptService } from '../../ai/services/zero-prompt.service';
+import { Capability } from '../types/capbilities.type';
 import { PromptResponse } from '../types/prompt-response.type';
 import { BasePromptComponent } from './base-prompt.component';
 import { PromptResponseComponent } from './prompt-response.component';
-import { Capability } from '../types/capbilities.type';
 
 const cmpCapabilties = (a: Capability, b: Capability) => a.temperature === b.temperature && a.topK === b.topK;
 
@@ -33,7 +33,7 @@ const cmpCapabilties = (a: Capability, b: Capability) => a.temperature === b.tem
           </div>
           <div>
             <span class="label" for="temp">Per Session: </span>
-            <span>{{ capabilities.description }}</span>
+            <span>{{ capabilities.configValues }}</span>
           </div>
         </div>
       </ng-template>
@@ -71,7 +71,7 @@ export class ZeroPromptComponent extends BasePromptComponent {
       capabilities: { 
         temperature: this.temperature,
         topK: this.topK,
-        description: this.zeroPromptService.description(),
+        configValues: this.zeroPromptService.configValues(),
       } 
     } : undefined
   );
@@ -82,22 +82,21 @@ export class ZeroPromptComponent extends BasePromptComponent {
       .pipe(
         debounceTime(300),
         distinctUntilChanged(cmpCapabilties),
-        switchMap(async ({ topK, temperature }) => {
-          await this.zeroPromptService.resetConfigs({ temperature, topK });
+        switchMap(async (data) => {
+          await this.zeroPromptService.resetConfigs(data);
           await this.zeroPromptService.createSessionIfNotExists();
         }),
         takeUntilDestroyed(),
       ).subscribe();
 
-    toObservable(this.isPerSession).pipe(
-tap(async (isPerSession) => {
-        this.zeroPromptService.isPerSession.set(isPerSession);
+    toObservable(this.isPerSession).pipe(takeUntilDestroyed())
+    .subscribe({
+      next: async (isPerSession) => {
         if (!isPerSession) {
           await this.zeroPromptService.resetConfigs();
           await this.zeroPromptService.createSessionIfNotExists();
         }
-      }),
-      takeUntilDestroyed(),
-    ).subscribe();
+      }
+    });
   }
 }
