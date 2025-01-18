@@ -5,6 +5,8 @@ import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { PromptResponse } from '../types/prompt-response.type';
 import { TokenizationComponent } from './tokenization.component';
 
+const transform = (value: TemplateRef<any> | undefined) => typeof value === 'undefined' ? null : value;
+
 @Component({
   selector: 'app-prompt-response',
   imports: [TokenizationComponent, FormsModule, LineBreakPipe, NgTemplateOutlet],
@@ -41,9 +43,7 @@ import { TokenizationComponent } from './tokenization.component';
 export class PromptResponseComponent {
   state = input.required<PromptResponse>();
   query = model.required<string>();
-  perSessionTemplate = input<TemplateRef<any> | null, TemplateRef<any> | undefined>(null,
-    { transform: (value) => typeof value === 'undefined' ? null : value} 
-  );
+  perSessionTemplate = input(null,{ transform });
   perSessionTemplateContext = input<any | undefined>(undefined);
 
   countPromptTokens = output();
