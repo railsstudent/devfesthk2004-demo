@@ -60,15 +60,17 @@ export class ZeroPromptComponent extends BasePromptComponent {
     response: this.response(),
   }));
 
+  temperature = this.zeroPromptService.temperature;
+  topK = this.zeroPromptService.topK;
   capabilities = computed(() => ({
-    temperature: this.zeroPromptService.temperature(),
-    topK: this.zeroPromptService.topK(),
+    temperature: this.temperature(),
+    topK: this.topK(),
   }));
 
   templateContext = computed(() => this.isPerSession() ? { 
       capabilities: { 
-        temperature: this.zeroPromptService.temperature,
-        topK: this.zeroPromptService.topK,
+        temperature: this.temperature,
+        topK: this.topK,
         description: this.zeroPromptService.description(),
       } 
     } : undefined
