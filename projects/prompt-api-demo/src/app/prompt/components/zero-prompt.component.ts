@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, TemplateRef, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
@@ -7,6 +7,9 @@ import { ZeroPromptService } from '../../ai/services/zero-prompt.service';
 import { PromptResponse } from '../types/prompt-response.type';
 import { BasePromptComponent } from './base-prompt.component';
 import { PromptResponseComponent } from './prompt-response.component';
+import { Capability } from '../types/capbilities.type';
+
+const cmpCapabilties = (a: Capability, b: Capability) => a.temperature === b.temperature && a.topK === b.topK;
 
 @Component({
     selector: 'app-zero-prompt',
@@ -16,7 +19,7 @@ import { PromptResponseComponent } from './prompt-response.component';
       <h3>Zero-shot prompting</h3>
       <app-prompt-response [state]="responseState()" [(query)]="query" 
         (countPromptTokens)="countPromptTokens()" (submitPrompt)="submitPrompt()"
-        [perSessionTemplate]="isPerSession() ? template() : undefined"
+        [perSessionTemplate]="isPerSession() ? session : undefined"
         [perSessionTemplateContext]="templateContext()"
       />
       <ng-template #session let-capabilities="capabilities">
@@ -48,8 +51,7 @@ import { PromptResponseComponent } from './prompt-response.component';
 export class ZeroPromptComponent extends BasePromptComponent {
   isPerSession = input(false);
   zeroPromptService = this.promptService as ZeroPromptService;
-  template = viewChild.required('session', { read: TemplateRef });
-
+  
   responseState = computed<PromptResponse>(() => ({
     ...this.state(),
     numPromptTokens: this.numPromptTokens(),
@@ -77,7 +79,7 @@ export class ZeroPromptComponent extends BasePromptComponent {
     toObservable(this.capabilities) 
       .pipe(
         debounceTime(300),
-        distinctUntilChanged((a, b) => a.temperature === b.temperature && a.topK === b.topK),
+        distinctUntilChanged(cmpCapabilties),
         switchMap(async ({ topK, temperature }) => {
           await this.zeroPromptService.resetConfigs({ temperature, topK });
           await this.zeroPromptService.createSessionIfNotExists();

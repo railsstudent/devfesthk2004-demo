@@ -29,8 +29,8 @@ export class PromptShowcaseComponent {
   promptService = inject(ZeroPromptService);
 
   demos = signal([
-    { name: 'Zero-shot prompting', component: ZeroPromptComponent, },
     { name: 'Per session Option', component: ZeroPromptComponent, isPerSession: true },
+    { name: 'Zero-shot prompting', component: ZeroPromptComponent, },
     { name: 'System Prompts', component: SystemPromptsComponent },
     { name: 'N-shot prompting', component: NShotsPromptComponent },
   ]);
