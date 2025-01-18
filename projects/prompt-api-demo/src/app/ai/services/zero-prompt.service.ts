@@ -44,12 +44,9 @@ export class ZeroPromptService extends AbstractPromptService implements OnDestro
     const defaultTopK = capabilities?.defaultTopK || 3;
     const { temperature = defaultTemperature, topK = defaultTopK } = config || {}; 
 
-    const customTemperature = Math.min(temperature, 3);
-    const customTopK = Math.min(topK, capabilities?.maxTopK || 8);
-
     this.destroySession();
-    this.temperature.set(customTemperature);
-    this.topK.set(customTopK);
+    this.temperature.set(temperature);
+    this.topK.set(topK);
   }
 
   ngOnDestroy(): void {
