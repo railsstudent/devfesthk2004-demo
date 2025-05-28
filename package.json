@@ -22,9 +22,9 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.0.6",
-    "@angular/cli": "^19.0.6",
-    "@angular/compiler-cli": "^19.0.5",
+    "@angular-devkit/build-angular": "^19.2.14",
+    "@angular/cli": "^19.2.14",
+    "@angular/compiler-cli": "^19.2.14",
     "@types/dom-chromium-ai": "0.0.7",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.4.0",
