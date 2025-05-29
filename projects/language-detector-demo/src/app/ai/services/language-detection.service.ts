@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, Injectable, OnDestroy, signal } from '@angular/core';
 import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 import { getLanguageDetectorAPIAvailability } from '../utils/ai-detection';
 
@@ -10,6 +10,10 @@ export class LanguageDetectionService implements OnDestroy  {
 
     #detector = signal<LanguageDetector| undefined>(undefined);
     detector = this.#detector.asReadonly();
+    inputQuota = computed(() => {
+        const detector = this.detector();
+        return detector ? detector.inputQuota : 0;
+    })
 
     async detect(query: string, topNResults = 3): Promise<LanguageDetectionWithNameResult[]> {
         const detector = this.detector();
