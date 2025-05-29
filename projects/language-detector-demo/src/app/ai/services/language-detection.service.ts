@@ -63,11 +63,9 @@ export class LanguageDetectionService implements OnDestroy  {
 
         const expectedInputLanguages = ['es', 'en', 'zh', 'de', 'pt'];
         const monitor = availability === 'available' ? undefined :
-            (m: CreateMonitor) => {
-                m.addEventListener('downloadprogress', (e) => {
-                    console.log(`Downloaded ${e.loaded * 100}%`);
-                });
-            };
+            (m: CreateMonitor) => m.addEventListener('downloadprogress', (e) => 
+                console.log(`Downloaded ${e.loaded * 100}%`)
+            );
 
         const newDetector = await LanguageDetector.create({
             monitor,
