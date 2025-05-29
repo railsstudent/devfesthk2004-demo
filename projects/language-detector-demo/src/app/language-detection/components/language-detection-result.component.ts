@@ -9,7 +9,7 @@ import { LanguageDetectionWithNameResult } from '../../ai/types/language-detecti
         <span class="label">Response: </span>
         @for (language of detectedLanguages(); track language.detectedLanguage) {
           <p>
-            <span>Confidence: {{ language.confidence.toFixed(3) }}, </span>
+            <span>Confidence: {{ language.confidence?.toFixed(3) || 'N/A' }}, </span>
             <span>Detected Language: {{ language.detectedLanguage }}, </span>
             <span>Detected Language Name: {{ language.name }}</span>
           </p>

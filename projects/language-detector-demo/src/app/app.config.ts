@@ -1,9 +1,7 @@
-import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@angular/core';
-import { provideAILanguageDetectionAPI } from './ai/providers/ai-language-detector.provider';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideExperimentalZonelessChangeDetection(), 
-    provideAILanguageDetectionAPI()
+    provideZonelessChangeDetection(), 
   ]
 };

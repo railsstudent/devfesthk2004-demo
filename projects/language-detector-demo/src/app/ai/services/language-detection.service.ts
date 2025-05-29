@@ -1,9 +1,6 @@
-import { inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { AI_LANGUAGE_DETECTION_API_TOKEN } from '../constants/core.constant';
+import { Injectable, OnDestroy, signal } from '@angular/core';
 import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
-import { ERROR_CODES } from '../enums/errors.enum';
-
-const MAX_LANGUAGE_RESULTS = 111;
+import { getLanguageDetectorAPIAvailability } from '../utils/ai-detection';
 
 @Injectable({
   providedIn: 'root'
@@ -11,30 +8,32 @@ const MAX_LANGUAGE_RESULTS = 111;
 export class LanguageDetectionService implements OnDestroy  {
     #controller = new AbortController();
 
-    #languageDetectionAPI = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
-    #detector = signal<AILanguageDetector| undefined>(undefined);
+    #detector = signal<LanguageDetector| undefined>(undefined);
     detector = this.#detector.asReadonly();
-    #capabilities = signal<AILanguageDetectorCapabilities | null>(null);
-    capabilities = this.#capabilities.asReadonly();
 
     async detect(query: string, topNResults = 3): Promise<LanguageDetectionWithNameResult[]> {
-        if (!this.#languageDetectionAPI) {
-            throw new Error(ERROR_CODES.NO_API);
-        }
-
         const detector = this.detector();
         if (!detector) {
             throw new Error('Failed to create the LanguageDetector.');
         }
 
-        const minTopNReesults = Math.min(topNResults, MAX_LANGUAGE_RESULTS);
-        const results = await detector.detect(query);
-        const probablyLanguages = results.slice(0, minTopNReesults);
-        return probablyLanguages.map((item) => ({ ...item, name: this.languageTagToHumanReadable(item.detectedLanguage) }))
+        try {
+            const results = await detector.detect(query);
+            const minTopNReesults = Math.min(topNResults, results.length);
+            const probablyLanguages = results.slice(0, minTopNReesults);
+            return probablyLanguages.map((item) => ({ ...item, name: this.languageTagToHumanReadable(item.detectedLanguage) }))
+        } catch (e) {
+            if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+                console.error('LanguageDetector API quota exceeded. Please try again later.');
+            } else if (e instanceof Error) {
+                console.error(e);
+            }
+
+            return [];
+        }
     }
 
     destroyDetector() {
-        this.#capabilities.set(null);
         this.resetDetector();
     }
 
@@ -49,23 +48,35 @@ export class LanguageDetectionService implements OnDestroy  {
     }
 
     async createDetector() {
-        if (!this.#languageDetectionAPI) {
-            throw new Error(ERROR_CODES.NO_API);
-        }
-
         this.resetDetector();
-        const [capabilities, newDetector]  = await Promise.all([
-            this.#languageDetectionAPI.capabilities(),
-            this.#languageDetectionAPI.create({ signal: this.#controller.signal })
-        ]);
-        this.#capabilities.set(capabilities);
+        
+        const newDetector = await this.createDetectorWithMonitor();
         this.#detector.set(newDetector);
     }
 
-    languageTagToHumanReadable(languageTag: string | null, targetLanguage = 'en') {
+    private async createDetectorWithMonitor() {
+        const availability = await getLanguageDetectorAPIAvailability();
+
+        const expectedInputLanguages = ['es', 'en', 'zh', 'de', 'pt'];
+        const monitor = availability === 'available' ? undefined :
+            (m: CreateMonitor) => {
+                m.addEventListener('downloadprogress', (e) => {
+                    console.log(`Downloaded ${e.loaded * 100}%`);
+                });
+            };
+
+        const newDetector = await LanguageDetector.create({
+            monitor,
+            signal: this.#controller.signal,
+            expectedInputLanguages
+        });
+        return newDetector;
+    }
+
+    languageTagToHumanReadable(languageTag: string | undefined, targetLanguage = 'en') {
         const displayNames = new Intl.DisplayNames([targetLanguage], { type: 'language' });
         if (languageTag) {
-            return displayNames.of(languageTag) || 'NA';
+            return displayNames.of(languageTag) || 'N/A';
         }
 
         return 'NA';

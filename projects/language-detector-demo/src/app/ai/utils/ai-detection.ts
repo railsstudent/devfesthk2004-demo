@@ -1,39 +1,22 @@
-import { inject } from '@angular/core';
-import { catchError, from, Observable, of } from 'rxjs';
-import { AI_LANGUAGE_DETECTION_API_TOKEN } from '../constants/core.constant';
-import { getChromVersion, isChromeBrowser } from './user-agent-data';
+import { catchError, from, map, Observable, of } from 'rxjs';
 import { ERROR_CODES } from '../enums/errors.enum';
 
-const CHROME_VERSION = 129
-
-async function checkChromeBuiltInAI(): Promise<string> {
-   if (!isChromeBrowser()) {
-      throw new Error(ERROR_CODES.UNSUPPORTED_BROWSER);
-   }
-
-   if (getChromVersion() < CHROME_VERSION) {
-      throw new Error(ERROR_CODES.OLD_BROSWER);
-   }
-
-   if (!('ai' in globalThis)) {
+export async function getLanguageDetectorAPIAvailability(): Promise<string> {
+   if (!('LanguageDetector' in self)) {
       throw new Error(ERROR_CODES.NO_API);
    }
 
-   const languageDetector = inject(AI_LANGUAGE_DETECTION_API_TOKEN);
-   const status = (await languageDetector?.capabilities())?.available;
-   if (!status) { 
+   const availability = await LanguageDetector.availability();
+   if (availability === 'unavailable') { 
       throw new Error(ERROR_CODES.NO_API);
-   } else if (status === 'after-download') {
-      throw new Error(ERROR_CODES.AFTER_DOWNLOAD);
-   } else if (status === 'no') {
-      throw new Error(ERROR_CODES.NO_GEMINI_NANO);
    }
 
-   return '';
+   return availability;
 }
 
 export function isLanguageDetectionAPISupported(): Observable<string> {
-   return from(checkChromeBuiltInAI()).pipe(
+   return from(getLanguageDetectorAPIAvailability()).pipe(
+      map(() => ''),
       catchError(
          (e) => {
             console.error(e);
