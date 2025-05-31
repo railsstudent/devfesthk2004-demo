@@ -8,8 +8,9 @@ const CHROME_VERSION = 131
 enum ERROR_CODES {
    NO_TRANSLATOR = 'Build-in Language Translator not found in window. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation',
    TRANSLATION_AFTER_DOWNLLOAD = 'Built-in AI is not ready, please go to chrome://components and start downloading the Chrome TranslateKit.',
-   NO_TRANSLATION_API = 'The model of the Translation API is not implemented. Please check your configuration in chrome://flags/#translation-api',
-   NO_LANGUAGE_DETECTOR = 'Build-in Language Detector not found in window. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation',
+   NO_TRANSLATION_API = 'The Translation API is not enabled. Please check your configuration in chrome://flags/#translation-api',
+   NO_LANGUAGE_DETECTOR_API = 'The Language Detector API is not enabled. Please check your configuration in chrome://flags/#language-detection-api',
+   NO_LANGUAGE_DETECTOR = 'Build-in Language Detector not found. Please check the Translation API\'s explainer in github.com/WICG/translation-api?tab=readme-ov-file#translation',
    NO_CHROME = 'Your browser is not supported. Please use Google Chrome Dev or Canary',
    OLD_CHROME = 'Please upgrade the Chrome version to at least 131'
 }

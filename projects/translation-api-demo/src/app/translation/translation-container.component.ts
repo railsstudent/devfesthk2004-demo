@@ -10,7 +10,7 @@ import { AllowTranslation } from './types/allow-translation.type';
     imports: [LanguageDetectionComponent, TranslateTextComponent],
     template: `
     <div>
-      <h3>Translation API Demo</h3>
+      <h3>Translator API Demo</h3>
       <app-language-detection (nextStep)="updateCanTranslate($event)" />
       @let inputText = sample().inputText;
       @if (sample().sourceLanguage && inputText) {
