@@ -6,7 +6,7 @@ import { SetupComponent } from './translation/components/setup.component';
     selector: 'app-root',
     imports: [DetectAIComponent, SetupComponent],
     template: `
-    <h2>Chrome Built-in Translation API </h2>
+    <h2>Translator API </h2>
     @let btnSetupText = showSetup() ? 'Hide Setup' : 'Show Setup';
     @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show User Agent';
     <div style="margin-bottom: 0.5rem;">

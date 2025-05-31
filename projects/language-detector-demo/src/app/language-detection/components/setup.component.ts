@@ -4,10 +4,8 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   selector: 'app-setup',
   standalone: true,
   template: `
-    <p>Explainer: <a href="https://github.com/WICG/translation-api?tab=readme-ov-file#language-detection" target="_blank">
-    https://github.com/WICG/translation-api?tab=readme-ov-file#language-detection</a>
-    </p>
-    <p>You will need Version 136 or above.</p>
+    <p>Explainer: <a [href]="explainer" target="_blank">{{explainer}}</a></p>
+    <p>You will need Version {{minimumVersion}} or above.</p>
     <h3>Setup</h3>
     <ol style="margin-left: 1rem; color: black;">
         @for (step of steps(); track $index) {
@@ -19,9 +17,11 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SetupComponent {
-    steps = signal([
-        'Open a new tab in Chrome, go to chrome://flags/#language-detection-api.',
-        'Select Enabled.',
-        'Relaunch Chrome',
-    ]);
+  explainer = 'https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs';
+  minimumVersion = 136
+  steps = signal([
+    'Open a new tab in Chrome, go to chrome://flags/#language-detection-api.',
+    'Select Enabled.',
+    'Relaunch Chrome',
+  ]);
 }

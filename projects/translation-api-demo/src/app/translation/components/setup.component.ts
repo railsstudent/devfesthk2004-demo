@@ -2,16 +2,13 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-setup',
-  standalone: true,
   template: `
     <p>Explainer: <a [href]="explainer" target="_blank">{{ explainer }}</a>
-      (Outdated or broken changes)
-    </p>
     <p>You will need Version {{ minimumVersion }} or above.</p>
     <h3>Setup</h3>
     <ol style="margin-left: 1rem; color: black;">
         @for (step of steps(); track $index) {
-            <li style="line-height: 1.25rem;">{{ step }}</li>
+          <li style="line-height: 1.25rem;">{{ step }}</li>
         }
     </ol>
     <hr />
@@ -19,8 +16,8 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SetupComponent {
-  explainer = 'https://github.com/WICG/translation-api?tab=readme-ov-file#translation';
-  minimumVersion = '131.0.6778.2'
+  explainer = 'https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs';
+  minimumVersion = '136'
 
   steps = signal([
     'Open new tab, go to chrome://flags/#translation-api.',
