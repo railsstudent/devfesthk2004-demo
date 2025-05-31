@@ -13,7 +13,7 @@ export class LanguageDetectionService implements OnDestroy  {
     inputQuota = computed(() => {
         const detector = this.detector();
         return detector ? detector.inputQuota : 0;
-    })
+    });
 
     async detect(query: string, topNResults = 3): Promise<LanguageDetectionWithNameResult[]> {
         const detector = this.detector();
