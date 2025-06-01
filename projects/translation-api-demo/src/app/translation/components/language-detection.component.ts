@@ -17,9 +17,14 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
       <button style="margin-right: 0.5rem;" (click)="setup()">Create the Language Detector</button>
       <button (click)="detectLanguage()" [disabled]="isDisableDetectLanguage()">Detect the Language</button>
       <app-language-detection-result [detectedLanguage]="detectedLanguage()" [minConfidence]="minConfidence" />
-      <div>
-        <p>Error: {{strError()}}</p>
-      </div>
+      @if (strError()) {
+        <div>
+          <p>
+            <span class="label" for="input">Error:</span> 
+            {{strError()}}
+          </p>
+        </div>
+      }
     </div>
   `,
   styles: `
@@ -33,7 +38,7 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
 })
 export class LanguageDetectionComponent {
   service = inject(LanguageDetectorService);
-  inputText = signal('Buenos tarde. Mucho Gusto. Hoy es 23 de Noviembre, 2024 y Mi charla es sobre Chrome Built-in AI.');
+  inputText = signal('Buenos tarde. Mucho Gusto. Hoy es 1 de Junio, 2025 y Mi charla es sobre Chrome AI. Uso Language Detector API para detectar el idioma de este texto.');
   detectedLanguage = signal<LanguageDetectionWithNameResult | undefined>(undefined);
 
   detector = this.service.detector;

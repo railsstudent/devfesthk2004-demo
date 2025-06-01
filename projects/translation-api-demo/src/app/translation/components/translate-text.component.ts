@@ -17,9 +17,9 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
             <div style="margin: 1rem;">
                 @for(item of canTranslateButtons(); track $index) {
                     @let pair = { sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage };
-                    @if (item.available === 'readily') {
+                    @if (item.available === 'available') {
                         <button style="margin-right: 0.25rem;" (click)="translateText(pair)">{{ item.text }}</button>
-                    } @else if (item.available === 'after-download') {
+                    } @else if (item.available === 'downloadable' || item.available === 'downloading') {
                         <button style="margin-right: 0.25rem;" (click)="download(pair)">{{ item.text }}</button>
                     } 
                 }
@@ -41,9 +41,9 @@ export class TranslateTextComponent {
 
     canTranslateButtons = computed(() =>
         this.languagePairs().reduce((acc, pair) => {
-            if (pair.available === 'readily') {
+            if (pair.available === 'available') {
                 return acc.concat({ ...pair, text: `${pair.sourceLanguage} to ${pair.targetLanguage}` })
-            } else if (pair.available === 'after-download') {
+            } else if (pair.available === 'downloadable' || pair.available === 'downloading') {
                 return acc.concat({ ...pair, text: `Download ${pair.targetLanguage}` })
             }
             return acc;
@@ -59,11 +59,12 @@ export class TranslateTextComponent {
     async download(languagePair: LanguagePair) {
         try {
          const result = await this.service.downloadLanguagePackage(languagePair);
-         if (result?.available === 'readily') {
+         if (result?.available === 'available') {
             this.downloadSuccess.emit(result);
          }
         } catch (e) {
             console.error(e);
         }
     }
+
 }

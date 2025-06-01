@@ -14,7 +14,6 @@ import { TranslationContainerComponent } from './translation/translation-contain
     <div>
       @let error = hasCapability();
       @if (!error) {
-        <p>Another demo: <a [href]="glitchDemo" target="_blank">{{ glitchDemo }}</a></p>
         <app-translation-container />
       } @else if (error !== 'unknown') {
         {{ error }}
@@ -28,7 +27,6 @@ import { TranslationContainerComponent } from './translation/translation-contain
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
-  glitchDemo = 'https://translation-demo.glitch.me/';
   showUserAgent = input(false);
   hasCapability = toSignal(areAPIsSupported(), { initialValue: '' });
 }

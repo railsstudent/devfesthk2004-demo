@@ -57,20 +57,51 @@ export class LanguageDetectorService implements OnDestroy  {
             return;
         }
 
-        const availability = await validateLanguageDetector();
-        const monitor = availability === 'available' ? undefined : 
-            (m: CreateMonitor) => 
-                m.addEventListener('downloadprogress', (e) =>
-                    console.log(`Language Detector: downloaded ${e.loaded * 100}%`)
-                );
-            
-        const newDetector = await LanguageDetector.create({
-            expectedInputLanguages: EXPECTED_INPUT_LANGUAGES,
-            signal: this.#controller.signal,
-            monitor,
-        });
+        try {
+            const availability = await validateLanguageDetector();
+            const monitor = availability === 'available' ? undefined : 
+                (m: CreateMonitor) => 
+                    m.addEventListener('downloadprogress', (e) =>
+                        console.log(`Language Detector: downloaded ${e.loaded * 100}%`)
+                    );
+                
+            const newDetector = await LanguageDetector.create({
+                expectedInputLanguages: EXPECTED_INPUT_LANGUAGES,
+                signal: this.#controller.signal,
+                monitor,
+            });
 
-        this.#detector.set(newDetector);
+            this.#detector.set(newDetector);
+        } catch (e) {
+            let err = '';
+            if (e instanceof DOMException && e.name === 'InvalidStateError') {
+                err = 'The document is not active. Please try again later.'
+                console.error(err);
+                this.strError.set(err);
+            } else if (e instanceof DOMException && e.name === 'NetworkError') {
+                err = 'The network is not available to download the AI model.';
+                console.error(err);
+                this.strError.set(err);
+            } else if (e instanceof DOMException && e.name === 'NotAllowedError') {
+                err = 'The Language Detector Translator is not allowed to create.';
+                console.error(err);
+                this.strError.set(err);
+            } else if (e instanceof DOMException && e.name === 'NotSupportedError') {
+                console.error('The Language Detector does not support one of the expected input languages.');
+                console.error(err);
+                this.strError.set(err);
+            } else if (e instanceof DOMException && e.name === 'OperationError') {
+                err = 'Operation error occurred when creating the Language Detector.';
+                console.error(err);
+                this.strError.set(err);
+            } else if (e instanceof Error) {
+                console.error(e.message);
+                this.strError.set(e.message);
+            } else {
+                console.error(e);
+                this.strError.set('Unknown error occurred while creating the Language Detector.');
+            }
+        }
     }
 
     private languageTagToHumanReadable(languageTag: string | undefined, targetLanguage = 'en') {
