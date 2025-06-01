@@ -8,13 +8,13 @@ const TRANSKIT_LANGUAGES = ['en', 'es', 'ja', 'zh', 'zh-Hant', 'it', 'fr', 'zz']
 @Injectable({
   providedIn: 'root'
 })
-export class TranslationService  {
+export class TranslatorService  {
     #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
     #controller = new AbortController();
 
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePairAvailable[]> {
         if (!this.#translationAPI) {
-            throw new Error(ERROR_CODES.NO_API);
+            throw new Error(ERROR_CODES.NO_TRANSLATION_API);
         }
 
         const results: LanguagePairAvailable[] = [];
@@ -33,7 +33,7 @@ export class TranslationService  {
     async translate(languagePair: LanguagePair, inputText: string): Promise<string> {
         try { 
             if (!this.#translationAPI) {
-                throw new Error(ERROR_CODES.NO_API);
+                throw new Error(ERROR_CODES.NO_TRANSLATION_API);
             }
 
             const translator = await this.#translationAPI.create({ ...languagePair, signal: this.#controller.signal });
@@ -54,7 +54,7 @@ export class TranslationService  {
     async downloadLanguagePackage(languagePair: LanguagePair) {
         try {
             if (!this.#translationAPI) {
-                throw new Error(ERROR_CODES.NO_API);
+                throw new Error(ERROR_CODES.NO_TRANSLATION_API);
             }
             
             const translator = await this.#translationAPI.create({ ...languagePair, signal: this.#controller.signal });

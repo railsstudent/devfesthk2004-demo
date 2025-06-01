@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { TranslationService } from '../ai/services/translation.service';
+import { TranslatorService } from '../ai/services/translator.service';
 import { LanguagePairAvailable } from '../ai/types/language-pair.type';
 import { LanguageDetectionComponent } from './components/language-detection.component';
 import { TranslateTextComponent } from './components/translate-text.component';
@@ -24,7 +24,7 @@ import { AllowTranslation } from './types/allow-translation.type';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranslationContainerComponent {
-  translationService = inject(TranslationService);
+  translationService = inject(TranslatorService);
   languagePairs = signal<LanguagePairAvailable[]>([]);
   sample = signal({ sourceLanguage: '', inputText: '' });
 

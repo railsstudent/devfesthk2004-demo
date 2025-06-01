@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserAgentComponent } from './ai/user-agent.component';
-import { isTranslationApiSupported } from './ai/utils/ai-detection';
+import { areAPIsSupported } from './ai/utils/ai-detection';
 import { TranslationContainerComponent } from './translation/translation-container.component';
 
 @Component({
@@ -30,5 +30,5 @@ import { TranslationContainerComponent } from './translation/translation-contain
 export class DetectAIComponent {
   glitchDemo = 'https://translation-demo.glitch.me/';
   showUserAgent = input(false);
-  hasCapability = toSignal(isTranslationApiSupported(), { initialValue: '' });
+  hasCapability = toSignal(areAPIsSupported(), { initialValue: '' });
 }

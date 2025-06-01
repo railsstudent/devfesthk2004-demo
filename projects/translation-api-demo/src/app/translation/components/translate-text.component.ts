@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TranslationService } from '../../ai/services/translation.service';
+import { TranslatorService } from '../../ai/services/translator.service';
 import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
 
 @Component({
@@ -33,7 +33,7 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranslateTextComponent {
-    service = inject(TranslationService);
+    service = inject(TranslatorService);
     languagePairs = input.required<LanguagePairAvailable[]>();
     inputText = input.required<string>();
     translation = signal('');
