@@ -38,7 +38,7 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
 })
 export class LanguageDetectionComponent {
   service = inject(LanguageDetectorService);
-  inputText = signal('Buenos tarde. Mucho Gusto. Hoy es 1 de Junio, 2025 y Mi charla es sobre Chrome AI. Uso Language Detector API para detectar el idioma de este texto.');
+  inputText = signal('Buenos tarde. Mucho Gusto. Hoy es 1 de Junio, 2025 y Mi charla es sobre Chrome AI. Uso el Language Detector API para detectar el idioma de este texto. Uso el Translation API para traducir entre dos idiomas.');
   detectedLanguage = signal<LanguageDetectionWithNameResult | undefined>(undefined);
 
   detector = this.service.detector;

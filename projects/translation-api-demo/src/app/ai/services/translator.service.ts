@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { EXPECTED_TRANSLATOR_LANGUAGES } from '../constants/expected-languages.constant';
 import { LanguagePair, LanguagePairAvailable } from '../types/language-pair.type';
 import { isTranslatorAPISupported } from '../utils/ai-detection';
@@ -8,6 +8,7 @@ import { isTranslatorAPISupported } from '../utils/ai-detection';
 })
 export class TranslatorService  {
     #controller = new AbortController();
+    strError = signal('');
 
     private async isCreateMonitorCallbackNeeded(languagePair: LanguagePair) {
         const availability = await Translator.availability(languagePair);
@@ -47,21 +48,37 @@ export class TranslatorService  {
 
     private handleErrors(e: unknown, languagePair: LanguagePair) {
         if (e instanceof DOMException && e.name === 'InvalidStateError') {
-            console.error('The document is not active. Please try again later.');
+            const invalidStateError ='The document is not active. Please try again later.';
+            console.error(invalidStateError);
+            this.strError.set(invalidStateError);
         } else if (e instanceof DOMException && e.name === 'NetworkError') {
-            console.error('The network is not available to download the AI model.');
+            const networkError = 'The network is not available to download the AI model.';
+            console.error(networkError);
+            this.strError.set(networkError);
         } else if (e instanceof DOMException && e.name === 'NotAllowedError') {
-            console.error('The Translator is not allowed to create. Language pair:', languagePair);
+            const unallowedError = 'The Translator is not allowed to create.';
+            console.error(unallowedError, languagePair);
+            this.strError.set(unallowedError);
         } else if (e instanceof DOMException && e.name === 'NotSupportedError') {
-            console.error('The Translator does not support one of the languages. Language pair:', languagePair);
+            const unsupportedError = 'The Translator does not support one of the languages.';
+            const unallowedError = 'The Translator is not allowed to create.';
+            console.error(unallowedError, languagePair);
+            this.strError.set(unallowedError);
         } else if (e instanceof DOMException && e.name === 'OperationError') {
-            console.error('Operation error occurred when creating the translator for the language pair:', languagePair);
+            const operationError = 'Operation error occurred when creating the translator for the language pair:';
+            console.error(operationError, languagePair);
+            this.strError.set(operationError);
+
         } else if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-            console.error('Translator API Quota exceeded. Please try again later.');
+            const quotaError = 'Translator API Quota exceeded. Please try again later.';
+            console.error(quotaError);
+            this.strError.set(quotaError);
         } else if (e instanceof Error) {
             console.error(e.message);
+            this.strError.set(e.message);
         } else {
             console.error(e);
+            this.strError.set('Unknow error occurred while using the translator.');
         }
     }
 

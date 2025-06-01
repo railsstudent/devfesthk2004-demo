@@ -27,6 +27,14 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
             <div>
                 <p>Translation: {{ translation() }}</p>
             </div>
+            @if (strError()) {
+                <div>
+                    <p>
+                        <span class="label" for="input">Error:</span> 
+                        <span>{{strError()}}</span>
+                    </p>
+                </div>
+            }
         </div>
     </div>
   `,
@@ -36,8 +44,11 @@ export class TranslateTextComponent {
     service = inject(TranslatorService);
     languagePairs = input.required<LanguagePairAvailable[]>();
     inputText = input.required<string>();
+
     translation = signal('');
     downloadSuccess = output<LanguagePairAvailable>();
+    
+    strError = this.service.strError;
 
     canTranslateButtons = computed(() =>
         this.languagePairs().reduce((acc, pair) => {
