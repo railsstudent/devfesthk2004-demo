@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { EXPECTED_TRANSLATOR_LANGUAGES } from '../constants/expected-languages.constant';
+import { EXPECTED_TRANSLATOR_LANGUAGES } from '../constants/translator-languages.constant';
 import { LanguagePair, LanguagePairAvailable } from '../types/language-pair.type';
 import { isTranslatorAPISupported } from '../utils/ai-detection';
 
@@ -46,39 +46,29 @@ export class TranslatorService  {
         }) 
     }
 
-    private handleErrors(e: unknown, languagePair: LanguagePair) {
-        if (e instanceof DOMException && e.name === 'InvalidStateError') {
-            const invalidStateError ='The document is not active. Please try again later.';
-            console.error(invalidStateError);
-            this.strError.set(invalidStateError);
-        } else if (e instanceof DOMException && e.name === 'NetworkError') {
-            const networkError = 'The network is not available to download the AI model.';
-            console.error(networkError);
-            this.strError.set(networkError);
-        } else if (e instanceof DOMException && e.name === 'NotAllowedError') {
-            const unallowedError = 'The Translator is not allowed to create.';
-            console.error(unallowedError, languagePair);
-            this.strError.set(unallowedError);
-        } else if (e instanceof DOMException && e.name === 'NotSupportedError') {
-            const unsupportedError = 'The Translator does not support one of the languages.';
-            const unallowedError = 'The Translator is not allowed to create.';
-            console.error(unallowedError, languagePair);
-            this.strError.set(unallowedError);
-        } else if (e instanceof DOMException && e.name === 'OperationError') {
-            const operationError = 'Operation error occurred when creating the translator for the language pair:';
-            console.error(operationError, languagePair);
-            this.strError.set(operationError);
+    private readonly errors: Record<string, string> = {
+        'InvalidStateError': 'The document is not active. Please try again later.',
+        'NetworkError': 'The network is not available to download the AI model.',
+        'NotAllowedError': 'The Translator is not allowed to create.',
+        'NotSupportedError': 'The Translator does not support one of the languages.',
+        'OperationError': 'Operation error occurred when creating the translator for the language pair:',
+        'QuotaExceededError': 'Translator API Quota exceeded. Please try again later.',
+        'UnknownError': 'Unknown error occurred while using the translator.',
+    }
 
-        } else if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-            const quotaError = 'Translator API Quota exceeded. Please try again later.';
-            console.error(quotaError);
-            this.strError.set(quotaError);
-        } else if (e instanceof Error) {
+    private handleErrors(e: unknown, languagePair: LanguagePair) {
+        if (e instanceof DOMException) {
+            const error = this.errors[e.name];
+            if (error) {
+                console.error(error, languagePair);
+                this.strError.set(error);
+            }
+        } else if (e instanceof Error && e.message) {
             console.error(e.message);
             this.strError.set(e.message);
         } else {
             console.error(e);
-            this.strError.set('Unknow error occurred while using the translator.');
+            this.strError.set(this.errors['UnknownError']);
         }
     }
 

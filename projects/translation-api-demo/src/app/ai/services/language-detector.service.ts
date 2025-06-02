@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
-import { EXPECTED_INPUT_LANGUAGES } from '../constants/expected-languages.constant';
+import { EXPECTED_INPUT_LANGUAGES } from '../constants/input-languages.constant';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 import { validateLanguageDetector } from '../utils/ai-detection';

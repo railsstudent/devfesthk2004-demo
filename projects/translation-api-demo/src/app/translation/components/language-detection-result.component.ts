@@ -1,20 +1,26 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { LanguageDetectionWithNameResult } from '../../ai/types/language-detection-result.type';
-import { ConfidencePipe } from '../pipes/confidence.pipe';
 
 @Component({
     selector: 'app-language-detection-result',
-    imports: [ConfidencePipe],
     template: `
     <div>
         <span class="label">Response: </span>
         @let language = detectedLanguage();
         @if (language) {
+          @let value = language.confidence;
           <p>
-            <span>Confidence: {{ language.confidence | confidence:minConfidence() }}, </span>
+            @if (!value) {
+              <span>No Confidence</span>
+            } @else {
+              @let level = value >= minConfidence() ? 'High Confidence' : 'Low Confidence';
+              <span>Confidence: {{ value.toFixed(3) }} ({{ level }})</span>
+            }
             <span>Detected Language: {{ language.detectedLanguage }}, </span>
             <span>Detected Language Name: {{ language.name }}</span>
           </p>
+        } @else {
+          <p>No language detected.</p> 
         }
     </div>
   `,
