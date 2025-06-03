@@ -18,13 +18,16 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
                 @for(item of canTranslateButtons(); track $index) {
                     @let pair = { sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage };
                     @if (item.available === 'available') {
-                        <button style="margin-right: 0.25rem;" (click)="translateText(pair)">{{ item.text }}</button>
+                        <button (click)="translateText(pair)" 
+                            [disabled]="isDisableButtons()">{{ item.text }}</button>
                     } @else if (item.available === 'downloadable' || item.available === 'downloading') {
-                        <button style="margin-right: 0.25rem;" (click)="download(pair)">{{ item.text }}</button>
+                        <button (click)="download(pair)"
+                            [disabled]="isDisableButtons()">{{ item.text }}</button>
                     } 
                 }
             </div>
             <div>
+                <p>{{ downloadingText() }}</p>
                 <p>Translation: {{ translation() }}</p>
             </div>
             @if (strError()) {
@@ -38,12 +41,23 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
         </div>
     </div>
   `,
+    styles: `
+        button {
+            margin-right: 0.25rem;
+        }
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranslateTextComponent {
     service = inject(TranslatorService);
     languagePairs = input.required<LanguagePairAvailable[]>();
     inputText = input.required<string>();
+    isDisableButtons= computed(() => this.service.downloadPercentage() < 100);
+    downloadingText = computed(() => {
+        const percentage = this.service.downloadPercentage();
+        const isDownloading = percentage > 0 && percentage < 100;
+        return isDownloading ? `Downloaded ${percentage}%` : '';
+    });
 
     translation = signal('');
     downloadSuccess = output<LanguagePairAvailable>();
@@ -68,13 +82,9 @@ export class TranslateTextComponent {
     }
 
     async download(languagePair: LanguagePair) {
-        try {
-         const result = await this.service.downloadLanguagePackage(languagePair);
-         if (result?.available === 'available') {
+        const result = await this.service.downloadLanguagePackage(languagePair);
+        if (result?.available === 'available') {
             this.downloadSuccess.emit(result);
-         }
-        } catch (e) {
-            console.error(e);
         }
     }
 

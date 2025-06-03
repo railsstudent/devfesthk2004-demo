@@ -9,6 +9,7 @@ import { isTranslatorAPISupported } from '../utils/ai-detection';
 export class TranslatorService  {
     #controller = new AbortController();
     strError = signal('');
+    downloadPercentage = signal(100);
 
     private readonly errors: Record<string, string> = {
         'InvalidStateError': 'The document is not active. Please try again later.',
@@ -44,10 +45,18 @@ export class TranslatorService  {
     private async createTranslator(languagePair: LanguagePair): Promise<Translator> {
         await isTranslatorAPISupported();
 
-        const monitor = (await this.isCreateMonitorCallbackNeeded(languagePair)) ? 
-            (m: CreateMonitor) => m.addEventListener("downloadprogress", (e) => 
-                console.log(`Translator: Downloaded ${Math.floor(e.loaded * 100)}%`)
-            ) : undefined;
+        this.downloadPercentage.set(0);
+        const requireMonitor = await this.isCreateMonitorCallbackNeeded(languagePair);
+        if (!requireMonitor) {
+            this.downloadPercentage.set(100);            
+        }
+
+        const monitor = requireMonitor ? 
+            (m: CreateMonitor) => m.addEventListener("downloadprogress", (e) => {
+                const percentage = Math.floor(e.loaded * 100);
+                console.log(`Translator: Downloaded ${percentage}%`);
+                this.downloadPercentage.set(percentage);
+            }) : undefined;
 
         return Translator.create({
             ...languagePair,
