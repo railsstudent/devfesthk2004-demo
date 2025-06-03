@@ -13,6 +13,15 @@ export class LanguageDetectorService implements OnDestroy  {
     detector = this.#detector.asReadonly();
     strError = signal('');
 
+    private readonly errors: Record<string, string> = {
+        'InvalidStateError': 'The document is not active. Please try again later.',
+        'NetworkError': 'The network is not available to download the AI model.',
+        'NotAllowedError': 'The Language Detector is not allowed to create.',
+        'NotSupportedError': 'The Language Detector does not support one of the expected input languages.',
+        'OperationError': 'Operation error occurred when creating the Language Detector.',
+        'UnknownError': 'Unknown error occurred while creating the Language Detector.',
+    }
+
     async detect(query: string, minConfidence = 0.6): Promise<LanguageDetectionWithNameResult | undefined> {
         this.strError.set('');
         const detector = this.detector();
@@ -73,33 +82,18 @@ export class LanguageDetectorService implements OnDestroy  {
 
             this.#detector.set(newDetector);
         } catch (e) {
-            let err = '';
-            if (e instanceof DOMException && e.name === 'InvalidStateError') {
-                err = 'The document is not active. Please try again later.'
-                console.error(err);
-                this.strError.set(err);
-            } else if (e instanceof DOMException && e.name === 'NetworkError') {
-                err = 'The network is not available to download the AI model.';
-                console.error(err);
-                this.strError.set(err);
-            } else if (e instanceof DOMException && e.name === 'NotAllowedError') {
-                err = 'The Language Detector Translator is not allowed to create.';
-                console.error(err);
-                this.strError.set(err);
-            } else if (e instanceof DOMException && e.name === 'NotSupportedError') {
-                console.error('The Language Detector does not support one of the expected input languages.');
-                console.error(err);
-                this.strError.set(err);
-            } else if (e instanceof DOMException && e.name === 'OperationError') {
-                err = 'Operation error occurred when creating the Language Detector.';
-                console.error(err);
-                this.strError.set(err);
+            if (e instanceof DOMException) {
+                const err = this.errors[e.name];
+                if (err) {
+                    console.error(err);
+                    this.strError.set(err);
+                }
             } else if (e instanceof Error) {
                 console.error(e.message);
                 this.strError.set(e.message);
             } else {
                 console.error(e);
-                this.strError.set('Unknown error occurred while creating the Language Detector.');
+                this.strError.set(this.errors['UnknownError']);
             }
         }
     }

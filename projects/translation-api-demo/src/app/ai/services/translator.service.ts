@@ -10,6 +10,16 @@ export class TranslatorService  {
     #controller = new AbortController();
     strError = signal('');
 
+    private readonly errors: Record<string, string> = {
+        'InvalidStateError': 'The document is not active. Please try again later.',
+        'NetworkError': 'The network is not available to download the AI model.',
+        'NotAllowedError': 'The Translator is not allowed to create.',
+        'NotSupportedError': 'The Translator does not support one of the languages.',
+        'OperationError': 'Operation error occurred when creating the translator for the language pair:',
+        'QuotaExceededError': 'Translator API Quota exceeded. Please try again later.',
+        'UnknownError': 'Unknown error occurred while using the translator.',
+    }
+
     private async isCreateMonitorCallbackNeeded(languagePair: LanguagePair) {
         const availability = await Translator.availability(languagePair);
 
@@ -44,16 +54,6 @@ export class TranslatorService  {
             signal: this.#controller.signal,
             monitor,
         }) 
-    }
-
-    private readonly errors: Record<string, string> = {
-        'InvalidStateError': 'The document is not active. Please try again later.',
-        'NetworkError': 'The network is not available to download the AI model.',
-        'NotAllowedError': 'The Translator is not allowed to create.',
-        'NotSupportedError': 'The Translator does not support one of the languages.',
-        'OperationError': 'Operation error occurred when creating the translator for the language pair:',
-        'QuotaExceededError': 'Translator API Quota exceeded. Please try again later.',
-        'UnknownError': 'Unknown error occurred while using the translator.',
     }
 
     private handleErrors(e: unknown, languagePair: LanguagePair) {

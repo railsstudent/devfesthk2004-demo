@@ -19,8 +19,6 @@ import { LanguageDetectionWithNameResult } from '../../ai/types/language-detecti
             <span>Detected Language: {{ language.detectedLanguage }}, </span>
             <span>Detected Language Name: {{ language.name }}</span>
           </p>
-        } @else {
-          <p>No language detected.</p> 
         }
     </div>
   `,
