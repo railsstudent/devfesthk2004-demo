@@ -8,7 +8,7 @@ export async function getLanguageDetectorAPIAvailability(): Promise<string> {
 
    const availability = await LanguageDetector.availability();
    if (availability === 'unavailable') { 
-      throw new Error(ERROR_CODES.NO_GEMINI_NANO);
+      throw new Error(ERROR_CODES.NO_LLM);
    }
 
    return availability;

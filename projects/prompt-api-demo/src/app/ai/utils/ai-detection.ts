@@ -5,15 +5,15 @@ import { getChromVersion, isChromeBrowser } from './user-agent-data';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 
 export async function checkChromeBuiltInAI(): Promise<string> {
-   if (!isChromeBrowser()) {
-      throw new Error(ERROR_CODES.NOT_CHROME_BROWSER);
-   }
+   // if (!isChromeBrowser()) {
+   //    throw new Error(ERROR_CODES.NOT_CHROME_BROWSER);
+   // }
 
-   if (getChromVersion() < CHROME_VERSION) {
-      throw new Error(ERROR_CODES.OLD_BROWSER);
-   }
+   // if (getChromVersion() < CHROME_VERSION) {
+   //    throw new Error(ERROR_CODES.OLD_BROWSER);
+   // }
 
-   if (!('ai' in globalThis)) {
+   if (!('LanguageModel' in globalThis)) {
       throw new Error(ERROR_CODES.NO_PROMPT_API);
    }
 

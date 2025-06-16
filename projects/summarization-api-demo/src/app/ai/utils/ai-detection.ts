@@ -1,38 +1,22 @@
-import { inject } from '@angular/core';
-import { catchError, from, Observable, of } from 'rxjs';
-import { AI_SUMMARIZATION_API_TOKEN } from '../constants/core.constant';
-import { getChromVersion, isChromeBrowser } from './user-agent-data';
+import { catchError, from, map, Observable, of } from 'rxjs';
+import { ERROR_CODES } from '../enums/error-codes.enum';
 
-const CHROME_VERSION = 129
-
-async function checkChromeBuiltInAI(): Promise<string> {
-   if (!isChromeBrowser()) {
-      throw new Error('Your browser is not supported. Please use Google Chrome Dev or Canary.');
+async function getSummarizationAPIAvailability(): Promise<string> {
+   if (!('Summarizer' in self)) {
+      throw new Error(ERROR_CODES.NO_SUMMARIZATION_API);
    }
 
-   if (getChromVersion() < CHROME_VERSION) {
-      throw new Error(`Please upgrade the Chrome version to at least ${CHROME_VERSION}.`);
+   const availability = await Summarizer.availability();
+   if (availability === 'unavailable') { 
+      throw new Error(ERROR_CODES.NO_SUMMARIZATION_API);
    }
 
-   if (!('ai' in globalThis)) {
-      throw new Error('Summarization API is not available, check your configuration in chrome://flags/#summarization-api-for-gemini-nano');
-   }
-
-   const summarizer = inject(AI_SUMMARIZATION_API_TOKEN);
-   const status = (await summarizer?.capabilities())?.available;
-   if (!status) { 
-      throw new Error('Build-in Summarizer API not found in window. Please check the Summarizer API\'s explainer in https://github.com/WICG/writing-assistance-apis');
-   } else if (status === 'after-download') {
-      throw new Error('Built-in AI is not ready, please go to chrome://components and start downloading the Optimization Guide On Device Model');
-   } else if (status === 'no') {
-      throw new Error('The model of the Summarization API is not implemented. Please check your configuration in chrome://flags/#optimization-guide-on-device-model');
-   }
-
-   return '';
+   return availability;
 }
 
 export function isSummarizationAPISupported(): Observable<string> {
-   return from(checkChromeBuiltInAI()).pipe(
+   return from(getSummarizationAPIAvailability()).pipe(
+      map(() => ''),
       catchError(
          (e) => {
             console.error(e);

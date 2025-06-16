@@ -1,9 +1,7 @@
-import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@angular/core';
-import { provideSummarizationApi } from './ai/providers/ai-summarization-api.provider';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideExperimentalZonelessChangeDetection(),
-    provideSummarizationApi()
+    provideZonelessChangeDetection(),
   ]
 };
