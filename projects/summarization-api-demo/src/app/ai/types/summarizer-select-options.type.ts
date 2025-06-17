@@ -1,5 +1,5 @@
 export type SummarizerSelectOptions = { 
-    formatValues: AISummarizerFormat[], 
-    lengthValues: AISummarizerLength[], 
-    typeValues: AISummarizerType[] 
+    formats: SummarizerFormat[], 
+    lengths: SummarizerLength[], 
+    types: SummarizerType[] 
 };

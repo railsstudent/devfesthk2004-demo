@@ -7,9 +7,9 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
     imports: [FormsModule],
     template: `
     <div class="options-container">
-      @let formatOptions = selectOptions().formatValues;
-      @let typeOptions = selectOptions().typeValues;
-      @let lengthOptions = selectOptions().lengthValues;
+      @let formatOptions = selectOptions().formats;
+      @let typeOptions = selectOptions().types;
+      @let lengthOptions = selectOptions().lengths;
       @if (formatOptions.length > 0 && typeOptions.length > 0 && lengthOptions.length > 0) {
         <div>
           <label for="format">Format: </label>

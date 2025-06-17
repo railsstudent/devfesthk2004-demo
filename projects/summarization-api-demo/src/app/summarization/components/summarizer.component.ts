@@ -39,9 +39,9 @@ export class SummarizerComponent {
   summarizationService = inject(SummarizationService);
   selectOptions = input.required<SummarizerSelectOptions>();
 
-  formatOptions = computed(() => this.selectOptions().formatValues);
-  typeOptions = computed(() => this.selectOptions().typeValues);
-  lengthOptions = computed(() => this.selectOptions().lengthValues);
+  formatOptions = computed(() => this.selectOptions().formats);
+  typeOptions = computed(() => this.selectOptions().types);
+  lengthOptions = computed(() => this.selectOptions().lengths);
 
   selectedFormat = linkedSignal({
     source: this.formatOptions,
@@ -93,10 +93,12 @@ In practice, episodic memory is implemented as few-shot example prompting. If yo
 
   summarizerCreateOptions = computed(() => {
     return {
-      format: this.selectedFormat() as AISummarizerFormat,
-      type: this.selectedType() as AISummarizerType,
-      length: this.selectedLength() as AISummarizerLength,
+      format: this.selectedFormat() as SummarizerFormat,
+      type: this.selectedType() as SummarizerType,
+      length: this.selectedLength() as SummarizerLength,
       sharedContext: this.sharedContext(),
+      expectedInputLanguages: ["en-US"],
+      outputLanguage: "en-US",
     }
   });
 

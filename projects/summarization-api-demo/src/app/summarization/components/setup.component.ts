@@ -18,14 +18,13 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SetupComponent {
-  explainer = 'https://github.com/WICG/writing-assistance-apis';
-  minimumVersion = '129.0.6639.0'
+  explainer = 'https://developer.mozilla.org/en-US/docs/Web/API/Summarizer_API/Using';
+  minimumVersion = '136'
 
   steps = signal([
     'Open new tab, go to chrome://flags/#summarization-api-for-gemini-nano.',
     'Select Enabled.',
     'Relaunch Chrome',
-    'Open new tab, go to chrome://components.',
     'Open new tab, go to chrome://components.',
     'Find Optimization Guide On Device Model',
     'Click "Check for update" button to download the model. Version number should update.',
