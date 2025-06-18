@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { SummarizationService } from '../ai/services/summarization.service';
 import { SummarizerSelectOptions } from '../ai/types/summarizer-select-options.type';
 import { SummarizerComponent } from './components/summarizer.component';
+import { formats } from '../ai/constants/summarizer-format-list.constant';
+import { lengths } from '../ai/constants/summarizer-length-list.constant';
+import { types } from '../ai/constants/summarizer.-type-list.constant';
 
 @Component({
     selector: 'app-summarizer-container',
@@ -16,22 +19,9 @@ import { SummarizerComponent } from './components/summarizer.component';
 })
 export class SummarizerContainerComponent {
   summarizationService = inject(SummarizationService);
-  supportedFormats = signal<string[]>([]);
-  supportedTypes = signal<string[]>([]);
-  supportedLength = signal<string[]>([]);
-  languageAvailable = signal<string[]>([]);
   selectOptions = signal<SummarizerSelectOptions>({
-    formatValues: [],
-    lengthValues: [],
-    typeValues: [],
+    formats,
+    lengths,
+    types,
   });
-
-  constructor() {
-    this.summarizationService.languageAvailable(['en', 'zh']).then((results) => 
-      this.languageAvailable.set(results)
-    )
-
-    this.summarizationService.populateSelectOptions()
-      .then((result) => this.selectOptions.set(result));
-  }
 }

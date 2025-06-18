@@ -37,6 +37,7 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
         </div>
       }
     </div>
+    <p>Availability: {{ availability() ? 'Yes' : 'No' }}</p>
     <hr />
   `,
     styles: `
@@ -63,6 +64,7 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
 })
 export class SummarizerOptionsComponent {
     selectOptions = input.required<SummarizerSelectOptions>();
+    availability = input(false);
 
     selectedFormat = model.required<string>();
     selectedType = model.required<string>();

@@ -1,5 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { SummarizerSelectOptions } from '../types/summarizer-select-options.type';
+import { getAvailability } from '../utils/ai-detection';
 
 const formats: SummarizerFormat[] = ['plain-text', 'markdown'];
 const types: SummarizerType[] = ['headline', 'key-points', 'teaser', 'tldr'];
@@ -12,6 +13,10 @@ export class SummarizationService {
     #abortController = new AbortController();
     #summaries = signal<string[]>([]);
     summaries = this.#summaries.asReadonly();
+    #error = signal('');
+    error = this.#error.asReadonly();
+    #availability = signal(false);
+    availability = this.#availability.asReadonly();
 
     summarizerOptions = computed<SummarizerSelectOptions>(() => ({
         formats,
