@@ -24,33 +24,67 @@ export class SummarizationService {
         types,
     }));
 
+    private readonly errors: Record<string, string> = {
+        'InvalidStateError': 'The document is not active. Please try again later.',
+        'NotAllowedError': 'The Summarizer API is blocked.',
+        'NotSupportedError': 'The Summarizer does not support the language of the context.',
+        'NotReadableError': 'The output is unreadable, could be harmful, inaccurate, or nonsensical.',
+        'QuotaExceededError': 'Summarizer API Quota exceeded. Please try again later.',
+        'UnknownError': 'Unknown error occurred while using the summarizer.',
+    }
+    
+    private handleErrors(e: unknown) {
+        if (e == null) {
+            console.error('Error was null.', e);
+            this.#error.set('Error was null.');
+            return;
+        }
+
+        if (!(e instanceof DOMException) && !(e instanceof Error)) {
+            console.error('Error was not an instance of DOMException or Error.', e);
+            this.#error.set('Error was not an instance of DOMException or Error.');
+            return;
+        }
+
+        if (e instanceof DOMException) {
+            const error = this.errors[e.name];
+            if (error == null) {
+                console.error(`Error code not found for ${e.name}`, e);
+                this.#error.set(`Error code not found for ${e.name}`);
+                return;
+            }
+
+            console.error(error, e);
+            this.#error.set(error);
+        } else {
+            console.error(e.message, e);
+            this.#error.set(e.message);
+        }
+    }
+
     async summarize(options: SummarizerCreateCoreOptions, ...texts: string[]) {
+        this.#summaries.set([]);
+        this.#error.set('');
 
         try {
-            this.#summaries.set([]);
-            this.#error.set('');
-
             const availability = await getAvailability(options);
-            this.#availability.set(true);
-            const monitorCallback = availability === 'available' ? undefined : 
-                (monitor: CreateMonitor) => monitor.addEventListener("downloadprogress", (e) => {
-                    console.log(`download progress: ${e.loaded * 100}%`);
-                });
+            this.#availability.set(availability === 'available');
 
             const summarizer = await Summarizer.create({
                 ...options,
-                monitor: monitorCallback,
-                signal: this.#abortController.signal
+                signal: this.#abortController.signal,
+                monitor: availability === 'available' ? undefined : (monitor) => monitor.addEventListener('downloadprogress', (e) => {
+                    const percentage = Math.floor(e.loaded * 100);
+                    console.log(`Summarizer: Downloaded ${percentage}%`);
+                })
             });
-            
-            const promises = texts.map((text) => summarizer.summarize(text))
-            const summarizedTexts = await Promise.all(promises);
 
+            const summarizedTexts = await Promise.all(texts.map(text => summarizer.summarize(text)));
             this.#summaries.set(summarizedTexts);
             summarizer.destroy();
         } catch (e) {
             this.#availability.set(false);
-            this.#error.set(e instanceof Error ? e.message : 'unknown');
+            this.handleErrors(e);
         }
     }
 }
