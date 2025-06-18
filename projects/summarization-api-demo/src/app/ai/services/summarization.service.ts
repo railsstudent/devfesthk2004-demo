@@ -24,30 +24,33 @@ export class SummarizationService {
         types,
     }));
 
-    async isOptionSupported(languageFlags: string[]): Promise<string[]> {
-        const capabilities = await this.initCapabilities();
-        return languageFlags.map((flag) => 
-            `capabilities.languageAvailable(${flag}) = ${capabilities.languageAvailable(flag)}`
-        );
-    }
+    async summarize(options: SummarizerCreateCoreOptions, ...texts: string[]) {
 
-    async summarize(options: SummarizerCreateOptions, ...texts: string[]) {
-        this.#summaries.set([]);
+        try {
+            this.#summaries.set([]);
+            this.#error.set('');
 
-        const session = await this.validateAndReturnApi().create({ ...options, 
-            signal: this.#abortController.signal })
-        
-        const isAvailable = await this.createOptionsAvalable(options);
-        if (!isAvailable) {
-            return;
+            const availability = await getAvailability(options);
+            this.#availability.set(true);
+            const monitorCallback = availability === 'available' ? undefined : 
+                (monitor: CreateMonitor) => monitor.addEventListener("downloadprogress", (e) => {
+                    console.log(`download progress: ${e.loaded * 100}%`);
+                });
+
+            const summarizer = await Summarizer.create({
+                ...options,
+                monitor: monitorCallback,
+                signal: this.#abortController.signal
+            });
+            
+            const promises = texts.map((text) => summarizer.summarize(text))
+            const summarizedTexts = await Promise.all(promises);
+
+            this.#summaries.set(summarizedTexts);
+            summarizer.destroy();
+        } catch (e) {
+            this.#availability.set(false);
+            this.#error.set(e instanceof Error ? e.message : 'unknown');
         }
-        
-        const summarizedTexts: string[] = [];
-        for (const text of texts) {
-            summarizedTexts.push(await session.summarize(text));
-        }
-
-        this.#summaries.set(summarizedTexts);
-        session.destroy();
     }
 }
