@@ -66,7 +66,7 @@ export class SummarizerComponent {
     computation: (source) => source.find((item) => item === 'medium') || source[0]
   });
 
-  sharedContext = signal('Book description from https://www.packtpub.com/');
+  sharedContext = signal('Generate a summary of book description from https://www.packtpub.com/');
   text = signal(data.cicd);
   text2 = signal(data.llm);
   isSummarizing = signal(false);
