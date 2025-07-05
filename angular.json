@@ -501,7 +501,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/writer-api-demo",
+            "outputPath": {
+              "base": "dist/writer-api-demo",
+              "browser": ""
+            },
             "index": "projects/writer-api-demo/src/index.html",
             "browser": "projects/writer-api-demo/src/main.ts",
             "polyfills": [
