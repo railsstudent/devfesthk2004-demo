@@ -1,25 +1,20 @@
-import { inject, Injectable } from '@angular/core';
-import { AI_TRANSLATION_API_TOKEN } from '../constants/core.constant';
+import { Injectable, OnDestroy } from '@angular/core';
 import { TRANSLATION_ERROR_CODES } from '../enums/translation-error-codes.enum';
 import { LanguagePair } from '../types/language-pair.type';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TranslationService  {
-    #translationAPI = inject(AI_TRANSLATION_API_TOKEN);
+export class TranslationService implements OnDestroy  {
+    #constroller = new AbortController();
     
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePair[]> {
-        if (!this.#translationAPI) {
-            throw new Error(TRANSLATION_ERROR_CODES.NO_API);
-        }
-
         const results: LanguagePair[] = [];
         const targetLanguage = 'en';
         if (sourceLanguage !== targetLanguage) {
-            const pair = { sourceLanguage, targetLanguage }
-            const available = await this.#translationAPI.canTranslate(pair);
-            if (available !==  'no') {
+            const pair: TranslatorCreateCoreOptions = { sourceLanguage, targetLanguage }
+            const availability = await Translator.availability(pair);
+            if (availability !== 'unavailable') {
                 results.push(pair);
             }
         }
@@ -29,23 +24,26 @@ export class TranslationService  {
 
     async translate(languagePair: LanguagePair, inputText: string): Promise<string> {
         try { 
-            if (!this.#translationAPI) {
-                throw new Error(TRANSLATION_ERROR_CODES.NO_API);
-            }
+            const translator = await Translator.create({
+                ...languagePair,
+                signal: this.#constroller.signal,
+            });
 
-            const translator = await this.#translationAPI.createTranslator(languagePair);
             if (!translator) {
                 return '';
             }
 
-            const result = await translator.translate(inputText) as Promise<string>;
-            if (translator.destroy) {
-                translator.destroy();
-            }
+            const result = await translator.translate(inputText, { signal: this.#constroller.signal });
+            translator.destroy();
+
             return result;
         } catch (e) {
             console.error(e);
             return '';
         }
     }
+
+    ngOnDestroy(): void {
+        this.#constroller.abort();
+    }  
 }

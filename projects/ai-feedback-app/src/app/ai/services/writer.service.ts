@@ -1,31 +1,20 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { AI_WRITER_API_TOKEN } from '../constants/core.constant';
+import { Injectable, OnDestroy, signal } from '@angular/core';
+import { WRITER_OPTIONS } from '../constants/writer.constant';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WriterService {
-  #writerApi = inject(AI_WRITER_API_TOKEN);
-  #session = signal<AIWriter | undefined>(undefined);
+export class WriterService implements OnDestroy {
+  #writer = signal<Writer | undefined>(undefined);
   #controller = new AbortController();
 
-  private async createSession(options?: AIWriterCreateOptions) {
-    this.destroySession();
-    
-    const newSession = await this.#writerApi?.create({ ...options, signal: this.#controller.signal });
-    this.#session.set(newSession);
-  }
-
   async generateDraft(query: string, sentiment: string): Promise<string> {
-    if (!this.#writerApi) {
-      throw new Error(`Your browser doesn't support the Prompt API. If you are on Chrome, join the Early Preview Program to enable it.`);
+    if (!this.#writer()) {
+      const writer = await Writer.create({ ...WRITER_OPTIONS, signal: this.#controller.signal });
+      this.#writer.set(writer);
     }
 
-    if (!this.#session()) {
-      await this.createSession({ sharedContext: 'You are a professional public relation who drafts a response for feedback in English.' });
-    }
-
-    const session = this.#session();
+    const session = this.#writer();
     if (!session) {
       throw new Error('Failed to create a Prompt session.');
     }
@@ -40,11 +29,17 @@ export class WriterService {
   }
 
   destroySession() {
-    const session = this.#session();
+    const session = this.#writer();
 
     if (session) {
-        session.destroy();
-        this.#session.set(undefined);
+      console.log('Destroying the writer.');
+      session.destroy();
+      this.#writer.set(undefined);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.#controller.abort();
+    this.destroySession();
   }
 }

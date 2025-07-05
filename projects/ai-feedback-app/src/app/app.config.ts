@@ -1,9 +1,7 @@
-import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@angular/core';
-import { provideBuiltInApis } from './ai/providers/ai-built-in-api.provider';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideExperimentalZonelessChangeDetection(),
-    provideBuiltInApis(),
+    provideZonelessChangeDetection(),
   ]
 };

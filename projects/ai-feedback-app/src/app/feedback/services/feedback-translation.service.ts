@@ -5,6 +5,8 @@ import { SummarizationService } from '../../ai/services/summarization.service';
 import { TranslationService } from '../../ai/services/translation.service';
 import { LanguagePair } from '../../ai/types/language-pair.type';
 import { TranslationInput } from './../types/translation-input.type';
+import { SUMMARIZER_SHARED_CONTEXT, SUMMARIZER_AVAILABILITY_OPTIONS } from '../../ai/constants/summarizer.constant';
+
 
 @Injectable({
     providedIn: 'root'
@@ -36,8 +38,14 @@ export class FeedbackTranslationService {
         }
     }
 
-    async canSummarize(query: string): Promise<boolean> {
-        return this.#summarizationService.canSummarize(query);
+    async canSummarize(query: string, 
+        options: SummarizerCreateCoreOptions
+    ): Promise<boolean> {
+        const { isAvailable } = await this.#summarizationService.canSummarize(
+            options, query
+        );
+
+        return isAvailable
     }
 
     async summarize(query: string): Promise<string> {
@@ -46,13 +54,11 @@ export class FeedbackTranslationService {
                 return '';
             }
 
-            const sharedContext = `You are an expert that can summarize a customer's feedback. 
-            If the text is not in English, please return a blank string.`;
+            // const sharedContext = `You are an expert that can summarize a customer's feedback. 
+            // If the text is not in English, please return a blank string.`;
             return await this.#summarizationService.summarize({
-                type: 'headline',
-                format: 'plain-text',
-                length: 'short',
-                sharedContext,
+                ...SUMMARIZER_AVAILABILITY_OPTIONS,
+                sharedContext: SUMMARIZER_SHARED_CONTEXT,
             }, query);
         } catch (e) {
             console.error(e);

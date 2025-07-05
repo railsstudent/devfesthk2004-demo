@@ -50,7 +50,9 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
 
   sentimentLanguageEvaluated = output<TranslationInput>();
 
-  private sentiment$ = merge(toObservable(this.query).pipe(debounceTime(1000)), of(this.query()))
+  private sentiment$ = merge([
+      toObservable(this.query).pipe(debounceTime(1000)), 
+      of(this.query())])
     .pipe(
       switchMap((query) => {
         this.isLoading.set(true);

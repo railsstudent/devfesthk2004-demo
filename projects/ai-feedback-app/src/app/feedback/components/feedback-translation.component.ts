@@ -50,8 +50,8 @@ export class FeedbackTranslationComponent {
   })
   
   summary = resource({
-    request: () => this.feedback(),
-    loader: async ({ request: query }) => {
+    params: () => this.feedback(),
+    loader: async ({ params: query }) => {
       if (await this.translationService.canSummarize(query)) {
         return this.translationService.summarize(query);
       }

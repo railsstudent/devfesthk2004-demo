@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { NShotPromptService } from '../../ai/services/n-shot-prompt.service';
 import { LanguageDetectionService } from '../../ai/services/language-detection.service';
+import { NShotPromptService } from '../../ai/services/n-shot-prompt.service';
 import { SentimentLanguage } from '../types/sentiment-language.type';
 
 @Injectable({
@@ -28,9 +28,5 @@ export class FeedbackSentimentService {
             const errMsg = e instanceof Error ? e.message : 'Error in finding the sentiment.';
             throw new Error(errMsg);
         });
-    }
-
-    destroySessions() {
-        this.promptService.destroySession();
     }
 }
