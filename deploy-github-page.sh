@@ -5,11 +5,9 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-echo "delete docs/$1"
-rm -rf docs/$1
+echo "delete dist/$1"
+rm -rf dist/$1
 echo "build project $1 starts"
-ng build --project=$1 --output-path docs/$1
-cp ./docs/$1/browser/index.html  ./docs/$1/browser/404.html
-cp ./docs/$1/browser/*  ./docs/$1
-rm -rf ./docs/$1/browser
+ng build --project=$1 --output-path dist/$1
+cp ./dist/$1/index.html  ./dist/$1/404.html
 echo 'build project finishes'

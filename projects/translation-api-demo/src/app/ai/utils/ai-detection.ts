@@ -1,4 +1,5 @@
 import { catchError, from, map, Observable, of, switchMap } from 'rxjs';
+import { EXPECTED_INPUT_LANGUAGES } from '../constants/input-languages.constant';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 
 export async function getLanguageDetectorAPIAvailability(): Promise<Omit<Availability, 'uavailable'>> {
@@ -21,7 +22,9 @@ export async function validateLanguageDetector() {
       throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR_API);
    }
 
-   const availability = await LanguageDetector.availability()
+   const availability = await LanguageDetector.availability({
+      expectedInputLanguages: EXPECTED_INPUT_LANGUAGES,
+   })
 
    if (availability === 'unavailable') {
       throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);

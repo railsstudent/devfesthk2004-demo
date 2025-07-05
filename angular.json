@@ -20,7 +20,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/prompt-api-demo",
+            "outputPath": {
+              "base": "dist/prompt-api-demo",
+              "browser": ""
+            },
             "index": "projects/prompt-api-demo/src/index.html",
             "browser": "projects/prompt-api-demo/src/main.ts",
             "polyfills": [],
@@ -115,7 +118,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/language-detector-demo",
+            "outputPath": {
+              "base": "dist/language-detector-demo",
+              "browser": ""
+            },
             "index": "projects/language-detector-demo/src/index.html",
             "browser": "projects/language-detector-demo/src/main.ts",
             "polyfills": [],
@@ -210,7 +216,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/translation-api-demo",
+            "outputPath": {
+              "base": "dist/translation-api-demo",
+              "browser": ""
+            },
             "index": "projects/translation-api-demo/src/index.html",
             "browser": "projects/translation-api-demo/src/main.ts",
             "polyfills": [],
@@ -304,7 +313,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/summarization-api-demo",
+            "outputPath": {
+              "base": "dist/summarization-api-demo",
+              "browser": ""
+            },
             "index": "projects/summarization-api-demo/src/index.html",
             "browser": "projects/summarization-api-demo/src/main.ts",
             "polyfills": [],
@@ -395,7 +407,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/ai-feedback-app",
+            "outputPath": {
+              "base": "dist/ai-feedback-app",
+              "browser": ""
+            },
             "index": "projects/ai-feedback-app/src/index.html",
             "browser": "projects/ai-feedback-app/src/main.ts",
             "polyfills": [],
