@@ -11,6 +11,7 @@ export class NShotsPromptService extends AbstractPromptService implements OnDest
   }
 
   ngOnDestroy(): void {
+    this.controller.abort();
     this.destroySession();
   }
 }

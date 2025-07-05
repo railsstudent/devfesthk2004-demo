@@ -1,6 +1,5 @@
 import { computed, Injectable, OnDestroy, signal } from '@angular/core';
 import { from } from 'rxjs';
-import { ERROR_CODES } from '../enums/error-codes.enum';
 import { AbstractPromptService } from './abstract-prompt.service';
 
 @Injectable({
@@ -41,6 +40,7 @@ export class ZeroPromptService extends AbstractPromptService implements OnDestro
   }
 
   ngOnDestroy(): void {
+    this.controller.abort();
     this.destroySession();
   }
 }

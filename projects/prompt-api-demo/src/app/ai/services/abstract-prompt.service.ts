@@ -1,5 +1,4 @@
-import { computed, inject, signal } from '@angular/core';
-import { ERROR_CODES } from '../enums/error-codes.enum';
+import { computed, signal } from '@angular/core';
 
 export abstract class AbstractPromptService {
     controller = new AbortController();
@@ -12,7 +11,7 @@ export abstract class AbstractPromptService {
     }
 
     #inputQuota = computed(() => this.#session()?.inputQuota || 0);
-    #inputUsage = computed(() => this.#session()?.inputUsage || 0);
+    #inputUsage = signal(0);
     #tokenLeft = computed(() => this.#inputQuota() - this.#inputUsage());
 
     tokenContext = computed(() => {
@@ -40,6 +39,7 @@ export abstract class AbstractPromptService {
                 throw new Error('Prompt API failed to create a session.');       
             }
             this.resetSession(newSession);
+            this.updateTokenContext()
         } 
     }
 
@@ -52,7 +52,16 @@ export abstract class AbstractPromptService {
             throw new Error('Session does not exist.');       
         }
         const answer = await session.prompt(query);
+        this.updateTokenContext();
+        console.log('prompt -> session', this.session());
         return answer;
+    }
+
+    updateTokenContext() {
+        const session = this.session();
+        if (session) {
+            this.#inputUsage.set(session.inputUsage);
+        }
     }
 
     async countNumTokens(query: string): Promise<number> {
@@ -66,7 +75,6 @@ export abstract class AbstractPromptService {
     }
 
     destroySession() {
-        this.controller.abort();
         const session = this.session();
 
         if (session) {

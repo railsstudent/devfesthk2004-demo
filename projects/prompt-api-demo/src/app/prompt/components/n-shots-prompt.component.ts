@@ -10,7 +10,8 @@ import { PromptResponseComponent } from './prompt-response.component';
 
 const INITIAL_PROMPTS: LanguageInitialPrompt = [
   { role: 'system', content: `You are an expert in determine the sentiment of a text. 
-  If it is positive, say 'positive'. If it is negative, say 'negative'. If you are not sure, then say 'not sure'` },
+  If it is positive, say 'positive'. If it is negative, say 'negative'. If you are not sure, then say 'not sure'. 
+  Do not give other opinion when seeing repeated pattern.` },
   { role: 'user', content: "The food is affordable and delicious, and the venue is close to the train station." },
   { role: 'assistant', content: "positive" },
   { role: 'user', content: "The waiters are very rude, the food is salty, and the drinks are sour." },
@@ -56,5 +57,6 @@ export class NShotsPromptComponent extends BasePromptComponent {
     super();
     this.query.set('The toilet has no toilet papers again.');
     this.promptService.setPromptOptions({ initialPrompts: this.initialPrompts() });
+    this.promptService.createSessionIfNotExists();
   }
 }
