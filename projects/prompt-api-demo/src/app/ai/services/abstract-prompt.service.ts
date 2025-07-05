@@ -1,28 +1,34 @@
-import { inject, signal } from '@angular/core';
-import { AI_PROMPT_API_TOKEN } from '../constants/core.constant';
+import { computed, inject, signal } from '@angular/core';
 import { ERROR_CODES } from '../enums/error-codes.enum';
-import { PromptOptions, Tokenization } from '../types/prompt.type';
 
 export abstract class AbstractPromptService {
-    promptApi = inject(AI_PROMPT_API_TOKEN);
-    #session = signal<AILanguageModel | undefined>(undefined);
+    controller = new AbortController();
+    #session = signal<LanguageModel | undefined>(undefined);
     session = this.#session.asReadonly();
-    #tokenContext = signal<Tokenization | null>(null);
-    tokenContext = this.#tokenContext.asReadonly();
-    #options = signal<PromptOptions | undefined>(undefined);
+    #options = signal<LanguageModelCreateOptions | undefined>(undefined);
 
-    resetSession(newSession: AILanguageModel | undefined) {
+    resetSession(newSession: LanguageModel | undefined) {
         this.#session.set(newSession);
-        this.#tokenContext.set(null);
     }
+
+    #inputQuota = computed(() => this.#session()?.inputQuota || 0);
+    #inputUsage = computed(() => this.#session()?.inputUsage || 0);
+    #tokenLeft = computed(() => this.#inputQuota() - this.#inputUsage());
+
+    tokenContext = computed(() => {
+        return {
+            tokensSoFar: this.#inputUsage(),
+            maxTokens: this.#inputQuota(),
+            tokensLeft: this.#tokenLeft(),
+        }
+    });
 
     shouldCreateSession() {
         const session = this.#session();
-        const context = this.#tokenContext();
-        return !session || (context && context.tokensLeft < 500);
+        return !session || this.#tokenLeft() < 500;
     }
 
-    setPromptOptions(options?: PromptOptions) {
+    setPromptOptions(options?: LanguageModelCreateOptions) {
         this.#options.set(options);
     }
 
@@ -37,25 +43,15 @@ export abstract class AbstractPromptService {
         } 
     }
 
-    abstract createPromptSession(options?: PromptOptions): Promise<AILanguageModel | undefined>;
+    abstract createPromptSession(options?: LanguageModelCreateOptions): Promise<LanguageModel | undefined>;
 
     async prompt(query: string): Promise<string> {
-        if (!this.promptApi) {
-            throw new Error(ERROR_CODES.NO_PROMPT_API);
-        }
-
         await this.createSessionIfNotExists();
         const session = this.#session();
         if (!session) {
             throw new Error('Session does not exist.');       
         }
         const answer = await session.prompt(query);
-        this.#tokenContext.set({
-            tokensSoFar: session.tokensSoFar,
-            maxTokens: session.maxTokens,
-            tokensLeft: session.tokensLeft,
-        });
-
         return answer;
     }
 
@@ -66,10 +62,11 @@ export abstract class AbstractPromptService {
             return Promise.resolve(0);
         }
 
-        return session.countPromptTokens(query);
+        return session.measureInputUsage(query);
     }
 
     destroySession() {
+        this.controller.abort();
         const session = this.session();
 
         if (session) {

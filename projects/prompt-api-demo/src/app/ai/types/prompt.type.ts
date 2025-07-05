@@ -1,7 +1,8 @@
-export type Tokenization = Pick<AILanguageModel, "tokensSoFar" | "tokensLeft" | "maxTokens">;
-
-export type LanguageInitialPrompt = 
-    [AILanguageModelSystemPrompt, ...AILanguageModelPrompt[]]
-    | AILanguageModelPrompt[];
+export type LanguageInitialPrompt = [LanguageModelSystemMessage, ...LanguageModelMessage[]] 
+    | LanguageModelMessage[];
     
-export type PromptOptions = AILanguageModelCreateOptionsWithSystemPrompt | AILanguageModelCreateOptionsWithoutSystemPrompt;
+export type Tokenization = {
+    tokensSoFar: number;
+    maxTokens: number;
+    tokensLeft: number;
+};

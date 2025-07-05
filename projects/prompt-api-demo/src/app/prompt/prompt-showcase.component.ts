@@ -1,13 +1,12 @@
 import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { INIT_CAPABILITIES } from '../ai/constants/capabilities.constant';
 import { ZeroPromptService } from '../ai/services/zero-prompt.service';
 import { CapabilityComponent } from './components/capability.component';
 import { NShotsPromptComponent } from './components/n-shots-prompt.component';
 import { SystemPromptsComponent } from './components/system-prompts.component';
 import { ZeroPromptComponent } from './components/zero-prompt.component';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-prompt-showcase',
@@ -45,7 +44,6 @@ export class PromptShowcaseComponent {
       inputs
     }; 
   });
- 
-  defaultCapabilities = toSignal(this.promptService.getCapabilities(), 
-    { initialValue: INIT_CAPABILITIES as AILanguageModelCapabilities });
+
+  defaultCapabilities = toSignal(this.promptService.getCapabilities());
 }

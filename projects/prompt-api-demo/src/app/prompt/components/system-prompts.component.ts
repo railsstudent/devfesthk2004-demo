@@ -53,13 +53,23 @@ export class SystemPromptsComponent extends BasePromptComponent {
         distinctUntilChanged(),
         switchMap(async (systemPrompt) => {
             this.promptService.destroySession();
-            this.promptService.setPromptOptions({ systemPrompt });
+            this.promptService.setPromptOptions({
+              initialPrompts: [
+                { role: 'system', content: systemPrompt }
+              ]
+            });
             await this.promptService.createSessionIfNotExists();
         }),
         takeUntilDestroyed(),
       )
       .subscribe();   
 
-    this.promptService.setPromptOptions({ systemPrompt: this.systemPrompt() });
+    this.promptService.setPromptOptions(
+      {
+        initialPrompts: [
+          { role: 'system', content: this.systemPrompt() }
+        ]
+      }
+    );
   }
 }

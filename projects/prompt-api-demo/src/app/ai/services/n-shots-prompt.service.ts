@@ -1,16 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { AbstractPromptService } from './abstract-prompt.service';
-import { PromptOptions } from '../types/prompt.type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NShotsPromptService extends AbstractPromptService implements OnDestroy  {
-  #controller = new AbortController();
-
-  override async createPromptSession(options?: PromptOptions): Promise<AILanguageModel | undefined> {
+  override async createPromptSession(options?: LanguageModelCreateOptions): Promise<LanguageModel | undefined> {
     const { initialPrompts = undefined } = options || {};
-    return this.promptApi?.create({ initialPrompts, signal: this.#controller.signal });
+    return LanguageModel.create({ initialPrompts, signal: this.controller.signal });
   }
 
   ngOnDestroy(): void {

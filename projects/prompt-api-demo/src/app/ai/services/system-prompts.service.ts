@@ -1,16 +1,23 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { AbstractPromptService } from './abstract-prompt.service';
-import { PromptOptions } from '../types/prompt.type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SystemPromptService extends AbstractPromptService implements OnDestroy  {
-  #controller = new AbortController();
+  override async createPromptSession(options?: LanguageModelCreateOptions): Promise<LanguageModel | undefined> {
+    const { initialPrompts = [] } = options || {};
+    const systemPromptMessage = initialPrompts.find(prompt => prompt.role === 'system');
 
-  override async createPromptSession(options?: PromptOptions): Promise<AILanguageModel | undefined> {
-    const { systemPrompt = undefined } = options || {};
-    return this.promptApi?.create({ systemPrompt, signal: this.#controller.signal });
+    if (!systemPromptMessage) {
+      throw new Error('System prompt is not found');
+    }
+
+    return LanguageModel.create({ 
+      initialPrompts: [
+        systemPromptMessage as LanguageModelSystemMessage
+      ],
+      signal: this.controller.signal });
   }
   
   ngOnDestroy(): void {
