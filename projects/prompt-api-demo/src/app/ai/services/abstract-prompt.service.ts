@@ -22,18 +22,12 @@ export abstract class AbstractPromptService {
         }
     });
 
-    shouldCreateSession() {
-        const session = this.#session();
-        return !session || this.#tokenLeft() < 500;
-    }
-
     setPromptOptions(options?: LanguageModelCreateOptions) {
         this.#options.set(options);
     }
 
     async createSessionIfNotExists(): Promise<void> {
-        if (this.shouldCreateSession()) {
-            this.destroySession();
+        if (!this.#session()) {
             const newSession = await this.createPromptSession(this.#options());
             if (!newSession) {
                 throw new Error('Prompt API failed to create a session.');       
@@ -53,7 +47,6 @@ export abstract class AbstractPromptService {
         }
         const answer = await session.prompt(query);
         this.updateTokenContext();
-        console.log('prompt -> session', this.session());
         return answer;
     }
 
