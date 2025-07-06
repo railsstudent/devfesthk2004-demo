@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, Injector, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, Injector, output, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, merge, of, switchMap } from 'rxjs';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
-import { TranslationInput } from '../types/translation-input.type';
+import { TranslatedFeedbackWithPair } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { FeedbackErrorComponent } from './feedback-error.component';
 
@@ -48,7 +48,7 @@ Mientras servía nuestra bebida, derramó el líquido sobre mi abrigo y ni siqui
 Por si fuera poco, el baño estaba en condiciones horribles: olía mal y no había papel higiénico en la cabina.
 En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la limpieza son aspectos que definitivamente necesitan mejorar. No volveré.`);
 
-  sentimentLanguageEvaluated = output<TranslationInput>();
+  sentimentLanguageEvaluated = output<TranslatedFeedbackWithPair>();
 
   private sentiment$ = merge(
       toObservable(this.query).pipe(debounceTime(1000)), 
@@ -59,20 +59,23 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
         this.isLoading.set(true);
         this.error.set('');
         return this.sentimentService.detectSentimentAndLanguage(query)
-            .then((result) => {
-                if (result) {
-                  this.sentimentLanguageEvaluated.emit({
-                    code: result.code,
-                    sentiment: result.sentiment,
-                    query
-                  });
-                }
-                return result;
-            }).catch((e: Error) => {
+            .catch((e: Error) => {
               this.error.set(e.message);
               return undefined;
-            }).finally(() => this.isLoading.set(false));
+            })
+            .finally(() => this.isLoading.set(false));
       }));
 
   sentiment = toSignal(this.sentiment$, { injector: this.injector, initialValue: undefined });
+
+  constructor() {
+    effect(() => {
+      const sentiment = this.sentiment();
+
+      if (sentiment) {
+        const { language, ...rest } = sentiment;
+        this.sentimentLanguageEvaluated.emit(rest);
+      }
+    });
+  }
 }

@@ -5,7 +5,10 @@ export type SentimentLanguage = {
 };
 
 export type TranslatedFeedback = Pick<SentimentLanguage, 'code' | 'language'> & {
-    text: string 
+    translatedText: string;
+    targetCode: string;
 };
 
-export type TranslatedFeedbackWithSentiment = SentimentLanguage & TranslatedFeedback
+export type TranslatedFeedbackWithSentiment = SentimentLanguage & TranslatedFeedback;
+
+export type TranslatedFeedbackWithPair = Omit<TranslatedFeedbackWithSentiment, 'language'>;

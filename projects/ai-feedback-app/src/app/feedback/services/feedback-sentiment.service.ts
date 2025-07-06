@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { LanguageDetectionService } from '../../ai/services/language-detection.service';
 import { NShotPromptService } from '../../ai/services/n-shot-prompt.service';
 import { TranslationService } from '../../ai/services/translation.service';
-import { TranslatedFeedback, TranslatedFeedbackWithSentiment } from '../types/sentiment-language.type';
+import { TranslatedFeedbackWithSentiment, TranslatedFeedback } from '../types/sentiment-language.type';
 
 @Injectable({
     providedIn: 'root'
@@ -35,7 +35,8 @@ export class FeedbackSentimentService {
         return {
             code,
             language,
-            text: translatedText || text,
+            targetCode: 'en',
+            translatedText: translatedText || text,
         }
     }
 
@@ -49,10 +50,8 @@ export class FeedbackSentimentService {
             // determine sentiment for the English feedback
             const sentiment = await this.#promptService.prompt(text);
             return {
+                ...enFeedback,
                 sentiment,
-                code: enFeedback.code,
-                language: enFeedback.language,
-                text: enFeedback.text,
             }
         } catch (e) {
             const errMsg = e instanceof Error ? e.message : 'Error in finding the sentiment.';

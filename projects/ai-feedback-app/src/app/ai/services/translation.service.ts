@@ -1,5 +1,4 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { TRANSLATION_ERROR_CODES } from '../enums/translation-error-codes.enum';
 import { LanguagePair } from '../types/language-pair.type';
 
 @Injectable({
