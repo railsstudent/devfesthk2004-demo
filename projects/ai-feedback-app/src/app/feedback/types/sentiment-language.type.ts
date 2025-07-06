@@ -3,3 +3,9 @@ export type SentimentLanguage = {
     code: string;
     language: string 
 };
+
+export type TranslatedFeedback = Pick<SentimentLanguage, 'code' | 'language'> & {
+    text: string 
+};
+
+export type TranslatedFeedbackWithSentiment = SentimentLanguage & TranslatedFeedback

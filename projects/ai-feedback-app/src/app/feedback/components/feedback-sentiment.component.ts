@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, Injector, OnDestroy, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Injector, output, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, merge, of, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, merge, of, switchMap } from 'rxjs';
 import { LineBreakPipe } from '../pipes/line-break.pipe';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
 import { TranslationInput } from '../types/translation-input.type';
@@ -37,7 +37,7 @@ import { FeedbackErrorComponent } from './feedback-error.component';
   `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeedbackSentimentComponent implements OnDestroy {
+export class FeedbackSentimentComponent {
   sentimentService = inject(FeedbackSentimentService);
   injector = inject(Injector);
 
@@ -50,10 +50,11 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
 
   sentimentLanguageEvaluated = output<TranslationInput>();
 
-  private sentiment$ = merge([
+  private sentiment$ = merge(
       toObservable(this.query).pipe(debounceTime(1000)), 
-      of(this.query())])
+      of(this.query()))
     .pipe(
+      distinctUntilChanged(),
       switchMap((query) => {
         this.isLoading.set(true);
         this.error.set('');
@@ -72,9 +73,6 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
               return undefined;
             }).finally(() => this.isLoading.set(false));
       }));
-  sentiment = toSignal(this.sentiment$, { injector: this.injector, initialValue: undefined });
 
-  ngOnDestroy(): void {
-    this.sentimentService.destroySessions();
-  }
+  sentiment = toSignal(this.sentiment$, { injector: this.injector, initialValue: undefined });
 }

@@ -1,7 +1,7 @@
 import { catchError, from, Observable, of } from 'rxjs';
 
 async function checkChromeTranslationApi(): Promise<string> {
-   if (!('translation' in self)) {
+   if (!('Translator' in self)) {
       throw new Error('Translation API is not available, check your configuration in chrome://flags/#translation-api');
    }
 
