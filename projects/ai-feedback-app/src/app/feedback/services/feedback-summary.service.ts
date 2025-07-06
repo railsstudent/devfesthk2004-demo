@@ -1,12 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { SummarizationService } from '../../ai/services/summarization.service';
-import { TranslationService } from '../../ai/services/translation.service';
-
 
 @Injectable({
     providedIn: 'root'
 })
-export class FeedbackTranslationService {
+export class FeedbackSummaryService {
     #summarizationService = inject(SummarizationService);
 
     async summarize(query: string): Promise<string> {

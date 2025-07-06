@@ -1,0 +1,20 @@
+<div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">      
+    <app-feedback-loading [isLoading]="isLoading()">Summarizing...</app-feedback-loading>
+    @let code = translationInput().code;
+    @let targetCode = translationInput().targetCode;
+    <div style="margin-bottom: 0.5rem;">
+      <span class="label">Language Pair:</span>   
+      {{ `${code} to ${targetCode}` }}
+    </div>
+
+    @let labelText = targetCode !== code ? 'Translation: ' : 'Original Text: ';
+    <div style="margin-bottom: 0.5rem;">
+      <p style="margin-bottom: 1rem;"><span class="label">{{ labelText }}</span> 
+        {{ translationInput().translatedText }}
+      </p>
+      <p><span class="label">Summary: </span> 
+        {{ summaryValue() }}
+      </p>
+    </div>
+    <!-- <app-response-writer [translationInput]="writerInput()"  /> -->
+</div>
