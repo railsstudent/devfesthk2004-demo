@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, resource }
 import { FeedbackSummaryService } from '../services/feedback-summary.service';
 import { TranslatedFeedbackWithPair } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
+import { ResponseWriterComponent } from './response-writer.component';
 
 @Component({
     selector: 'app-feedback-translation',
-    imports: [/*ResponseWriterComponent,*/ FeedbackLoadingComponent],
+    imports: [ResponseWriterComponent, FeedbackLoadingComponent],
     templateUrl: './feedback-translation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -13,13 +14,13 @@ export class FeedbackTranslationComponent {
   translationInput = input.required<TranslatedFeedbackWithPair>();
   summaryService = inject(FeedbackSummaryService);
   
-  // writerInput = computed<TranslationInput>(() => {
-  //   return {
-  //     code: this.translationInput().code, 
-  //     query: this.feedback(),
-  //     sentiment: this.translationInput().sentiment,
-  //   }
-  // })
+  writerInput = computed(() => {
+    return {
+      code: this.translationInput().code, 
+      translatedText: this.translationInput().translatedText,
+      sentiment: this.translationInput().sentiment,
+    }
+  });
   
   summary = resource({
     params: () => this.translationInput().translatedText,

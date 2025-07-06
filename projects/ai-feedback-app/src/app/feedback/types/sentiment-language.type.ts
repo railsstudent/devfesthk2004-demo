@@ -12,3 +12,5 @@ export type TranslatedFeedback = Pick<SentimentLanguage, 'code' | 'language'> & 
 export type TranslatedFeedbackWithSentiment = SentimentLanguage & TranslatedFeedback;
 
 export type TranslatedFeedbackWithPair = Omit<TranslatedFeedbackWithSentiment, 'language'>;
+
+export type TranslationInput = Pick<TranslatedFeedbackWithSentiment, 'code' | 'translatedText' | 'sentiment'>;
