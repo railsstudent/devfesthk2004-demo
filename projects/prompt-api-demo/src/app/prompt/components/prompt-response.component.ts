@@ -61,12 +61,11 @@ export class PromptResponseComponent {
   streamedResponse = linkedSignal<PromptResponse, ParseStreamedResponse>({
     source: () => this.state(),
     computation: (source, previous) => {
-      const { value, sequence, done } = source.chunk;
-      if (sequence === -1) {
+      const { value = '', sequence, done } = source.chunk;
+      if (typeof sequence === 'undefined') {
         return { 
           chunk: '',
           chunks: '',
-          sequence,
           done: false,
         };
       }
@@ -87,7 +86,7 @@ export class PromptResponseComponent {
     effect(() => {
       const { chunk, chunks, sequence, done } = this.streamedResponse();
 
-      if (sequence === -1) {
+      if (typeof sequence === 'undefined') {
         const element = this.element();
         while (element.lastChild) {
           element.removeChild(element.lastChild as ChildNode);
