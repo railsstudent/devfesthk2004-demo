@@ -1,5 +1,6 @@
 import { computed, Directive, inject, signal } from '@angular/core';
 import { AbstractPromptService } from '../../ai/services/abstract-prompt.service';
+import { State } from '../types/prompt-response.type';
 
 @Directive({
     standalone: false
@@ -8,14 +9,14 @@ export abstract class BasePromptComponent {
     promptService = inject(AbstractPromptService);
   
     session = this.promptService.session;
+    chunk = this.promptService.chunk;
     
     isLoading = signal(false);
     error = signal('');
     query = signal('Tell me about the job responsibility of an A.I. engineer, maximum 500 words.');
-    response = signal('');
     numPromptTokens = signal(0);
     
-    state = computed(() => {
+    state = computed<State>(() => {
         const isLoading = this.isLoading();
         const isUnavailableForCall = isLoading || this.query().trim() === '';
         return {
@@ -23,7 +24,7 @@ export abstract class BasePromptComponent {
             text: isLoading ? 'Progressing...' : 'Submit',
             disabled: isLoading,
             numTokensDisabled: isUnavailableForCall,
-            submitDisabled: isUnavailableForCall
+            submitDisabled: isUnavailableForCall,
         }
     });
 
@@ -39,14 +40,12 @@ export abstract class BasePromptComponent {
         this.isLoading.set(false);
       }
     }
-  
+    
     async submitPrompt() {
       try {
         this.isLoading.set(true);
         this.error.set('');
-        this.response.set('');
-        const answer = await this.promptService.prompt(this.query());
-        this.response.set(answer);
+        await this.promptService.prompt(this.query());
       } catch(e) {
         const errMsg = e instanceof Error ? (e as Error).message : 'Error in submitPrompt';
         this.error.set(errMsg);

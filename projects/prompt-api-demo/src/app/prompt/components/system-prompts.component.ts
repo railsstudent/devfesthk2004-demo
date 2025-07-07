@@ -41,7 +41,7 @@ export class SystemPromptsComponent extends BasePromptComponent {
     numPromptTokens: this.numPromptTokens(),
     tokenContext: this.tokenContext(),
     error: this.error(),
-    response: this.response(),
+    chunk: this.chunk(),
   }));
 
   constructor() {

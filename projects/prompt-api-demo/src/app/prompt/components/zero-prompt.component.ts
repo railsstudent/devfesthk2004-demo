@@ -57,7 +57,7 @@ export class ZeroPromptComponent extends BasePromptComponent {
     numPromptTokens: this.numPromptTokens(),
     tokenContext: this.zeroPromptService.tokenContext(),
     error: this.error(),
-    response: this.response(),
+    chunk: this.chunk(),
   }));
 
   temperature = this.zeroPromptService.temperature;

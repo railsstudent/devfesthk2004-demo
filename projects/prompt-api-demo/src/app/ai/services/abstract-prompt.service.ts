@@ -5,6 +5,8 @@ export abstract class AbstractPromptService {
     #session = signal<LanguageModel | undefined>(undefined);
     session = this.#session.asReadonly();
     #options = signal<LanguageModelCreateOptions | undefined>(undefined);
+    #chunk = signal({ value: '', sequence: 0, done: false });
+    chunk = this.#chunk.asReadonly();
 
     resetSession(newSession: LanguageModel | undefined) {
         this.#session.set(newSession);
@@ -30,24 +32,41 @@ export abstract class AbstractPromptService {
         if (!this.#session()) {
             const newSession = await this.createPromptSession(this.#options());
             if (!newSession) {
-                throw new Error('Prompt API failed to create a session.');       
+                throw new Error('Prompt API failed to create a session.');
             }
             this.resetSession(newSession);
             this.updateTokenContext()
-        } 
+        }
     }
 
     abstract createPromptSession(options?: LanguageModelCreateOptions): Promise<LanguageModel | undefined>;
 
-    async prompt(query: string): Promise<string> {
+    async prompt(query: string): Promise<void> {
         await this.createSessionIfNotExists();
         const session = this.#session();
         if (!session) {
-            throw new Error('Session does not exist.');       
+            throw new Error('Session does not exist.');
         }
-        const answer = await session.prompt(query);
-        this.updateTokenContext();
-        return answer;
+
+        this.#chunk.set({ value: '', sequence: -1, done: false });
+        const stream = await session.promptStreaming(query);
+        const self = this;
+        const reader = stream.getReader();
+        let sequence = 0;
+        reader.read().then(function processText({ done, value }): any {
+            // console.log('done', done, 'value', value);
+            if (done) {
+                self.#chunk.set({ value: '', sequence, done });
+                self.updateTokenContext();
+                return;
+            }
+
+            if (value) {
+                self.#chunk.set({ value, sequence, done });
+                sequence = sequence + 1;
+            }
+            return reader.read().then(processText);
+        });
     }
 
     updateTokenContext() {

@@ -1,15 +1,16 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, model, output, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, linkedSignal, model, output, TemplateRef, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
-import { PromptResponse } from '../types/prompt-response.type';
+import DOMPurify from 'dompurify';
+import * as smd from 'streaming-markdown';
+import { ParseStreamedResponse, PromptResponse } from '../types/prompt-response.type';
 import { TokenizationComponent } from './tokenization.component';
 
 const transform = (value: TemplateRef<any> | undefined) => typeof value === 'undefined' ? null : value;
 
 @Component({
   selector: 'app-prompt-response',
-  imports: [TokenizationComponent, FormsModule, LineBreakPipe, NgTemplateOutlet],
+  imports: [TokenizationComponent, FormsModule, NgTemplateOutlet],
   template: `
     @let responseState = state();
     <app-tokenization [numPromptTokens]="responseState.numPromptTokens" [tokenContext]="responseState.tokenContext" />
@@ -27,7 +28,7 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
     <button (click)="submitPrompt.emit()" [disabled]="responseState.submitDisabled">{{ responseState.text }}</button>
     <div>
       <span class="label">Response: </span>
-      <p [innerHTML]="responseState.response | lineBreak"></p>
+      <div #answer></div>
     </div>
     @let error = responseState.error;
     @if (error) {
@@ -48,4 +49,67 @@ export class PromptResponseComponent {
 
   countPromptTokens = output();
   submitPrompt = output();
+
+  answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
+  element = computed(() => this.answer().nativeElement);
+
+  parser = computed(() => {
+    const renderer = smd.default_renderer(this.element());
+    return smd.parser(renderer);
+  });
+
+  streamedResponse = linkedSignal<PromptResponse, ParseStreamedResponse>({
+    source: () => this.state(),
+    computation: (source, previous) => {
+      const { value, sequence, done } = source.chunk;
+      if (sequence === -1) {
+        return { 
+          chunk: '',
+          chunks: '',
+          sequence,
+          done: false,
+        };
+      }
+
+      const p = previous?.value || { chunk: '', chunks: '' };
+      return { 
+        chunk: value,
+        chunks: `${p.chunks}${value}`,
+        sequence,
+        done,
+      }; 
+    }
+  });
+
+  constructor() {
+    effect(() => {
+      const { chunk, chunks, sequence, done } = this.streamedResponse();
+      if (sequence === -1) {
+        const element = this.element();
+        while (element.lastChild) {
+          element.removeChild(element.lastChild as ChildNode);
+        } 
+      }
+
+      const parser = this.parser();
+      DOMPurify.sanitize(chunks);
+      if (DOMPurify.removed.length) {
+        // If the output was insecure, immediately stop what you were doing.
+        // Reset the parser and flush the remaining Markdown.
+        smd.parser_end(parser);
+        return;
+      }
+
+      if (!done) {
+        smd.parser_write(parser, chunk);
+        console.log('write', chunk);
+      }
+
+      // smd.parser_end(parser);
+      if (done) {
+        smd.parser_end(parser);
+        console.log('flush parser');
+      }
+    });
+  }
 }
