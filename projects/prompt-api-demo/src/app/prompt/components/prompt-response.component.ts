@@ -81,14 +81,22 @@ export class PromptResponseComponent {
     }
   });
 
+  renderMarkdown = input(true);
+
   constructor() {
     effect(() => {
       const { chunk, chunks, sequence, done } = this.streamedResponse();
+
       if (sequence === -1) {
         const element = this.element();
         while (element.lastChild) {
           element.removeChild(element.lastChild as ChildNode);
         } 
+      }
+
+      if (!this.renderMarkdown()) {
+        this.element().append(chunk);
+        return;
       }
 
       const parser = this.parser();
@@ -102,12 +110,8 @@ export class PromptResponseComponent {
 
       if (!done) {
         smd.parser_write(parser, chunk);
-        console.log('write', chunk);
-      }
-
-      if (done) {
+      } else {
         smd.parser_end(parser);
-        console.log('flush parser');
       }
     });
   }

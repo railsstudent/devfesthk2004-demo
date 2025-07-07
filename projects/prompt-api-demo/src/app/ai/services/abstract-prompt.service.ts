@@ -5,8 +5,12 @@ export abstract class AbstractPromptService {
     #session = signal<LanguageModel | undefined>(undefined);
     session = this.#session.asReadonly();
     #options = signal<LanguageModelCreateOptions | undefined>(undefined);
+    
     #chunk = signal({ value: '', sequence: 0, done: false });
     chunk = this.#chunk.asReadonly();
+    
+    #isLoading = signal(false);
+    isLoading = this.#isLoading.asReadonly();
 
     resetSession(newSession: LanguageModel | undefined) {
         this.#session.set(newSession);
@@ -48,16 +52,17 @@ export abstract class AbstractPromptService {
             throw new Error('Session does not exist.');
         }
 
+        this.#isLoading.set(true);
         this.#chunk.set({ value: '', sequence: -1, done: false });
         const stream = await session.promptStreaming(query);
         const self = this;
         const reader = stream.getReader();
         let sequence = 0;
         reader.read().then(function processText({ done, value }): any {
-            // console.log('done', done, 'value', value);
             if (done) {
                 self.#chunk.set({ value: '', sequence, done });
                 self.updateTokenContext();
+                self.#isLoading.set(false);
                 return;
             }
 
@@ -77,13 +82,18 @@ export abstract class AbstractPromptService {
     }
 
     async countNumTokens(query: string): Promise<number> {
-        await this.createSessionIfNotExists();
-        const session = this.#session();
-        if (!session) {
-            return Promise.resolve(0);
-        }
+        try {
+            this.#isLoading.set(true);
+            await this.createSessionIfNotExists();
+            const session = this.#session();
+            if (!session) {
+                return Promise.resolve(0);
+            }
 
-        return session.measureInputUsage(query);
+            return session.measureInputUsage(query);
+        } finally {
+            this.#isLoading.set(false);
+        }
     }
 
     destroySession() {

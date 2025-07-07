@@ -10,8 +10,8 @@ export abstract class BasePromptComponent {
   
     session = this.promptService.session;
     chunk = this.promptService.chunk;
+    isLoading = this.promptService.isLoading;
     
-    isLoading = signal(false);
     error = signal('');
     query = signal('Tell me about the job responsibility of an A.I. engineer, maximum 500 words.');
     numPromptTokens = signal(0);
@@ -30,27 +30,21 @@ export abstract class BasePromptComponent {
 
     async countPromptTokens() {
       try {
-        this.isLoading.set(true);
         const numTokens = await this.promptService.countNumTokens(this.query());
         this.numPromptTokens.set(numTokens);
       } catch(e) {
         const errMsg = e instanceof Error ? (e as Error).message : 'Error in countPromptTokens';
         this.error.set(errMsg);
-      } finally {
-        this.isLoading.set(false);
       }
     }
     
     async submitPrompt() {
       try {
-        this.isLoading.set(true);
         this.error.set('');
         await this.promptService.prompt(this.query());
       } catch(e) {
         const errMsg = e instanceof Error ? (e as Error).message : 'Error in submitPrompt';
         this.error.set(errMsg);
-      } finally {
-        this.isLoading.set(false);
       }
     }
   }

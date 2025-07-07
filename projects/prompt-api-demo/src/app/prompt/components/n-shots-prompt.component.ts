@@ -29,6 +29,7 @@ const INITIAL_PROMPTS: LanguageInitialPrompt = [
     <h3>N-shots prompting</h3>
     <app-initial-prompt [initialPrompts]="initialPrompts()" /> 
     <app-prompt-response [state]="responseState()" [(query)]="query" 
+      [renderMarkdown]="false"
       (countPromptTokens)="countPromptTokens()" (submitPrompt)="submitPrompt()"
     />
   `,
