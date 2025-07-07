@@ -15,6 +15,9 @@ export abstract class AbstractPromptService {
     #isLoading = signal(false);
     isLoading = this.#isLoading.asReadonly();
 
+    #error = signal('');
+    error = this.#error.asReadonly();
+
     resetSession(newSession: LanguageModel | undefined) {
         this.#session.set(newSession);
     }
@@ -55,26 +58,34 @@ export abstract class AbstractPromptService {
             throw new Error('Session does not exist.');
         }
 
+        this.#error.set('');
         this.#isLoading.set(true);
         this.#chunk.set({ done: false });
         const stream = await session.promptStreaming(query);
         const self = this;
         const reader = stream.getReader();
         let sequence = 0;
-        reader.read().then(function processText({ done, value }): any {
-            if (done) {
-                self.#chunk.set({ sequence, done });
-                self.updateTokenContext();
-                self.#isLoading.set(false);
-                return;
-            }
+        reader.read()
+            .then(function processText({ done, value }): any {
+                if (done) {
+                    self.#chunk.set({ sequence, done });
+                    self.updateTokenContext();
+                    return;
+                }
 
-            if (value) {
-                self.#chunk.set({ value, sequence, done });
-                sequence = sequence + 1;
-            }
-            return reader.read().then(processText);
-        });
+                if (value) {
+                    self.#chunk.set({ value, sequence, done });
+                    sequence = sequence + 1;
+                }
+                return reader.read().then(processText);
+            })
+            .catch((e) => {
+                const errMsg = e instanceof Error ? (e as Error).message : 'Error in prompt';
+                this.#error.set(errMsg);
+            })
+            .finally(() => {
+                this.#isLoading.set(false);
+            })
     }
 
     updateTokenContext() {
@@ -86,6 +97,7 @@ export abstract class AbstractPromptService {
 
     async countNumTokens(query: string): Promise<number> {
         try {
+            this.#error.set('');
             this.#isLoading.set(true);
             await this.createSessionIfNotExists();
             const session = this.#session();
@@ -94,6 +106,10 @@ export abstract class AbstractPromptService {
             }
 
             return session.measureInputUsage(query);
+        } catch (e) {
+            const errMsg = e instanceof Error ? (e as Error).message : 'Error in countNumTokens';
+            this.#error.set(errMsg);
+            return -1;
         } finally {
             this.#isLoading.set(false);
         }
