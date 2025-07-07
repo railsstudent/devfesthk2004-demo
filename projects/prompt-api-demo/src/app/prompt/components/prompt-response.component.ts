@@ -105,7 +105,6 @@ export class PromptResponseComponent {
         console.log('write', chunk);
       }
 
-      // smd.parser_end(parser);
       if (done) {
         smd.parser_end(parser);
         console.log('flush parser');
