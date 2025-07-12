@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, resource } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { filter, switchMap } from 'rxjs';
 import { FeedbackSummaryService } from '../services/feedback-summary.service';
-import { TranslatedFeedbackWithPair } from '../types/sentiment-language.type';
+import { TranslatedFeedbackWithSentiment } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { ResponseWriterComponent } from './response-writer.component';
 
@@ -11,22 +13,36 @@ import { ResponseWriterComponent } from './response-writer.component';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeedbackTranslationComponent {
-  translationInput = input.required<TranslatedFeedbackWithPair>();
+  translationInput = input.required<TranslatedFeedbackWithSentiment>();
   summaryService = inject(FeedbackSummaryService);
   
   writerInput = computed(() => {
+    const { code, translatedText, sentiment  } = this.translationInput();
     return {
-      code: this.translationInput().code, 
-      translatedText: this.translationInput().translatedText,
-      sentiment: this.translationInput().sentiment,
+      code, 
+      translatedText, 
+      sentiment,
     }
   });
   
-  summary = resource({
-    params: () => this.translationInput().translatedText,
-    loader: async ({ params: text }) => this.summaryService.summarize(text)
-  });
+  isLoading = signal(false);
+  error = signal('');
+  translatedText = computed(() => this.translationInput().translatedText);
+  summaryValue = this.summaryService.chunk;
 
-  summaryValue = computed(() => this.summary.hasValue() ? this.summary.value() : '');
-  isLoading = computed(() => this.summary.isLoading());
+  constructor() {
+    toObservable(this.translatedText)
+      .pipe(
+        filter((text) => !!text),
+        switchMap((text) => {
+          this.isLoading.set(true);
+          this.error.set('');
+          return this.summaryService.summarizeStream(text)
+            .catch((e: Error) => this.error.set(e.message))
+            .finally(() => this.isLoading.set(false));
+        }),
+        takeUntilDestroyed(),
+      )
+    .subscribe();
+  }
 }

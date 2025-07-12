@@ -1,24 +1,57 @@
-import { inject, Injectable } from '@angular/core';
-import { SummarizationService } from '../../ai/services/summarization.service';
+import { Injectable, OnDestroy, signal } from '@angular/core';
+import { SUMMARIZER_OPTIONS } from '../../ai/constants/summarizer.constant';
 
 @Injectable({
     providedIn: 'root'
 })
-export class FeedbackSummaryService {
-    #summarizationService = inject(SummarizationService);
+export class FeedbackSummaryService implements OnDestroy {
+    #controller = new AbortController();
+    
+    #chunk = signal<string>('');
+    chunk = this.#chunk.asReadonly();
+    #done = signal(false);
+    done = this.#done.asReadonly();
 
-    async summarize(query: string): Promise<string> {
-        try {
-            if (!query) {
-                return '';
-            }
+    async summarizeStream(text: string): Promise<void> {        
+        const summarizerOptions: SummarizerCreateOptions = {
+            ...SUMMARIZER_OPTIONS,
+            signal: this.#controller.signal,
+        };
 
-            // const sharedContext = `You are an expert that can summarize a customer's feedback. 
-            // If the text is not in English, please return a blank string.`;
-            return await this.#summarizationService.summarize(query);
-        } catch (e) {
-            console.error(e);
-            return '';
-        }
+        const summarizer = await Summarizer.create(summarizerOptions);
+        const stream = await summarizer.summarizeStreaming(
+            text, 
+            { signal: this.#controller.signal }
+        );
+
+        const self = this;
+        const reader = stream.getReader();
+        reader.read()
+            .then(function processText({ value, done }): any {
+                if (done) {
+                    self.#done.set(done);
+                    return;
+                }
+
+                self.#chunk.update((prev) => prev + value);
+                return reader.read().then(processText);
+            })
+            .catch((err) => {
+                console.error(err);
+                if (err instanceof Error) {
+                    throw err;
+                }
+                throw new Error('Error in streaming the summary.');
+            })
+            .finally(() => {
+                if (summarizer) {
+                    console.log('Destroying the summarizer.');
+                    summarizer.destroy();
+                }
+            });
+    }
+
+    ngOnDestroy(): void {
+        this.#controller.abort();
     }
 }

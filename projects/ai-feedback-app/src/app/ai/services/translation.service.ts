@@ -104,7 +104,7 @@ export class TranslationService implements OnDestroy  {
                 if (err instanceof Error) {
                     throw err;
                 }
-                throw new Error('Error in streaming translation.');
+                throw new Error('Error in streaming the translation.');
             })
             .finally(() => {
                 if (translator) {

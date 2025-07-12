@@ -1,16 +1,12 @@
-export type SentimentLanguage = { 
-    sentiment: string;
+export type TranslatedFeedback = {
     code: string;
     language: string 
-};
-
-export type TranslatedFeedback = Pick<SentimentLanguage, 'code' | 'language'> & {
     translatedText: string;
     targetCode: string;
 };
 
-export type TranslatedFeedbackWithSentiment = SentimentLanguage & TranslatedFeedback;
+export type TranslatedFeedbackWithSentiment = Omit<TranslatedFeedback, 'language'> & {
+    sentiment: string;
+}
 
-export type TranslatedFeedbackWithPair = Omit<TranslatedFeedbackWithSentiment, 'language'>;
-
-export type TranslationInput = Pick<TranslatedFeedbackWithSentiment, 'code' | 'translatedText' | 'sentiment'>;
+export type TranslationInput = Omit<TranslatedFeedbackWithSentiment, 'targetCode'>;

@@ -12,9 +12,17 @@
       <p style="margin-bottom: 1rem;"><span class="label">{{ labelText }}</span> 
         {{ translationInput().translatedText }}
       </p>
-      <p><span class="label">Summary: </span> 
-        {{ summaryValue() }}
-      </p>
+      
+      @let errorMsg = error();
+      @if (errorMsg) {
+        <p><span class="label">Error: </span>  
+          {{ errorMsg }}
+        </p>
+      } @else {
+        <p><span class="label">Summary: </span> 
+          {{ summaryValue() }}
+        </p>
+      }
     </div>
     <app-response-writer [translationInput]="writerInput()"  />
 </div>

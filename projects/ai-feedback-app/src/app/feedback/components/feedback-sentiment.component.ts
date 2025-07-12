@@ -3,7 +3,7 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { FormsModule } from '@angular/forms';
 import { debounceTime, filter, finalize, switchMap } from 'rxjs';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
-import { TranslatedFeedbackWithPair } from '../types/sentiment-language.type';
+import { TranslatedFeedbackWithSentiment } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { FeedbackErrorComponent } from './feedback-error.component';
 
@@ -46,7 +46,7 @@ Mientras servía nuestra bebida, derramó el líquido sobre mi abrigo y ni siqui
 Por si fuera poco, el baño estaba en condiciones horribles: olía mal y no había papel higiénico en la cabina.
 En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la limpieza son aspectos que definitivamente necesitan mejorar. No volveré.`);
 
-  sentimentLanguageEvaluated = output<TranslatedFeedbackWithPair>();
+  sentimentLanguageEvaluated = output<TranslatedFeedbackWithSentiment>();
 
   translation = this.sentimentService.translation;
   sourceLanguage = this.sentimentService.sourceLanguage;
