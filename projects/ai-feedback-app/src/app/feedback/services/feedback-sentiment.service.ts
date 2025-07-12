@@ -1,8 +1,8 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { LanguageDetectionService } from '../../ai/services/language-detection.service';
 import { NShotPromptService } from '../../ai/services/n-shot-prompt.service';
 import { TranslationService } from '../../ai/services/translation.service';
-import { TranslatedFeedbackWithSentiment, TranslatedFeedback } from '../types/sentiment-language.type';
+import { LanguagePair } from '../../ai/types/language-pair.type';
 
 @Injectable({
     providedIn: 'root'
@@ -12,50 +12,51 @@ export class FeedbackSentimentService {
     #languageDetectionService = inject(LanguageDetectionService);
     #translationService = inject(TranslationService);
 
-    private async translateFeedback(text: string): Promise<TranslatedFeedback | undefined> {
+    #sourceLanguage = signal<{ code: string; name: string} | undefined>(undefined);
+    sourceLanguage = this.#sourceLanguage.asReadonly();
+    
+    done = this.#translationService.done;
+    chunk = this.#translationService.chunk;
+
+    async translateFeedbackStream(text: string): Promise<void> {
         const feedbackLanguage = await this.#languageDetectionService.detect(text);
         if (!feedbackLanguage) {
-            return undefined;
+            return;
         }
 
         const code = feedbackLanguage.code;
         const language = feedbackLanguage.name;
 
-        let translatedText = '';
-        if (code !== 'en') {
-            const pair = { 
-                sourceLanguage: code,
-                targetLanguage: 'en'
-            };
-            translatedText = await this.#translationService.translate(pair, text);
-        }
+        console.log('feedback language', feedbackLanguage);
+        this.#sourceLanguage.set({ code, name: language });
 
-        console.log('original text', text);
-        console.log('translated text', translatedText);
-        return {
-            code,
-            language,
-            targetCode: 'en',
-            translatedText: translatedText || text,
-        }
+        const pair: LanguagePair = { 
+            sourceLanguage: code,
+            targetLanguage: 'en'
+        };
+
+        await this.#translationService.translateStream(pair, language, text);
     }
 
-    async detectSentimentAndLanguage(text: string): Promise<TranslatedFeedbackWithSentiment | undefined> {
+    async detectSentiment(text: string) {
         try {
-            const enFeedback = await this.translateFeedback(text);
-            if (!enFeedback) {
-                return undefined;
+            console.log('text', text);
+
+            if (!text) {
+                throw new Error('Error in finding sentiment, the input text is blank.');
             }
 
             // determine sentiment for the English feedback
             const sentiment = await this.#promptService.prompt(text);
-            return {
-                ...enFeedback,
-                sentiment,
+            
+            if (!['positive', 'negative', 'not sure'].includes(sentiment)) {
+                throw new Error('Error in finding sentiment, the input text is blank.');
             }
+
+            return sentiment;
         } catch (e) {
             const errMsg = e instanceof Error ? e.message : 'Error in finding the sentiment.';
             throw new Error(errMsg);
-        }
+        } 
     }
 }

@@ -1,10 +1,9 @@
-export const SUMMARIZER_SHARED_CONTEXT = `You are an expert that can summarize a customer's feedback. 
-If the text is not in English, please return a blank string.`;
+export const SUMMARIZER_SHARED_CONTEXT = "You are an expert that can summarize a customer's feedback.";
 
 export const SUMMARIZER_AVAILABILITY_OPTIONS: SummarizerCreateCoreOptions = {
-    type: 'headline',
+    type: 'tldr',
     format: 'plain-text',
-    length: 'medium',
+    length: 'short',
     expectedInputLanguages: ['en'],
     expectedContextLanguages: ['en'],
     outputLanguage: 'en',

@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, effect, inject, Injector, output, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, Injector, output, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, merge, of, switchMap } from 'rxjs';
-import { LineBreakPipe } from '../pipes/line-break.pipe';
+import { debounceTime, filter, finalize, switchMap } from 'rxjs';
 import { FeedbackSentimentService } from '../services/feedback-sentiment.service';
 import { TranslatedFeedbackWithPair } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
@@ -10,7 +9,7 @@ import { FeedbackErrorComponent } from './feedback-error.component';
 
 @Component({
     selector: 'app-feedback-sentiment',
-    imports: [FormsModule, LineBreakPipe, FeedbackErrorComponent, FeedbackLoadingComponent],
+    imports: [FormsModule, FeedbackErrorComponent, FeedbackLoadingComponent],
     template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem;">
       <h3>Customer's Feedback</h3>
@@ -20,17 +19,20 @@ import { FeedbackErrorComponent } from './feedback-error.component';
         <textarea id="input" name="input" rows="5" [(ngModel)]="query" [disabled]="isLoading()"></textarea>
       </div>
       @let data = sentiment();
-      @if (data) {
+      @let language = sourceLanguage();
+      @if (data && language) {
         <div style="display: flex;">
             <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
                 <span class="label">Sentiment: </span>
-                <span [innerHTML]="data.sentiment | lineBreak"></span>
+                <span>{{ data }}</span>
             </p>
             <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
                 <span class="label">Language: </span>
-                <span [innerHTML]="data.language | lineBreak"></span>
+                <span>{{ language.name }}</span>
             </p>
         </div>
+      } @else {
+        <p>Unable to detect language or sentiment.</p>
       }
       <app-feedback-error [error]="error()" />
     </div>
@@ -50,32 +52,49 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
 
   sentimentLanguageEvaluated = output<TranslatedFeedbackWithPair>();
 
-  private sentiment$ = merge(
-      toObservable(this.query).pipe(debounceTime(1000)), 
-      of(this.query()))
-    .pipe(
-      distinctUntilChanged(),
-      switchMap((query) => {
-        this.isLoading.set(true);
-        this.error.set('');
-        return this.sentimentService.detectSentimentAndLanguage(query)
-            .catch((e: Error) => {
-              this.error.set(e.message);
-              return undefined;
-            })
-            .finally(() => this.isLoading.set(false));
-      }));
+  chunk = this.sentimentService.chunk;
+  sourceLanguage = this.sentimentService.sourceLanguage;
 
-  sentiment = toSignal(this.sentiment$, { injector: this.injector, initialValue: undefined });
+  private sentiment$ = toObservable(this.sentimentService.done)  
+    .pipe(
+      filter((done) => done && !!this.chunk()?.chunk),
+        switchMap(() => {
+          this.isLoading.set(true);
+          this.error.set('');
+          return this.sentimentService.detectSentiment(this.chunk()?.chunk || '')
+            .catch((err: Error) => { 
+              this.error.set(err.message);
+              return 'N/A';
+            })
+        }),
+        finalize(() => this.isLoading.set(false))
+    );
+  
+  sentiment = toSignal(this.sentiment$, { initialValue: '' });
+
+  debouncedQuery$ = toObservable(this.query).pipe(debounceTime(1000));
 
   constructor() {
-    effect(() => {
-      const sentiment = this.sentiment();
+    this.debouncedQuery$
+      .pipe(
+        switchMap((query) => {
+          this.isLoading.set(true);
+          this.error.set('');
+          return this.sentimentService.translateFeedbackStream(query)
+              .catch((e: Error) => this.error.set(e.message))
+        }),
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed()
+      )
+      .subscribe();
 
-      if (sentiment) {
-        const { language, ...rest } = sentiment;
-        this.sentimentLanguageEvaluated.emit(rest);
-      }
-    });
+    // effect(() => {
+    //   const sentiment = this.sentiment();
+
+    //   if (sentiment) {
+    //     const { language, ...rest } = sentiment;
+    //     this.sentimentLanguageEvaluated.emit(rest);
+    //   }
+    // });
   }
 }
