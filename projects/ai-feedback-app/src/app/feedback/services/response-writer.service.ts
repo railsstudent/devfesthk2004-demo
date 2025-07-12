@@ -12,6 +12,9 @@ export class ResponseWriterService {
     #writerService = inject(WriterService);
     #translationService = inject(TranslationService);
 
+    chunk = this.#writerService.chunk;
+    doneGenerating = this.#writerService.doneGenerating;
+
     async generateDraft({ translatedText, sentiment, code } : TranslationInput): Promise<{ firstDraft: string, translation?: string }> {
         try {
             const firstDraft = await this.#writerService.generateDraft(translatedText, sentiment);
@@ -50,5 +53,9 @@ export class ResponseWriterService {
             const errMsg = e instanceof Error ? e.message : 'Error in finding the sentiment.';
             throw new Error(errMsg);
         }
+    }
+
+    async generateDraftStream({ translatedText, sentiment } : TranslationInput): Promise<void> {
+        await this.#writerService.generateDraftStream(translatedText, sentiment);
     }
 }
