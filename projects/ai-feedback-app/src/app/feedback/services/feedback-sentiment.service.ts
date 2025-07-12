@@ -31,7 +31,6 @@ export class FeedbackSentimentService {
         const code = feedbackLanguage.code;
         const language = feedbackLanguage.name;
 
-        console.log('feedback language', feedbackLanguage);
         this.#sourceLanguage.set({ code, name: language });
 
         const pair: LanguagePair = { 
@@ -44,8 +43,6 @@ export class FeedbackSentimentService {
 
     async detectSentiment(text: string) {
         try {
-            console.log('text', text);
-
             if (!text) {
                 throw new Error('Error in finding sentiment, the input text is blank.');
             }

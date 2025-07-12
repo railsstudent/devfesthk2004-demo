@@ -25,7 +25,7 @@ export class FeedbackTranslationComponent {
     }
   });
   
-  isLoading = signal(false);
+  isLoading = computed(() => !this.summaryService.done());
   error = signal('');
   translatedText = computed(() => this.translationInput().translatedText);
   summaryValue = this.summaryService.chunk;
@@ -35,11 +35,9 @@ export class FeedbackTranslationComponent {
       .pipe(
         filter((text) => !!text),
         switchMap((text) => {
-          this.isLoading.set(true);
           this.error.set('');
           return this.summaryService.summarizeStream(text)
             .catch((e: Error) => this.error.set(e.message))
-            .finally(() => this.isLoading.set(false));
         }),
         takeUntilDestroyed(),
       )
