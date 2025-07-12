@@ -15,6 +15,9 @@ import { ResponseWriterComponent } from './response-writer.component';
 export class FeedbackTranslationComponent {
   translationInput = input.required<TranslatedFeedbackWithSentiment>();
   summaryService = inject(FeedbackSummaryService);
+
+  chunk = this.summaryService.chunk;
+  done = this.summaryService.done;
   
   writerInput = computed(() => {
     const { code, translatedText, sentiment  } = this.translationInput();
