@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Injector, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, Injector, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, filter, finalize, switchMap } from 'rxjs';
@@ -20,20 +20,16 @@ import { FeedbackErrorComponent } from './feedback-error.component';
       </div>
       @let data = sentiment();
       @let language = sourceLanguage();
-      @if (data && language) {
-        <div style="display: flex;">
-            <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
-                <span class="label">Sentiment: </span>
-                <span>{{ data }}</span>
-            </p>
-            <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
-                <span class="label">Language: </span>
-                <span>{{ language.name }}</span>
-            </p>
-        </div>
-      } @else {
-        <p>Unable to detect language or sentiment.</p>
-      }
+      <div style="display: flex;">
+          <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
+              <span class="label">Sentiment: </span>
+              <span>{{ data }}</span>
+          </p>
+          <p style="flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
+              <span class="label">Language: </span>
+              <span>{{ language?.name || '' }}</span>
+          </p>
+      </div>
       <app-feedback-error [error]="error()" />
     </div>
   `,
@@ -52,25 +48,27 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
 
   sentimentLanguageEvaluated = output<TranslatedFeedbackWithPair>();
 
-  chunk = this.sentimentService.chunk;
+  translation = this.sentimentService.translation;
   sourceLanguage = this.sentimentService.sourceLanguage;
 
-  private sentiment$ = toObservable(this.sentimentService.done)  
+  translatedText = computed(() => this.translation()?.text || '');
+
+  #sentiment$ = toObservable(this.sentimentService.done)  
     .pipe(
-      filter((done) => done && !!this.chunk()?.chunk),
+      filter((done) => done && !!this.translatedText()),
         switchMap(() => {
           this.isLoading.set(true);
           this.error.set('');
-          return this.sentimentService.detectSentiment(this.chunk()?.chunk || '')
+          return this.sentimentService.detectSentiment(this.translatedText())
             .catch((err: Error) => { 
               this.error.set(err.message);
               return 'N/A';
             })
+            .finally(() => this.isLoading.set(false));
         }),
-        finalize(() => this.isLoading.set(false))
     );
   
-  sentiment = toSignal(this.sentiment$, { initialValue: '' });
+  sentiment = toSignal(this.#sentiment$, { initialValue: '' });
 
   debouncedQuery$ = toObservable(this.query).pipe(debounceTime(1000));
 
@@ -82,19 +80,28 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
           this.error.set('');
           return this.sentimentService.translateFeedbackStream(query)
               .catch((e: Error) => this.error.set(e.message))
+              .finally(() => this.isLoading.set(false));
         }),
         finalize(() => this.isLoading.set(false)),
         takeUntilDestroyed()
       )
       .subscribe();
 
-    // effect(() => {
-    //   const sentiment = this.sentiment();
+    effect(() => {
+      const done = this.sentimentService.sentimentDone();
 
-    //   if (sentiment) {
-    //     const { language, ...rest } = sentiment;
-    //     this.sentimentLanguageEvaluated.emit(rest);
-    //   }
-    // });
+      const sentiment = untracked(this.sentiment);
+      const sourceLanguage = untracked(this.sourceLanguage);
+      const chunk = untracked(this.translation);
+
+      if (done && sentiment && sourceLanguage && chunk) {
+        this.sentimentLanguageEvaluated.emit({
+          code: sourceLanguage.code,
+          targetCode: chunk.targetCode,
+          sentiment: sentiment,
+          translatedText: chunk.text,
+        });
+      }
+    });
   }
 }

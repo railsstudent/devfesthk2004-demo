@@ -5,15 +5,13 @@ import { TranslatedFeedbackWithPair } from './types/sentiment-language.type';
 
 @Component({
     selector: 'app-feedback-container',
-    imports: [FeedbackSentimentComponent /*, FeedbackTranslationComponent*/],
+    imports: [FeedbackSentimentComponent, FeedbackTranslationComponent],
     template: `
     <app-feedback-sentiment (sentimentLanguageEvaluated)="translationInput.set($event)" />
-    <!--
     @let input = translationInput();
     @if (input) {
       <app-feedback-translation [translationInput]="input" />
     }
-  -->
   `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

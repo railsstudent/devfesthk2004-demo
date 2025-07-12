@@ -1,7 +1,5 @@
 export type TranslatedFeedbackChunk = {
     code: string;
-    language: string 
-    originalText: string;
-    chunk: string;
+    text: string;
     targetCode: string;
 };

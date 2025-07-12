@@ -37,18 +37,11 @@ export class TranslationService implements OnDestroy  {
         this.#done.set(false);
     }
 
-    #isEnglish(LanguagePair: LanguagePair) {
-        const { sourceLanguage, targetLanguage } = LanguagePair;
-        return sourceLanguage === targetLanguage
-    }
-
     #processText(languagePair: LanguagePair, sourceLanguage: string, inputText: string) {
         this.#chunk.set({
             code: languagePair.sourceLanguage,
-            language: sourceLanguage,
             targetCode: languagePair.targetLanguage,
-            originalText: inputText,
-            chunk: inputText,
+            text: inputText,
         });
         this.#done.set(true);
     }
@@ -93,16 +86,14 @@ export class TranslationService implements OnDestroy  {
                     if (prev) {
                         return {
                             ...prev,
-                            chunk: prev.chunk + value,
+                            text: prev.text + value,
                         };
                     }
                     
                     return {
                         code: languagePair.sourceLanguage,
-                        language: sourceLanguage,
                         targetCode: languagePair.targetLanguage,
-                        originalText: inputText,
-                        chunk: value
+                        text: value
                     }
                 });
 

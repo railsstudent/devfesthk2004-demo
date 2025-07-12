@@ -16,7 +16,11 @@ export class FeedbackSentimentService {
     sourceLanguage = this.#sourceLanguage.asReadonly();
     
     done = this.#translationService.done;
-    chunk = this.#translationService.chunk;
+    translation = this.#translationService.chunk;
+
+    #sentimentDone = signal(false);
+    sentimentDone = this.#sentimentDone.asReadonly();
+
 
     async translateFeedbackStream(text: string): Promise<void> {
         const feedbackLanguage = await this.#languageDetectionService.detect(text);
@@ -46,6 +50,8 @@ export class FeedbackSentimentService {
                 throw new Error('Error in finding sentiment, the input text is blank.');
             }
 
+            this.#sentimentDone.set(false);
+
             // determine sentiment for the English feedback
             const sentiment = await this.#promptService.prompt(text);
             
@@ -57,6 +63,8 @@ export class FeedbackSentimentService {
         } catch (e) {
             const errMsg = e instanceof Error ? e.message : 'Error in finding the sentiment.';
             throw new Error(errMsg);
-        } 
+        } finally {
+            this.#sentimentDone.set(true);
+        }
     }
 }
