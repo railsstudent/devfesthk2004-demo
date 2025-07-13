@@ -1,11 +1,7 @@
-export type TranslatedFeedback = {
+export type TranslatedFeedbackWithSentiment = {
     code: string;
-    language: string 
     translatedText: string;
     targetCode: string;
-};
-
-export type TranslatedFeedbackWithSentiment = Omit<TranslatedFeedback, 'language'> & {
     sentiment: string;
 }
 

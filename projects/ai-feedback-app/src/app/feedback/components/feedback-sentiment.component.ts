@@ -52,10 +52,8 @@ La experiencia estuve terrible para mi y mis amigos.
 
   sentimentLanguageEvaluated = output<TranslatedFeedbackWithSentiment>();
 
-  translation = this.sentimentService.translation;
+  translatedText = this.sentimentService.translation;
   sourceLanguage = this.sentimentService.sourceLanguage;
-
-  translatedText = computed(() => this.translation()?.text || '');
 
   done = computed(() => { 
     const done = this.sentimentService.done();
@@ -99,13 +97,16 @@ La experiencia estuve terrible para mi y mis amigos.
     effect(() => {
       const done = this.sentimentService.sentimentDone();
       const sentiment = untracked(this.sentiment);
-      const chunk = untracked(this.translation);
+      const translatedText = untracked(this.translatedText);
+      const sourceLanguage = untracked(this.sourceLanguage)
 
-      if (done && sentiment && chunk) {
+      if (done && sentiment && translatedText && sourceLanguage) {
+        const { code, targetCode } = sourceLanguage;
         this.sentimentLanguageEvaluated.emit({
-          ...chunk,
+          code,
+          targetCode,
           sentiment,
-          translatedText: chunk.text,
+          translatedText,
         });
       }
     });

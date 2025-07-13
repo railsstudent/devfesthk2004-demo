@@ -12,7 +12,7 @@ export class FeedbackSentimentService {
     #languageDetectionService = inject(LanguageDetectionService);
     #translationService = inject(TranslationService);
 
-    #sourceLanguage = signal<{ code: string; name: string} | undefined>(undefined);
+    #sourceLanguage = signal<{ code: string; name: string; targetCode: string} | undefined>(undefined);
     sourceLanguage = this.#sourceLanguage.asReadonly();
     
     done = this.#translationService.done;
@@ -30,7 +30,7 @@ export class FeedbackSentimentService {
         const code = feedbackLanguage.code;
         const language = feedbackLanguage.name;
 
-        this.#sourceLanguage.set({ code, name: language });
+        this.#sourceLanguage.set({ code, name: language, targetCode: 'en' });
 
         const pair: LanguagePair = { 
             sourceLanguage: code,
