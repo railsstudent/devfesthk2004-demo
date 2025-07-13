@@ -16,6 +16,7 @@ export class ResponseWriterService {
     doneTranslating = this.#translationService.doneTranslatingDraft;
 
     async generateDraftStream({ translatedText, sentiment } : TranslationInput): Promise<void> {
+        await this.#translationService.resetDraft();
         await this.#writerService.generateDraftStream(translatedText, sentiment);
     }
 

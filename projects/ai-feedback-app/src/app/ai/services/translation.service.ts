@@ -67,6 +67,9 @@ export class TranslationService implements OnDestroy  {
         await this.streamText(stream, this.#draft, this.#doneTranslatingDraft, translator);
     }
 
+    resetDraft() {
+        this.#draft.set('');
+    }
 
     ngOnDestroy(): void {
         this.#constroller.abort();
