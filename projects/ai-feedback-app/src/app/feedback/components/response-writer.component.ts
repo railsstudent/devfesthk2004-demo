@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, resource, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, tap } from 'rxjs';
-import { ENGLISH_CODE, ResponseWriterService } from '../services/response-writer.service';
+import { filter, switchMap } from 'rxjs';
+import { ResponseWriterService } from '../services/response-writer.service';
 import { TranslationInput } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { FeedbackErrorComponent } from './feedback-error.component';
@@ -20,10 +20,29 @@ export class ResponseWriterComponent {
     writerService = inject(ResponseWriterService);
 
     error = signal('');
-    draft = linkedSignal(() => this.writerService.chunk());
+    draft = linkedSignal(() => this.writerService.draftChunk());
     isGeneratingDraft = computed(() => { 
         const done = this.writerService.doneGenerating();
         return typeof done !== 'undefined' && !done;
+    });
+
+    isTranslatingDraft = computed(() => { 
+        const done = this.writerService.doneTranslating();
+        return typeof done !== 'undefined' && !done;
+    });
+    
+    translatedDraft = this.writerService.translateChunk;
+
+    statusText = computed(() => {
+        if (this.isGeneratingDraft()) {
+            return 'Generating draft...';
+        }
+
+        if (this.isTranslatingDraft()) {
+            return 'Translating draft...';
+        }
+
+        return '';
     });
 
     // #draft$ = toObservable(this.draft).pipe(
@@ -42,30 +61,29 @@ export class ResponseWriterComponent {
     //   } 
     // });
 
-    isNonEnglish = computed(() => this.translationInput().code !== ENGLISH_CODE);
+    isNonEnglish = computed(() => this.translationInput().code !== 'en');
   
+    constructor() {
+        toObservable(this.isGeneratingDraft)
+            .pipe(
+                filter((isGenerating) => !isGenerating && !!this.draft()),
+                switchMap(() => {
+                    return this.writerService.translateDraftStream(this.translationInput().code, this.draft())
+                        .catch((e: Error) => this.error.set(e.message))
+                }),
+                takeUntilDestroyed(),
+            )
+            .subscribe();
+    }
+
     async generateDraft() {
         this.error.set('');
         this.writerService.generateDraftStream(this.translationInput())
           .catch((error: Error) => this.error.set(error.message))
-          // .finally(() => { 
-          //   this.isLoading.set(false);
-          // });
-
-            // this.draft.set('');
-            // this.translatedDraft.set('');
-            // const { firstDraft, translation = '' } = await this.writerService.generateDraft(this.translationInput());
-            // this.draft.set(firstDraft);
-            // this.translatedDraft.set(translation);
-        // } catch (e) {
-        //     this.error.set((e as Error).message);
-        // } finally {
-        //     this.isLoading.set(false);
-        // }
     }
 
     fakeSubmit() {
-        // const stringifyDraft = JSON.stringify(this.isNonEnglish() ? this.translatedDraft.value() : this.draft());
-        // alert('Submit ' + stringifyDraft + " to the backend.");
+        const stringifyDraft = JSON.stringify(this.isNonEnglish() ? this.translatedDraft() : this.draft());
+        alert('Submit ' + stringifyDraft + " to the backend.");
     }
 }

@@ -1,5 +1,6 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import { WRITER_OPTIONS } from '../constants/writer.constant';
+import { streamTextUtil } from '../utils/string-stream-reader.until';
 
 @Injectable({
   providedIn: 'root'
@@ -13,25 +14,7 @@ export class WriterService implements OnDestroy {
   #done = signal<boolean | undefined>(undefined);
   doneGenerating = this.#done.asReadonly();
 
-  async generateDraft(query: string, sentiment: string): Promise<string> {
-    if (!this.#writer()) {
-      const writer = await Writer.create({ ...WRITER_OPTIONS, signal: this.#controller.signal });
-      this.#writer.set(writer);
-    }
-
-    const session = this.#writer();
-    if (!session) {
-      throw new Error('Failed to create a Prompt session.');
-    }
-
-    const responsePrompt = `
-      The customer wrote a ${sentiment} feedback. Please draft the response in one paragraph, 200 words max.
-      The response must be in formal English and do not use contractions such as "We're" and "I'm".
-      Feedback: ${query} 
-    `;
-
-    return session.write(responsePrompt);
-  }
+  streamString = streamTextUtil();
 
   async generateDraftStream(query: string, sentiment: string): Promise<void> {
     if (!this.#writer()) {
@@ -55,27 +38,7 @@ export class WriterService implements OnDestroy {
         { signal: this.#controller.signal }
     );
 
-    this.#chunk.set('');
-    this.#done.set(false);
-    const self = this;
-    const reader = stream.getReader();
-    reader.read()
-        .then(function processText({ value, done }): any {
-            if (done) {
-                self.#done.set(done);
-                return;
-            }
-
-            self.#chunk.update((prev) => prev + value);
-            return reader.read().then(processText);
-        })
-        .catch((err) => {
-            console.error(err);
-            if (err instanceof Error) {
-                throw err;
-            }
-            throw new Error('Error in streaming the summary.');
-        });
+    await this.streamString(stream, this.#chunk, this.#done);
   }
 
   #destroyWriter() {

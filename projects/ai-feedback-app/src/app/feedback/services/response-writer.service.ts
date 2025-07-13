@@ -1,9 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { TranslationService } from '../../ai/services/translation.service';
-import { WriterService } from '../../ai/services/writer.service';
+import { TranslationService, WriterService } from '../../ai/services';
 import { TranslationInput } from '../types/sentiment-language.type';
-
-export const ENGLISH_CODE = 'en';
 
 @Injectable({
     providedIn: 'root'
@@ -12,50 +9,28 @@ export class ResponseWriterService {
     #writerService = inject(WriterService);
     #translationService = inject(TranslationService);
 
-    chunk = this.#writerService.chunk;
+    draftChunk = this.#writerService.chunk;
     doneGenerating = this.#writerService.doneGenerating;
 
-    async generateDraft({ translatedText, sentiment, code } : TranslationInput): Promise<{ firstDraft: string, translation?: string }> {
-        try {
-            const firstDraft = await this.#writerService.generateDraft(translatedText, sentiment);
-            if (code !== ENGLISH_CODE) {
-                const translation = await this.#translationService.translate( {
-                    sourceLanguage: ENGLISH_CODE,
-                    targetLanguage: code
-                }, 
-                firstDraft);
+    translateChunk = this.#translationService.draft;
+    doneTranslating = this.#translationService.doneTranslatingDraft;
 
-                return {
-                    firstDraft,
-                    translation
-                };
-            }
-
-            return { firstDraft };
-        } catch (e) {
-            const errMsg = e instanceof Error ? e.message : 'Error in generating a draft.';
-            throw new Error(errMsg);
-        }
+    async generateDraftStream({ translatedText, sentiment } : TranslationInput): Promise<void> {
+        await this.#writerService.generateDraftStream(translatedText, sentiment);
     }
 
-    async translateDraft(code: string, query: string): Promise<string> {
+    async translateDraftStream(code: string, query: string): Promise<void> {
         try {
-            if (code !== ENGLISH_CODE) {
-                return this.#translationService.translate( {
-                    sourceLanguage: ENGLISH_CODE,
+            if (code !== 'en') {
+                await this.#translationService.translateDraftStream( {
+                    sourceLanguage: 'en',
                     targetLanguage: code
                 }, 
                 query);
             }
-
-            return '';
         } catch (e) {
-            const errMsg = e instanceof Error ? e.message : 'Error in finding the sentiment.';
+            const errMsg = e instanceof Error ? e.message : 'Error in translating the draft.';
             throw new Error(errMsg);
         }
-    }
-
-    async generateDraftStream({ translatedText, sentiment } : TranslationInput): Promise<void> {
-        await this.#writerService.generateDraftStream(translatedText, sentiment);
     }
 }

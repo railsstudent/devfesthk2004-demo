@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import { LanguagePair } from '../types/language-pair.type';
 import { TranslatedFeedbackChunk } from '../types/translation.type';
+import { streamTextUtil } from '../utils/string-stream-reader.until';
 
 @Injectable({
   providedIn: 'root'
@@ -9,28 +10,15 @@ export class TranslationService implements OnDestroy  {
     #constroller = new AbortController();
     #chunk = signal<TranslatedFeedbackChunk | undefined>(undefined);
     chunk = this.#chunk.asReadonly();
-    #done = signal(false);
+    #done = signal<boolean | undefined>(undefined);
     done = this.#done.asReadonly();
     
-    async translate(languagePair: LanguagePair, inputText: string): Promise<string> {
-        try { 
-            const translator = await Translator.create({
-                ...languagePair,
-                signal: this.#constroller.signal,
-            });
-
-            if (!translator) {
-                return '';
-            }
-
-            const result = await translator.translate(inputText, { signal: this.#constroller.signal });
-            translator.destroy();
-            return result;
-        } catch (e) {
-            console.error(e);
-            return '';
-        }
-    }
+    #draft = signal<string>('');
+    draft = this.#draft.asReadonly();
+    #doneTranslatingDraft = signal<boolean | undefined>(undefined);
+    doneTranslatingDraft = this.#doneTranslatingDraft.asReadonly();
+    
+    streamText = streamTextUtil();
 
     #startTranslation() {
         this.#chunk.set(undefined);
@@ -113,6 +101,23 @@ export class TranslationService implements OnDestroy  {
                 }
             });
     }
+
+    async translateDraftStream(languagePair: LanguagePair,  inputText: string): Promise<void> {
+        if (languagePair.sourceLanguage === languagePair.targetLanguage) {
+            this.#draft.set(inputText);
+            return;
+        }
+        
+        const translator = await this.#createTranslator(languagePair);
+
+        const stream = await translator.translateStreaming(
+            inputText, 
+            { signal: this.#constroller.signal }
+        );
+
+        await this.streamText(stream, this.#draft, this.#doneTranslatingDraft, translator);
+    }
+
 
     ngOnDestroy(): void {
         this.#constroller.abort();

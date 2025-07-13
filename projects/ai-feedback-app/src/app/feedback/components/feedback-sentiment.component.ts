@@ -44,7 +44,11 @@ export class FeedbackSentimentComponent {
   query = signal(`Tuve una experiencia muy mala en este restaurante. La comida llegó fría, lo cual fue decepcionante. Además, el camarero fue grosero durante toda la cena, lo que hizo que la situación fuera aún más incómoda.
 Mientras servía nuestra bebida, derramó el líquido sobre mi abrigo y ni siquiera ofreció papel toalla para secarlo. Me pareció una falta total de atención al cliente.
 Por si fuera poco, el baño estaba en condiciones horribles: olía mal y no había papel higiénico en la cabina.
-En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la limpieza son aspectos que definitivamente necesitan mejorar. No volveré.`);
+En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la limpieza son aspectos que definitivamente necesitan mejorar. No volveré.
+
+La experiencia estuve terrible para mi y mis amigos.
+¿Por qué tienen un negocio y un servicio tan pésimos?
+`);
 
   sentimentLanguageEvaluated = output<TranslatedFeedbackWithSentiment>();
 
@@ -53,7 +57,12 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
 
   translatedText = computed(() => this.translation()?.text || '');
 
-  #sentiment$ = toObservable(this.sentimentService.done)  
+  done = computed(() => { 
+    const done = this.sentimentService.done();
+    return typeof done !== 'undefined' && done;
+  });
+
+  #sentiment$ = toObservable(this.done)  
     .pipe(
       filter((done) => done && !!this.translatedText()),
         switchMap(() => {
@@ -89,16 +98,13 @@ En resumen, no recomendaría este lugar a nadie. La calidad del servicio y la li
 
     effect(() => {
       const done = this.sentimentService.sentimentDone();
-
       const sentiment = untracked(this.sentiment);
-      const sourceLanguage = untracked(this.sourceLanguage);
       const chunk = untracked(this.translation);
 
-      if (done && sentiment && sourceLanguage && chunk) {
+      if (done && sentiment && chunk) {
         this.sentimentLanguageEvaluated.emit({
-          code: sourceLanguage.code,
-          targetCode: chunk.targetCode,
-          sentiment: sentiment,
+          ...chunk,
+          sentiment,
           translatedText: chunk.text,
         });
       }

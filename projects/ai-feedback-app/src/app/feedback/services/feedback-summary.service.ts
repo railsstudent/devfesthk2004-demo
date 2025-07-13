@@ -1,5 +1,6 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import { SUMMARIZER_OPTIONS } from '../../ai/constants/summarizer.constant';
+import { streamTextUtil } from '../../ai/utils/string-stream-reader.until';
 
 @Injectable({
     providedIn: 'root'
@@ -11,6 +12,8 @@ export class FeedbackSummaryService implements OnDestroy {
     chunk = this.#chunk.asReadonly();
     #done = signal(false);
     done = this.#done.asReadonly();
+
+    streamString = streamTextUtil();
 
     async summarizeStream(text: string): Promise<void> {        
         const summarizerOptions: SummarizerCreateOptions = {
@@ -24,31 +27,7 @@ export class FeedbackSummaryService implements OnDestroy {
             { signal: this.#controller.signal }
         );
 
-        const self = this;
-        const reader = stream.getReader();
-        reader.read()
-            .then(function processText({ value, done }): any {
-                if (done) {
-                    self.#done.set(done);
-                    return;
-                }
-
-                self.#chunk.update((prev) => prev + value);
-                return reader.read().then(processText);
-            })
-            .catch((err) => {
-                console.error(err);
-                if (err instanceof Error) {
-                    throw err;
-                }
-                throw new Error('Error in streaming the summary.');
-            })
-            .finally(() => {
-                if (summarizer) {
-                    console.log('Destroying the summarizer.');
-                    summarizer.destroy();
-                }
-            });
+        await this.streamString(stream, this.#chunk, this.#done, summarizer);
     }
 
     ngOnDestroy(): void {

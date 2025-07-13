@@ -21,7 +21,6 @@ export class FeedbackSentimentService {
     #sentimentDone = signal(false);
     sentimentDone = this.#sentimentDone.asReadonly();
 
-
     async translateFeedbackStream(text: string): Promise<void> {
         const feedbackLanguage = await this.#languageDetectionService.detect(text);
         if (!feedbackLanguage) {
