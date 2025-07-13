@@ -1,17 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { filter, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, withLatestFrom } from 'rxjs';
 import { ResponseWriterService } from '../services/response-writer.service';
 import { TranslationInput } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
 import { FeedbackErrorComponent } from './feedback-error.component';
+import { TranslateDraftComponent } from './translate-draft.component';
 
 const transformTranslationInput = (x: TranslationInput) => ({ ...x, query: x.translatedText.trim() });
 
 @Component({
     selector: 'app-response-writer',
-    imports: [FormsModule, FeedbackErrorComponent, FeedbackLoadingComponent],  
+    imports: [FormsModule, TranslateDraftComponent, FeedbackErrorComponent, FeedbackLoadingComponent],  
     templateUrl: './response-writer.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -44,31 +45,23 @@ export class ResponseWriterComponent {
 
         return '';
     });
-
-    // #draft$ = toObservable(this.draft).pipe(
-    //   debounceTime(1000),
-    //   filter((draft) => !!draft),
-    //   distinctUntilChanged(),
-    //   tap((draft) => console.log('#draft$', draft)),
-    // );
-
-    // debounceDraft = toSignal(this.#draft$, { initialValue: '' });
-
-    // translatedDraft = resource({
-    //   params: () => this.debounceDraft(),
-    //   loader: ({ params: draft }) => {
-    //     return this.writerService.translateDraft(this.translationInput().code, draft);
-    //   } 
-    // });
-
-    isNonEnglish = computed(() => this.translationInput().code !== 'en');
-  
+ 
     constructor() {
-        toObservable(this.isGeneratingDraft)
+        const isGeneratingDraft$ = toObservable(this.isGeneratingDraft);
+        const hasDraft$ = toObservable(this.draft).pipe(
+            debounceTime(1000),
+            map((draft) => draft.trim()),
+            filter((draft) => !!draft),
+            withLatestFrom(isGeneratingDraft$),
+            filter(([, isGenerating]) => !isGenerating),
+            distinctUntilChanged(([a], [b]) => a === b),
+        );
+
+        hasDraft$
             .pipe(
-                filter((isGenerating) => !isGenerating && !!this.draft()),
-                switchMap(() => {
-                    return this.writerService.translateDraftStream(this.translationInput().code, this.draft())
+                switchMap(([draft]) => {
+                    this.error.set('');
+                    return this.writerService.translateDraftStream(this.translationInput().code, draft)
                         .catch((e: Error) => this.error.set(e.message))
                 }),
                 takeUntilDestroyed(),
@@ -83,7 +76,8 @@ export class ResponseWriterComponent {
     }
 
     fakeSubmit() {
-        const stringifyDraft = JSON.stringify(this.isNonEnglish() ? this.translatedDraft() : this.draft());
-        alert('Submit ' + stringifyDraft + " to the backend.");
+        const text = this.translationInput().code !== 'en' ? this.translatedDraft() : this.draft();
+        const stringifyDraft = JSON.stringify(text);
+        alert(`Submit ${stringifyDraft} to the backend.`);
     }
 }

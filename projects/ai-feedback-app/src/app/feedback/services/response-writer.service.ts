@@ -27,6 +27,7 @@ export class ResponseWriterService {
                     targetLanguage: code
                 }, 
                 query);
+                console.log('translateDraftStream done.');
             }
         } catch (e) {
             const errMsg = e instanceof Error ? e.message : 'Error in translating the draft.';

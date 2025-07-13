@@ -28,7 +28,6 @@ export function streamTextUtil() {
       .finally(() => {
         if (resource) {
           resource.destroy();
-          console.log('Destroying the resource.');
         }
       });
   }
