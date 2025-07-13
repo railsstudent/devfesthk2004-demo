@@ -3,10 +3,11 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 @Component({
     selector: 'app-translate-draft',
     template: `
-        @if (isNonEnglish() && draft()) {
+        @let text = draft();
+        @if (isNonEnglish() && text) {
             <div>
                 <h3>Translate back to original language</h3>
-                <p [innerHTML]="draft()"></p>
+                <div>{{ text }}</div>
             </div>
         }
     `,

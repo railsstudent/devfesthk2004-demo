@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, map, switchMap, withLatestFrom } from 'rxjs';
+import { switchMap } from 'rxjs';
+import { finishDrafting } from '../operators/finish_drafting.operator';
 import { ResponseWriterService } from '../services/response-writer.service';
 import { TranslationInput } from '../types/sentiment-language.type';
 import { FeedbackLoadingComponent } from './feeback-loading.componen';
@@ -37,9 +38,7 @@ export class ResponseWriterComponent {
     statusText = computed(() => {
         if (this.isGeneratingDraft()) {
             return 'Generating draft...';
-        }
-
-        if (this.isTranslatingDraft()) {
+        } else if (this.isTranslatingDraft()) {
             return 'Translating draft...';
         }
 
@@ -48,25 +47,17 @@ export class ResponseWriterComponent {
  
     constructor() {
         const isGeneratingDraft$ = toObservable(this.isGeneratingDraft);
-        const hasDraft$ = toObservable(this.draft).pipe(
-            debounceTime(1000),
-            map((draft) => draft.trim()),
-            filter((draft) => !!draft),
-            withLatestFrom(isGeneratingDraft$),
-            filter(([, isGenerating]) => !isGenerating),
-            distinctUntilChanged(([a], [b]) => a === b),
-        );
+        const hasDraft$ = toObservable(this.draft).pipe(finishDrafting(isGeneratingDraft$));
 
-        hasDraft$
-            .pipe(
-                switchMap(([draft]) => {
-                    this.error.set('');
-                    return this.writerService.translateDraftStream(this.translationInput().code, draft)
-                        .catch((e: Error) => this.error.set(e.message))
-                }),
-                takeUntilDestroyed(),
-            )
-            .subscribe();
+        hasDraft$.pipe(
+            switchMap((draft) => {
+                this.error.set('');
+                return this.writerService.translateDraftStream(this.translationInput().code, draft)
+                    .catch((e: Error) => this.error.set(e.message))
+            }),
+            takeUntilDestroyed(),
+        )
+        .subscribe();
     }
 
     async generateDraft() {
