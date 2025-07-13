@@ -40,14 +40,17 @@ export class TranslationService implements OnDestroy  {
             return;
         }
         
-        const translator = await this.#createTranslator(languagePair);
+        const { stream, translator } = await this.createStream(languagePair, inputText);
+        await this.streamText(stream, this.#chunk, this.#done, translator);
+    }
 
+    private async createStream(languagePair: LanguagePair, inputText: string) {
+        const translator = await this.#createTranslator(languagePair);
         const stream = await translator.translateStreaming(
-            inputText, 
+            inputText,
             { signal: this.#constroller.signal }
         );
-
-        await this.streamText(stream, this.#chunk, this.#done, translator);
+        return { stream, translator };
     }
 
     async translateDraftStream(languagePair: LanguagePair,  inputText: string): Promise<void> {
@@ -57,13 +60,7 @@ export class TranslationService implements OnDestroy  {
             return;
         }
         
-        const translator = await this.#createTranslator(languagePair);
-
-        const stream = await translator.translateStreaming(
-            inputText, 
-            { signal: this.#constroller.signal }
-        );
-
+        const { stream, translator } = await this.createStream(languagePair, inputText);
         await this.streamText(stream, this.#draft, this.#doneTranslatingDraft, translator);
     }
 
