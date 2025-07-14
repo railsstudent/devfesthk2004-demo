@@ -35,9 +35,9 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
             }
           </select>
         </div>
+        <div>Availability: {{ availability() ? 'Yes' : 'No' }}</div>
       }
     </div>
-    <p>Availability: {{ availability() ? 'Yes' : 'No' }}</p>
     <hr />
   `,
     styles: `
@@ -47,7 +47,7 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
     }
 
     .options-container > div {
-      flex-basis: 16.66%; 
+      flex-basis: calc(100% / 4); 
       margin-bottom: 1rem;
     }
 
@@ -60,7 +60,7 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
       font-style: italic;
     }
   `,
-    changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SummarizerOptionsComponent {
     selectOptions = input.required<SummarizerSelectOptions>();
