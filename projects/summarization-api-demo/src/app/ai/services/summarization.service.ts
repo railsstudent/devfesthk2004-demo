@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, OnDestroy, signal } from '@angular/core';
 import { SummarizerSelectOptions } from '../types/summarizer-select-options.type';
 import { getAvailability } from '../utils/ai-detection';
 
@@ -9,7 +9,7 @@ const lengths: SummarizerLength[] = ['long', 'medium', 'short'];
 @Injectable({
     providedIn: 'root'    
 })
-export class SummarizationService {
+export class SummarizationService implements OnDestroy {
     #abortController = new AbortController();
     #summaries = signal<string[]>([]);
     summaries = this.#summaries.asReadonly();
@@ -86,5 +86,55 @@ export class SummarizationService {
             this.#availability.set(false);
             this.handleErrors(e);
         }
+    }
+
+    #chunks = signal('');
+    chunks = this.#chunks.asReadonly();
+
+    #chunk = signal('');
+    chunk = this.#chunk.asReadonly();
+
+    #isSummarizing = signal(false);
+    isSummarizing = this.#isSummarizing.asReadonly();
+
+    async summarizeStream(options: SummarizerCreateCoreOptions, text: string) {
+        this.#error.set('');
+        this.#chunk.set('');
+        this.#chunks.set('');
+        this.#isSummarizing.set(true);
+
+        try {
+            const availability = await getAvailability(options);
+            this.#availability.set(availability === 'available');
+
+            const summarizer = await Summarizer.create({
+                ...options,
+                signal: this.#abortController.signal,
+                monitor: availability === 'available' ? undefined : (monitor) => monitor.addEventListener('downloadprogress', (e) => {
+                    const percentage = Math.floor(e.loaded * 100);
+                    console.log(`Summarizer: Downloaded ${percentage}%`);
+                })
+            });
+
+            const stream = summarizer.summarizeStreaming(text, { 
+                signal: this.#abortController.signal
+            });
+
+            for await (const chunk of stream) {
+                this.#chunks.update((prev) => prev + chunk);
+                this.#chunk.set(chunk);
+            }
+
+            summarizer.destroy();
+        } catch (e) {
+            this.#availability.set(false);
+            this.handleErrors(e);
+        } finally {
+            this.#isSummarizing.set(false);
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.#abortController.abort();
     }
 }
