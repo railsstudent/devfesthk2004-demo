@@ -1,15 +1,13 @@
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, Renderer2, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import DOMPurify from 'dompurify';
-import * as smd from 'streaming-markdown';
 import { SummarizationService } from '../../ai/services/summarization.service';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
-import data from '../data/description.json';
 import { SummarizerOptionsComponent } from './summarizer-options.component';
+import { SummaryComponent } from './summary.component';
 
 @Component({
     selector: 'app-summarizer',
-    imports: [FormsModule, SummarizerOptionsComponent],
+    imports: [FormsModule, SummarizerOptionsComponent, SummaryComponent],
     template: `
     <app-summarizer-options [selectOptions]="selectOptions()"
       [(selectedFormat)]="selectedFormat" [(selectedType)]="selectedType" [(selectedLength)]="selectedLength"
@@ -21,16 +19,11 @@ import { SummarizerOptionsComponent } from './summarizer-options.component';
     } 
     <label for="sharedContext">Shared Context:</label>
     <input id="sharedContext" name="sharedContext" [(ngModel)]="sharedContext" />
-    <label for="content">Content:</label>
-    <textarea id="content" name="content" rows="20" [(ngModel)]="text"></textarea>
-    <div>
-      @let buttonText = isSummarizing() ? 'Summarizing...' : 'Summarize';
-      @let disabled = text().trim() === '' || isSummarizing();
-      <button (click)="generateSummaries()" [disabled]="disabled">{{ buttonText }}</button>
-    </div>
-    @if (!error()) {
-      <div #answer></div>
-    }
+    <app-summary (getSummary)="generateSummary($event)"
+      [chunks]="chunks()"
+      [chunk]="chunk()"
+      [isSummarizing]="isSummarizing()"
+    />
   `,
     styles: `
     input {
@@ -55,7 +48,7 @@ export class SummarizerComponent {
   selectedType = linkedSignal({
     source: this.typeOptions,
     computation: (source) => source.find((item) => item === 'key-points') || source[0]
-  });;
+  });
   
   selectedLength = linkedSignal({
     source: this.lengthOptions,
@@ -63,7 +56,6 @@ export class SummarizerComponent {
   });
 
   sharedContext = signal('Generate a summary of book description from https://www.packtpub.com/');
-  text = signal(data.cicd);
 
   summarizerCreateOptions = computed<SummarizerCreateCoreOptions>(() => {
     return {
@@ -79,54 +71,11 @@ export class SummarizerComponent {
 
   error = this.summarizationService.error;
   availability = this.summarizationService.availability;
-  isSummarizing = computed(() => this.summarizationService.isSummarizing());
+  isSummarizing = this.summarizationService.isSummarizing;
   chunk = this.summarizationService.chunk;
   chunks = this.summarizationService.chunks;
   
-  answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
-  element = computed(() => this.answer().nativeElement);
-
-  parser = signal<smd.Parser | undefined>(undefined);
-  
-  renderer = inject(Renderer2);
-
-  constructor() {
-    afterRenderEffect({
-      write: () => {  
-        const parser = this.parser();
-        if (!parser) {
-          console.log('no parser, return');
-          return;
-        }
-        const chunks = this.chunks();
-
-        DOMPurify.sanitize(chunks);
-        if (DOMPurify.removed.length) {
-          // If the output was insecure, immediately stop what you were doing.
-          // Reset the parser and flush the remaining Markdown.
-          // smd.parser_end(parser);
-          return;
-        }
-  
-        if (this.isSummarizing()) {
-          smd.parser_write(parser, this.chunk());
-        } else {
-          smd.parser_end(parser);
-        }
-      }
-    });
-  }
-
-  async generateSummaries() {
-    const element = this.element();
-    const renderer = smd.default_renderer(element);
-    this.parser.set(smd.parser(renderer));
-
-    if (element.lastChild) {
-      console.log('Remove children');
-      this.renderer.setProperty(element, 'innerHTML', '');
-    }
-
-    await this.summarizationService.summarizeStream(this.summarizerCreateOptions(), this.text().trim());
+  async generateSummary(text: string) {
+    await this.summarizationService.summarizeStream(this.summarizerCreateOptions(), text);
   }
 }
