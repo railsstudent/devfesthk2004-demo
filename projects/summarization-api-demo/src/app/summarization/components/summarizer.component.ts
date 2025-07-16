@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSign
 import { FormsModule } from '@angular/forms';
 import { SummarizationService } from '../../ai/services/summarization.service';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
+import data from '../data/description.json';
 import { SummarizerOptionsComponent } from './summarizer-options.component';
 import { SummaryComponent } from './summary.component';
 
@@ -19,11 +20,8 @@ import { SummaryComponent } from './summary.component';
     } 
     <label for="sharedContext">Shared Context:</label>
     <input id="sharedContext" name="sharedContext" [(ngModel)]="sharedContext" />
-    <app-summary (getSummary)="generateSummary($event)"
-      [chunks]="chunks()"
-      [chunk]="chunk()"
-      [isSummarizing]="isSummarizing()"
-    />
+    <app-summary [options]="summarizerCreateOptions()" [content]="text()" />
+    <app-summary [options]="summarizerCreateOptions()" [content]="text2()" />
   `,
     styles: `
     input {
@@ -78,16 +76,9 @@ export class SummarizerComponent {
     loader: ({ params }) => this.summarizationService.checkAvailability(params)
   });
 
+  text = signal(data.cicd);
+  text2 = signal(data.llm);
+
   error = this.summarizationService.error;
-  availability = computed(() =>  {
-    console.log('value', this.availabilityResource.value());
-    return this.availabilityResource.hasValue() ? this.availabilityResource.value() : false
-  });
-  isSummarizing = this.summarizationService.isSummarizing;
-  chunk = this.summarizationService.chunk;
-  chunks = this.summarizationService.chunks;
-  
-  async generateSummary(text: string) {
-    await this.summarizationService.summarizeStream(this.summarizerCreateOptions(), text);
-  }
+  availability = computed(() =>  this.availabilityResource.hasValue() ? this.availabilityResource.value() : false);
 }

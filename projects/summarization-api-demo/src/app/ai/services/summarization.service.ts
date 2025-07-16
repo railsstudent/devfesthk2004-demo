@@ -11,10 +11,12 @@ const lengths: SummarizerLength[] = ['long', 'medium', 'short'];
 })
 export class SummarizationService implements OnDestroy {
     #abortController = new AbortController();
-    #summaries = signal<string[]>([]);
-    summaries = this.#summaries.asReadonly();
     #error = signal('');
     error = this.#error.asReadonly();
+
+    get signal() {
+        return this.#abortController.signal;
+    }
 
     summarizerOptions = computed<SummarizerSelectOptions>(() => ({
         formats,
@@ -60,17 +62,6 @@ export class SummarizationService implements OnDestroy {
         }
     }
 
-    
-
-    #chunks = signal('');
-    chunks = this.#chunks.asReadonly();
-
-    #chunk = signal('');
-    chunk = this.#chunk.asReadonly();
-
-    #isSummarizing = signal(false);
-    isSummarizing = this.#isSummarizing.asReadonly();
-
     async checkAvailability(options: SummarizerCreateCoreOptions) {
         try {
             const availability = await getAvailability(options);
@@ -81,12 +72,7 @@ export class SummarizationService implements OnDestroy {
         }
     }
 
-    async summarizeStream(options: SummarizerCreateCoreOptions, text: string) {
-        this.#error.set('');
-        this.#chunk.set('');
-        this.#chunks.set('');
-        this.#isSummarizing.set(true);
-
+    async createSummarizer(options: SummarizerCreateCoreOptions) {
         try {
             const availability = await getAvailability(options);
             const summarizer = await Summarizer.create({
@@ -98,20 +84,10 @@ export class SummarizationService implements OnDestroy {
                 })
             });
 
-            const stream = summarizer.summarizeStreaming(text, { 
-                signal: this.#abortController.signal
-            });
-
-            for await (const chunk of stream) {
-                this.#chunks.update((prev) => prev + chunk);
-                this.#chunk.set(chunk);
-            }
-
-            summarizer.destroy();
+            return summarizer;
         } catch (e) {
             this.handleErrors(e);
-        } finally {
-            this.#isSummarizing.set(false);
+            return undefined;
         }
     }
 
