@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, resource, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SummarizationService } from '../../ai/services/summarization.service';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
@@ -69,8 +69,20 @@ export class SummarizerComponent {
     }
   });
 
+  availabilityResource = resource({
+    params: () => ({
+      type: this.selectedType(),
+      format: this.selectedFormat(),
+      length: this.selectedLength(),
+    }),
+    loader: ({ params }) => this.summarizationService.checkAvailability(params)
+  });
+
   error = this.summarizationService.error;
-  availability = this.summarizationService.availability;
+  availability = computed(() =>  {
+    console.log('value', this.availabilityResource.value());
+    return this.availabilityResource.hasValue() ? this.availabilityResource.value() : false
+  });
   isSummarizing = this.summarizationService.isSummarizing;
   chunk = this.summarizationService.chunk;
   chunks = this.summarizationService.chunks;

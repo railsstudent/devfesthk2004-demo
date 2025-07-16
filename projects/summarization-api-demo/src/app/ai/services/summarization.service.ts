@@ -15,8 +15,6 @@ export class SummarizationService implements OnDestroy {
     summaries = this.#summaries.asReadonly();
     #error = signal('');
     error = this.#error.asReadonly();
-    #availability = signal(false);
-    availability = this.#availability.asReadonly();
 
     summarizerOptions = computed<SummarizerSelectOptions>(() => ({
         formats,
@@ -62,31 +60,7 @@ export class SummarizationService implements OnDestroy {
         }
     }
 
-    async summarize(options: SummarizerCreateCoreOptions, ...texts: string[]) {
-        this.#summaries.set([]);
-        this.#error.set('');
-
-        try {
-            const availability = await getAvailability(options);
-            this.#availability.set(availability === 'available');
-
-            const summarizer = await Summarizer.create({
-                ...options,
-                signal: this.#abortController.signal,
-                monitor: availability === 'available' ? undefined : (monitor) => monitor.addEventListener('downloadprogress', (e) => {
-                    const percentage = Math.floor(e.loaded * 100);
-                    console.log(`Summarizer: Downloaded ${percentage}%`);
-                })
-            });
-
-            const summarizedTexts = await Promise.all(texts.map(text => summarizer.summarize(text)));
-            this.#summaries.set(summarizedTexts);
-            summarizer.destroy();
-        } catch (e) {
-            this.#availability.set(false);
-            this.handleErrors(e);
-        }
-    }
+    
 
     #chunks = signal('');
     chunks = this.#chunks.asReadonly();
@@ -97,6 +71,16 @@ export class SummarizationService implements OnDestroy {
     #isSummarizing = signal(false);
     isSummarizing = this.#isSummarizing.asReadonly();
 
+    async checkAvailability(options: SummarizerCreateCoreOptions) {
+        try {
+            const availability = await getAvailability(options);
+            return availability === 'available';
+        } catch (e) {
+            this.handleErrors(e);
+            return false;
+        }
+    }
+
     async summarizeStream(options: SummarizerCreateCoreOptions, text: string) {
         this.#error.set('');
         this.#chunk.set('');
@@ -105,8 +89,6 @@ export class SummarizationService implements OnDestroy {
 
         try {
             const availability = await getAvailability(options);
-            this.#availability.set(availability === 'available');
-
             const summarizer = await Summarizer.create({
                 ...options,
                 signal: this.#abortController.signal,
@@ -127,7 +109,6 @@ export class SummarizationService implements OnDestroy {
 
             summarizer.destroy();
         } catch (e) {
-            this.#availability.set(false);
             this.handleErrors(e);
         } finally {
             this.#isSummarizing.set(false);
