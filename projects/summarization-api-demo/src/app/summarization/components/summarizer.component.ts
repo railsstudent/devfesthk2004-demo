@@ -6,6 +6,9 @@ import data from '../data/description.json';
 import { SummarizerOptionsComponent } from './summarizer-options.component';
 import { SummaryComponent } from './summary.component';
 
+const findDefault = <T>(options: T[], defaultValue: T) => 
+  options.find((item) => item ===  defaultValue) || options[0]
+
 @Component({
     selector: 'app-summarizer',
     imports: [FormsModule, SummarizerOptionsComponent, SummaryComponent],
@@ -34,32 +37,23 @@ export class SummarizerComponent {
   summarizationService = inject(SummarizationService);
   selectOptions = input.required<SummarizerSelectOptions>();
 
-  formatOptions = computed(() => this.selectOptions().formats);
-  typeOptions = computed(() => this.selectOptions().types);
-  lengthOptions = computed(() => this.selectOptions().lengths);
-
-  selectedFormat = linkedSignal({
-    source: this.formatOptions,
-    computation: (source) =>  source.find((item) => item === 'markdown') || source[0]
-  });
-
-  selectedType = linkedSignal({
-    source: this.typeOptions,
-    computation: (source) => source.find((item) => item === 'key-points') || source[0]
-  });
-  
-  selectedLength = linkedSignal({
-    source: this.lengthOptions,
-    computation: (source) => source.find((item) => item === 'medium') || source[0]
-  });
-
+  text = signal(data.cicd);
+  text2 = signal(data.llm);
   sharedContext = signal('Generate a summary of book description from https://www.packtpub.com/');
+
+  selectedFormat = linkedSignal(() => findDefault(this.selectOptions().formats, 'markdown'));
+  selectedType = linkedSignal(() => findDefault(this.selectOptions().types, 'key-points'));
+  selectedLength = linkedSignal(() => findDefault(this.selectOptions().lengths, 'medium'));
+
+  outputStyles = computed(() => ({
+    type: this.selectedType(),
+    format: this.selectedFormat(),
+    length: this.selectedLength(),
+  }));
 
   summarizerCreateOptions = computed<SummarizerCreateCoreOptions>(() => {
     return {
-      format: this.selectedFormat(),
-      type: this.selectedType(),
-      length: this.selectedLength(),
+      ...this.outputStyles(),
       sharedContext: this.sharedContext(),
       expectedContextLanguages: ['en-US'],
       expectedInputLanguages: ['en-US'],
@@ -68,16 +62,9 @@ export class SummarizerComponent {
   });
 
   availabilityResource = resource({
-    params: () => ({
-      type: this.selectedType(),
-      format: this.selectedFormat(),
-      length: this.selectedLength(),
-    }),
+    params: () => this.outputStyles(),
     loader: ({ params }) => this.summarizationService.checkAvailability(params)
   });
-
-  text = signal(data.cicd);
-  text2 = signal(data.llm);
 
   error = this.summarizationService.error;
   availability = computed(() =>  this.availabilityResource.hasValue() ? this.availabilityResource.value() : false);

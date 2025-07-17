@@ -42,7 +42,7 @@ import { SummarizationService } from '../../ai/services/summarization.service';
 
     chunk = signal('');
     chunks = linkedSignal<string, string>({
-      source: this.chunk,
+      source: () => this.chunk(),
       computation: (chunk, previous) => {
         if (!previous || !previous?.value) {
           return chunk;
@@ -62,9 +62,6 @@ import { SummarizationService } from '../../ai/services/summarization.service';
   
           DOMPurify.sanitize(this.chunks());
           if (DOMPurify.removed.length) {
-            // If the output was insecure, immediately stop what you were doing.
-            // Reset the parser and flush the remaining Markdown.
-            // smd.parser_end(parser);
             return;
           }
   
