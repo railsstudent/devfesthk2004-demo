@@ -1,4 +1,4 @@
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, model, Renderer2, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, model, Renderer2, signal, viewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import DOMPurify from 'dompurify';
 import * as smd from 'streaming-markdown';
@@ -50,6 +50,8 @@ import { SummarizationService } from '../../ai/services/summarization.service';
         return `${previous.value}${chunk}`;
       }
     });
+
+    streamReader = this.summarizationService.createChunkStreamReader();
   
     constructor() {
       afterRenderEffect({
@@ -82,36 +84,7 @@ import { SummarizationService } from '../../ai/services/summarization.service';
         try {
             summarizer = await this.summarizationService.createSummarizer(this.options());
             if (summarizer) {
-                const stream = summarizer.summarizeStreaming(this.content().trim(), {
-                    signal: this.summarizationService.signal,
-                });
-
-                const reader = stream.getReader();
-                this.chunk.set('');            
-                const self = this;
-
-                reader.read()
-                  .then(function processText({ value, done }): any {
-                      if (done) {
-                        return;
-                      }
-                      
-                      self.chunk.set(value);
-                      return reader.read().then(processText);
-                  })
-                  .catch((err) => {
-                      console.error(err);
-                      if (err instanceof Error) {
-                          throw err;
-                      }
-                      throw new Error('Error in streaming the draft.');
-                  })
-                  .finally(() => {
-                    if (summarizer) {
-                      summarizer.destroy();
-                    }
-                    this.isSummarizing.set(false);
-                  });
+              await this.streamReader(summarizer, this.content().trim(), this.chunk, this.isSummarizing);
             }
         } catch (err) {
             console.error(err);

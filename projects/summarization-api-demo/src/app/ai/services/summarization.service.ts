@@ -1,10 +1,5 @@
-import { computed, Injectable, OnDestroy, signal } from '@angular/core';
-import { SummarizerSelectOptions } from '../types/summarizer-select-options.type';
+import { Injectable, OnDestroy, signal, WritableSignal } from '@angular/core';
 import { getAvailability } from '../utils/ai-detection';
-
-const formats: SummarizerFormat[] = ['plain-text', 'markdown'];
-const types: SummarizerType[] = ['headline', 'key-points', 'teaser', 'tldr'];
-const lengths: SummarizerLength[] = ['long', 'medium', 'short'];
 
 @Injectable({
     providedIn: 'root'    
@@ -13,16 +8,6 @@ export class SummarizationService implements OnDestroy {
     #abortController = new AbortController();
     #error = signal('');
     error = this.#error.asReadonly();
-
-    get signal() {
-        return this.#abortController.signal;
-    }
-
-    summarizerOptions = computed<SummarizerSelectOptions>(() => ({
-        formats,
-        lengths,
-        types,
-    }));
 
     private readonly errors: Record<string, string> = {
         'InvalidStateError': 'The document is not active. Please try again later.',
@@ -88,6 +73,36 @@ export class SummarizationService implements OnDestroy {
         } catch (e) {
             this.handleErrors(e);
             return undefined;
+        }
+    }
+
+    createChunkStreamReader() {
+        return (summarizer: Summarizer, content: string, chunk: WritableSignal<string>, isSummarizing: WritableSignal<boolean>) => {
+            const stream = summarizer.summarizeStreaming(content, {
+                signal: this.#abortController.signal,
+            });
+      
+            const reader = stream.getReader();
+            reader.read()
+                .then(function processText({ value, done }): any {
+                    if (done) {
+                        return;
+                    }
+                    
+                    chunk.set(value);
+                    return reader.read().then(processText);
+                })
+                .catch((err) => {
+                    console.error(err);
+                    if (err instanceof Error) {
+                        throw err;
+                    }
+                    throw new Error('Error in streaming the draft.');
+                })
+                .finally(() => {
+                    summarizer?.destroy();
+                    isSummarizing.set(false);
+                });
         }
     }
 
