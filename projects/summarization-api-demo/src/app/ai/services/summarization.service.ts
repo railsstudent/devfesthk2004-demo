@@ -78,6 +78,7 @@ export class SummarizationService implements OnDestroy {
 
     createChunkStreamReader() {
         return (summarizer: Summarizer, content: string, chunk: WritableSignal<string>, isSummarizing: WritableSignal<boolean>) => {
+            isSummarizing.set(true);
             const stream = summarizer.summarizeStreaming(content, {
                 signal: this.#abortController.signal,
             });
