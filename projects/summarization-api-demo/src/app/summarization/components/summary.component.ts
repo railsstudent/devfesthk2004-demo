@@ -67,7 +67,7 @@ import { SummarizationService } from '../../ai/services/summarization.service';
         if (element.lastChild) {
           this.renderer.setProperty(element, 'innerHTML', '');
         }
-        this.parserService.resetParser(this.element());
+        this.parserService.resetParser(element);
     
         let summarizer: Summarizer | undefined = undefined;
         try {
