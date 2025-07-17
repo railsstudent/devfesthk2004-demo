@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Mode } from '../../ai/types/summarizer-mode.type';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
 
 @Component({
@@ -35,6 +36,13 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
             }
           </select>
         </div>
+        <div>
+          <label for="mode">Mode: </label>
+          <select name="mode" id="mode" [(ngModel)]="selectedMode">
+            <option ngValue="batch">Batch</option>
+            <option ngValue="streaming">Streaming</option>
+          </select>
+        </div>
         <div>Availability: {{ availability() ? 'Yes' : 'No' }}</div>
       }
     </div>
@@ -47,7 +55,7 @@ import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-option
     }
 
     .options-container > div {
-      flex-basis: calc(100% / 4); 
+      flex-basis: calc(100% / 5); 
       margin-bottom: 1rem;
     }
 
@@ -69,4 +77,5 @@ export class SummarizerOptionsComponent {
     selectedFormat = model.required<string>();
     selectedType = model.required<string>();
     selectedLength = model.required<string>();
+    selectedMode = model<Mode>('streaming');
 }

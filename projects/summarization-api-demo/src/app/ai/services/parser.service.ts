@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import DOMPurify from 'dompurify';
 import * as smd from 'streaming-markdown';
 
@@ -6,17 +6,21 @@ import * as smd from 'streaming-markdown';
     providedIn: 'root'    
 })
 export class ParserService {
-    parser = signal<smd.Parser | undefined>(undefined);
+    parser: smd.Parser | undefined = undefined;
 
     resetParser(element: HTMLElement): void {  
         const markdown_renderer = smd.default_renderer(element);
-        this.parser.set(smd.parser(markdown_renderer));
+        this.parser = smd.parser(markdown_renderer);
     }
 
-    writeToElement(isBusy: boolean, chunks: string, chunk: string) {
-        const parser = this.parser();
-        if (!parser) {
-            console.log('no parser, return');
+    writeToElement(chunks: string, chunk: string) {
+        if (!this.parser) {
+            console.log('No parser, return');
+            return;
+        }
+
+        if (!chunk) {
+            console.log('Empty chunk, return');
             return;
         }
 
@@ -25,10 +29,6 @@ export class ParserService {
             return;
         }
 
-        if (isBusy) {
-            smd.parser_write(parser, chunk);
-        } else {
-            smd.parser_end(parser);
-        }
+        smd.parser_write(this.parser, chunk);
     }
 }

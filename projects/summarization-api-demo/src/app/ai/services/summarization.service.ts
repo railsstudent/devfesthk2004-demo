@@ -1,4 +1,5 @@
-import { Injectable, OnDestroy, signal, WritableSignal } from '@angular/core';
+import { Injectable, OnDestroy, signal } from '@angular/core';
+import { SummarizerReaderOptions } from '../types/summarizer-reader-options.type';
 import { getAvailability } from '../utils/ai-detection';
 
 @Injectable({
@@ -76,20 +77,35 @@ export class SummarizationService implements OnDestroy {
         }
     }
 
-    createChunkStreamReader() {
-        return (summarizer: Summarizer, content: string, chunk: WritableSignal<string>, isSummarizing: WritableSignal<boolean>) => {
-            isSummarizing.set(true);
+    private async createStreamReader(summarizer: Summarizer, content: string, isStreaming: boolean) {
+        if (isStreaming) {
             const stream = summarizer.summarizeStreaming(content, {
                 signal: this.#abortController.signal,
             });
-      
-            const reader = stream.getReader();
+            return stream.getReader();
+        }
+
+        const result = await summarizer.summarize(content, { signal: this.#abortController.signal})
+        const batchStream = new ReadableStream<string>({
+            start(controller) {
+                controller.enqueue(result);
+                controller.close();
+            }
+        });
+        
+        return batchStream.getReader();
+    }
+    
+    createChunkStreamReader() {
+        return async ({ summarizer, content, chunks, chunk, isSummarizing, isStreaming = true }: SummarizerReaderOptions) => {      
+            const reader = await this.createStreamReader(summarizer, content, isStreaming);
             reader.read()
                 .then(function processText({ value, done }): any {
                     if (done) {
                         return;
                     }
                     
+                    chunks.update((prev) => prev + value);
                     chunk.set(value);
                     return reader.read().then(processText);
                 })
@@ -98,7 +114,7 @@ export class SummarizationService implements OnDestroy {
                     if (err instanceof Error) {
                         throw err;
                     }
-                    throw new Error('Error in streaming the draft.');
+                    throw new Error('Error in streaming the summary.');
                 })
                 .finally(() => {
                     summarizer?.destroy();

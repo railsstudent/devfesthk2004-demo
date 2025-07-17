@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, resource, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SummarizationService } from '../../ai/services/summarization.service';
+import { Mode } from '../../ai/types/summarizer-mode.type';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
 import data from '../data/description.json';
 import { SummarizerOptionsComponent } from './summarizer-options.component';
@@ -15,7 +16,7 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
     template: `
     <app-summarizer-options [selectOptions]="selectOptions()"
       [(selectedFormat)]="selectedFormat" [(selectedType)]="selectedType" [(selectedLength)]="selectedLength"
-      [availability]="availability()"
+      [availability]="availability()" [(selectedMode)]="selectedMode"
     />
     @if (error()) {
       <p>Error: {{ error() }}</p>
@@ -23,8 +24,8 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
     } 
     <label for="sharedContext">Shared Context:</label>
     <input id="sharedContext" name="sharedContext" [(ngModel)]="sharedContext" />
-    <app-summary [options]="summarizerCreateOptions()" [content]="text()" />
-    <app-summary [options]="summarizerCreateOptions()" [content]="text2()" />
+    <app-summary [options]="summarizerCreateOptions()" [content]="text()" [selectedMode]="selectedMode()" />
+    <app-summary [options]="summarizerCreateOptions()" [content]="text2()" [selectedMode]="selectedMode()" />
   `,
     styles: `
     input {
@@ -44,6 +45,7 @@ export class SummarizerComponent {
   selectedFormat = linkedSignal(() => findDefault(this.selectOptions().formats, 'markdown'));
   selectedType = linkedSignal(() => findDefault(this.selectOptions().types, 'key-points'));
   selectedLength = linkedSignal(() => findDefault(this.selectOptions().lengths, 'medium'));
+  selectedMode = signal<Mode>('streaming');
 
   outputStyles = computed(() => ({
     type: this.selectedType(),
