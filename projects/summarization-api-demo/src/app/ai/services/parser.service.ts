@@ -7,13 +7,15 @@ import * as smd from 'streaming-markdown';
 })
 export class ParserService {
     parser: smd.Parser | undefined = undefined;
+    chunks = '';
 
     resetParser(element: HTMLElement): void {  
         const markdown_renderer = smd.default_renderer(element);
         this.parser = smd.parser(markdown_renderer);
+        this.chunks = '';
     }
 
-    writeToElement(chunks: string, chunk: string) {
+    writeToElement(chunk: string) {
         if (!this.parser) {
             console.log('No parser, return');
             return;
@@ -24,7 +26,8 @@ export class ParserService {
             return;
         }
 
-        DOMPurify.sanitize(chunks);
+        this.chunks = this.chunks + chunk;
+        DOMPurify.sanitize(this.chunks);
         if (DOMPurify.removed.length) {
             return;
         }

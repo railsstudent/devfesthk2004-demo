@@ -97,7 +97,7 @@ export class SummarizationService implements OnDestroy {
     }
     
     createChunkStreamReader() {
-        return async ({ summarizer, content, chunks, chunk, isSummarizing, isStreaming = true }: SummarizerReaderOptions) => {      
+        return async ({ summarizer, content, chunk, isSummarizing, isStreaming }: SummarizerReaderOptions) => {      
             const reader = await this.createStreamReader(summarizer, content, isStreaming);
             reader.read()
                 .then(function processText({ value, done }): any {
@@ -105,7 +105,6 @@ export class SummarizationService implements OnDestroy {
                         return;
                     }
                     
-                    chunks.update((prev) => prev + value);
                     chunk.set(value);
                     return reader.read().then(processText);
                 })
