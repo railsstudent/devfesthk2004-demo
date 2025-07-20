@@ -5,7 +5,7 @@
     <app-feedback-loading [isLoading]="!!statusText()">{{ statusText() }}</app-feedback-loading>
     
     <div style="margin-bottom: 0.5rem;">
-      <textarea id="input" name="input" rows="7" [(ngModel)]="draft" [disabled]="isGeneratingDraft()"></textarea>
+      <textarea id="draft" name="draft" rows="7" [(ngModel)]="draft" [disabled]="isGeneratingDraft()"></textarea>
       <button style="margin-right: 0.5rem;" (click)="generateDraft()" [disabled]="disabled">Generate a draft</button>
       <button [disabled]="disableSubmit" (click)="fakeSubmit()">Fake submit</button>
     </div>

@@ -6,7 +6,7 @@ import { DetectAIComponent } from './detect-ai.component';
     imports: [DetectAIComponent],
     template: `
     <h2>Generate Response for Customer Feedback</h2>
-    <h3>Use Chrome Built-In Prompt, Language Detection, and Translation APIs</h3>
+    <h3>Use Chrome Built-In Prompt, Writer, Summarization, Language Detection, and Translation APIs</h3>
     <app-detect-ai />
   `,
     styles: `
