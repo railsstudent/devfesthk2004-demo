@@ -1,7 +1,6 @@
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, model, Renderer2, resource, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, model, Renderer2, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ParserService } from '../../ai/services/parser.service';
-import { SummarizationService } from '../../ai/services/summarization.service';
+import { ParserService, SummarizationService } from '../../ai/services';
 import { Mode } from '../../ai/types/summarizer-mode.type';
 
 @Component({
@@ -20,10 +19,10 @@ import { Mode } from '../../ai/types/summarizer-mode.type';
       }
     `,
     styles: `
-    input {
-      width: 100%;
-    }
-  `,
+      input {
+        width: 100%;
+      }
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
   })
   export class SummaryComponent {
@@ -43,7 +42,6 @@ import { Mode } from '../../ai/types/summarizer-mode.type';
     chunk = signal('');
 
     processSummary = this.summarizationService.createChunkStreamReader();
-    isStreaming = computed(() => this.selectedMode() === 'streaming');
   
     constructor() {
       afterRenderEffect({
@@ -68,7 +66,7 @@ import { Mode } from '../../ai/types/summarizer-mode.type';
                     content: this.content().trim(), 
                     chunk: this.chunk, 
                     isSummarizing: this.isSummarizing,
-                    isStreaming: this.isStreaming(),
+                    mode: this.selectedMode(),
                 };
                 await this.processSummary(options);
             }

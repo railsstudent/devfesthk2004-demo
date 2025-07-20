@@ -77,8 +77,8 @@ export class SummarizationService implements OnDestroy {
         }
     }
 
-    private async createStreamReader(summarizer: Summarizer, content: string, isStreaming: boolean) {
-        if (isStreaming) {
+    private async createStreamReader({ summarizer, content, mode }: SummarizerReaderOptions) {
+        if (mode === 'streaming') {
             const stream = summarizer.summarizeStreaming(content, {
                 signal: this.#abortController.signal,
             });
@@ -97,15 +97,15 @@ export class SummarizationService implements OnDestroy {
     }
     
     createChunkStreamReader() {
-        return async ({ summarizer, content, chunk, isSummarizing, isStreaming }: SummarizerReaderOptions) => {      
-            const reader = await this.createStreamReader(summarizer, content, isStreaming);
+        return async (options: SummarizerReaderOptions) => {      
+            const reader = await this.createStreamReader(options);
             reader.read()
                 .then(function processText({ value, done }): any {
                     if (done) {
                         return;
                     }
                     
-                    chunk.set(value);
+                    options.chunk.set(value);
                     return reader.read().then(processText);
                 })
                 .catch((err) => {
@@ -116,8 +116,8 @@ export class SummarizationService implements OnDestroy {
                     throw new Error('Error in streaming the summary.');
                 })
                 .finally(() => {
-                    summarizer?.destroy();
-                    isSummarizing.set(false);
+                    options.summarizer.destroy();
+                    options.isSummarizing.set(false);
                 });
         }
     }
