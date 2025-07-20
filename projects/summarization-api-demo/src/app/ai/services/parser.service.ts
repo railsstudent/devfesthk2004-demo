@@ -29,6 +29,7 @@ export class ParserService {
         this.chunks = this.chunks + chunk;
         DOMPurify.sanitize(this.chunks);
         if (DOMPurify.removed.length) {
+            smd.parser_end(this.parser);
             return;
         }
 
