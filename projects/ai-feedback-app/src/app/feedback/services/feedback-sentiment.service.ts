@@ -37,7 +37,7 @@ export class FeedbackSentimentService {
             targetLanguage: 'en'
         };
 
-        await this.#translationService.translateStream(pair, language, text);
+        await this.#translationService.translateStream(pair, text);
     }
 
     async detectSentiment(text: string) {

@@ -33,7 +33,7 @@ export class TranslationService implements OnDestroy  {
         return translator;
     }
 
-    async translateStream(languagePair: LanguagePair, sourceLanguage: string, inputText: string): Promise<void> {
+    async translateStream(languagePair: LanguagePair, inputText: string): Promise<void> {
         if (languagePair.sourceLanguage === languagePair.targetLanguage) {
             this.#chunk.set(inputText);
             this.#done.set(true);
