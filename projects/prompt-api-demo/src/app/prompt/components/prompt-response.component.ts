@@ -1,8 +1,9 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, linkedSignal, model, output, TemplateRef, viewChild } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, model, output, Renderer2, TemplateRef, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import DOMPurify from 'dompurify';
 import * as smd from 'streaming-markdown';
+import { ParserService } from '../../ai/services/parser.service';
 import { ParseStreamedResponse, PromptResponse } from '../types/prompt-response.type';
 import { TokenizationComponent } from './tokenization.component';
 
@@ -18,14 +19,13 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
       <span class="label">Status: </span><span>{{ responseState.status }}</span>
     </div>
     @if (perSessionTemplate()) {
-      <ng-container *ngTemplateOutlet="perSessionTemplate(); context: perSessionTemplateContext()" />
+      <ng-container [ngTemplateOutlet]="perSessionTemplate()" [ngTemplateOutletContext]="perSessionTemplateContext()" />
     }
     <div>
       <span class="label" for="input">Prompt: </span>
       <textarea id="input" name="input" [(ngModel)]="query" [disabled]="responseState.disabled" rows="3"></textarea>
     </div>
-    <button (click)="countPromptTokens.emit()" [disabled]="responseState.numTokensDisabled">Count Prompt Tokens</button>
-    <button (click)="submitPrompt.emit()" [disabled]="responseState.submitDisabled">{{ responseState.text }}</button>
+    <button (click)="askAIModel()" [disabled]="responseState.submitDisabled">{{ responseState.text }}</button>
     <div>
       <span class="label">Response: </span>
       <div #answer></div>
@@ -42,12 +42,12 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PromptResponseComponent {
+  
   state = input.required<PromptResponse>();
   query = model.required<string>();
   perSessionTemplate = input(null,{ transform });
   perSessionTemplateContext = input<any | undefined>(undefined);
 
-  countPromptTokens = output();
   submitPrompt = output();
 
   answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
@@ -82,36 +82,37 @@ export class PromptResponseComponent {
 
   renderMarkdown = input(true);
 
-  constructor() {
-    effect(() => {
-      const { chunk, chunks, sequence, done } = this.streamedResponse();
+  renderer = inject(Renderer2);
+  parserService = inject(ParserService)
 
-      if (typeof sequence === 'undefined') {
-        const element = this.element();
-        while (element.lastChild) {
-          element.removeChild(element.lastChild as ChildNode);
-        } 
-      }
+  constructor() {
+    afterRenderEffect({
+      write: () => {
+      const { chunk, chunks } = this.streamedResponse();
 
       if (!this.renderMarkdown()) {
         this.element().append(chunk);
         return;
       }
 
-      const parser = this.parser();
-      DOMPurify.sanitize(chunks);
-      if (DOMPurify.removed.length) {
-        // If the output was insecure, immediately stop what you were doing.
-        // Reset the parser and flush the remaining Markdown.
-        smd.parser_end(parser);
-        return;
-      }
+        const parser = this.parser();
+        DOMPurify.sanitize(chunks);
+        if (DOMPurify.removed.length) {
+          smd.parser_end(parser);
+          return;
+        }
 
-      if (!done) {
         smd.parser_write(parser, chunk);
-      } else {
-        smd.parser_end(parser);
       }
     });
+  }
+
+  askAIModel() {
+    const element = this.element();
+    if (element.lastChild) {
+      this.renderer.setProperty(element, 'innerHTML', '');
+    }
+    this.parserService.resetParser(element);
+    this.submitPrompt.emit();
   }
 }

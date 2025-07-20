@@ -28,12 +28,13 @@ export abstract class BasePromptComponent {
         }
     });
 
-    async countPromptTokens() {
+    private async countPromptTokens() {
       const numTokens = await this.promptService.countNumTokens(this.query());
       this.numPromptTokens.set(numTokens);
     }
     
     async submitPrompt() {
-      await this.promptService.prompt(this.query());
+      const promises = [this.countPromptTokens(), this.promptService.prompt(this.query())];
+      await Promise.all(promises);
     }
   }

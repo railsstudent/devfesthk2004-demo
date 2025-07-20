@@ -18,7 +18,7 @@ const cmpCapabilties = (a: Capability, b: Capability) => a.temperature === b.tem
     <div class="session">
       <h3>Zero-shot prompting</h3>
       <app-prompt-response [state]="responseState()" [(query)]="query" 
-        (countPromptTokens)="countPromptTokens()" (submitPrompt)="submitPrompt()"
+        (submitPrompt)="submitPrompt()"
         [perSessionTemplate]="isPerSession() ? session : undefined"
         [perSessionTemplateContext]="templateContext()"
       />

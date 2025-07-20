@@ -98,7 +98,6 @@ export abstract class AbstractPromptService {
     async countNumTokens(query: string): Promise<number> {
         try {
             this.#error.set('');
-            this.#isLoading.set(true);
             await this.createSessionIfNotExists();
             const session = this.#session();
             if (!session) {
@@ -110,8 +109,6 @@ export abstract class AbstractPromptService {
             const errMsg = e instanceof Error ? (e as Error).message : 'Error in countNumTokens';
             this.#error.set(errMsg);
             return -1;
-        } finally {
-            this.#isLoading.set(false);
         }
     }
 
