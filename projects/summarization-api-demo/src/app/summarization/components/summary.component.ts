@@ -52,26 +52,25 @@ import { Mode } from '../../ai/types/summarizer-mode.type';
     }
   
     async requestSummary() {    
-        let summarizer: Summarizer | undefined = undefined;
         try {
             this.isSummarizing.set(true);
-            summarizer = await this.summarizationService.createSummarizer(this.options());
+            const summarizer = await this.summarizationService.createSummarizer(this.options());
             if (summarizer) {
                 this.chunk.set('');
                 const element = this.element();
                 if (element.lastChild) {
-                this.renderer.setProperty(element, 'innerHTML', '');
-              }
-              this.parserService.resetParser(element);
+                    this.renderer.setProperty(element, 'innerHTML', '');
+                }
+                this.parserService.resetParser(element);
       
                 const options = { 
-                  summarizer, 
-                  content: this.content().trim(), 
-                  chunk: this.chunk, 
-                  isSummarizing: this.isSummarizing,
-                  isStreaming: this.isStreaming(),
-              };
-              await this.processSummary(options);
+                    summarizer, 
+                    content: this.content().trim(), 
+                    chunk: this.chunk, 
+                    isSummarizing: this.isSummarizing,
+                    isStreaming: this.isStreaming(),
+                };
+                await this.processSummary(options);
             }
         } catch (err) {
             console.error(err);
