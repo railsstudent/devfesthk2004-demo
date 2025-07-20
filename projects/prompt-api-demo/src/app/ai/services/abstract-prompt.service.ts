@@ -1,5 +1,4 @@
 import { computed, signal } from '@angular/core';
-import { ChunkType } from '../types/chunk.type';
 
 export abstract class AbstractPromptService {
     controller = new AbortController();
@@ -7,9 +6,7 @@ export abstract class AbstractPromptService {
     session = this.#session.asReadonly();
     #options = signal<LanguageModelCreateOptions | undefined>(undefined);
     
-    #chunk = signal<ChunkType>({ 
-        done: false 
-    });
+    #chunk = signal('');
     chunk = this.#chunk.asReadonly();
     
     #isLoading = signal(false);
@@ -60,23 +57,19 @@ export abstract class AbstractPromptService {
 
         this.#error.set('');
         this.#isLoading.set(true);
-        this.#chunk.set({ done: false });
+        this.#chunk.set('');
         const stream = await session.promptStreaming(query);
         const self = this;
         const reader = stream.getReader();
-        let sequence = 0;
         reader.read()
             .then(function processText({ done, value }): any {
                 if (done) {
-                    self.#chunk.set({ sequence, done });
+                    self.#chunk.set(value || '');
                     self.updateTokenContext();
                     return;
                 }
 
-                if (value) {
-                    self.#chunk.set({ value, sequence, done });
-                    sequence = sequence + 1;
-                }
+                self.#chunk.set(value);
                 return reader.read().then(processText);
             })
             .catch((e) => {

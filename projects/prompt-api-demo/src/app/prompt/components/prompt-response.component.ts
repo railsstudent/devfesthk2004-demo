@@ -1,10 +1,8 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, model, output, Renderer2, TemplateRef, viewChild } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, model, output, Renderer2, TemplateRef, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import DOMPurify from 'dompurify';
-import * as smd from 'streaming-markdown';
 import { ParserService } from '../../ai/services/parser.service';
-import { ParseStreamedResponse, PromptResponse } from '../types/prompt-response.type';
+import { PromptResponse } from '../types/prompt-response.type';
 import { TokenizationComponent } from './tokenization.component';
 
 const transform = (value: TemplateRef<any> | undefined) => typeof value === 'undefined' ? null : value;
@@ -42,7 +40,6 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PromptResponseComponent {
-  
   state = input.required<PromptResponse>();
   query = model.required<string>();
   perSessionTemplate = input(null,{ transform });
@@ -53,57 +50,12 @@ export class PromptResponseComponent {
   answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
   element = computed(() => this.answer().nativeElement);
 
-  parser = computed(() => {
-    const renderer = smd.default_renderer(this.element());
-    return smd.parser(renderer);
-  });
-
-  streamedResponse = linkedSignal<PromptResponse, ParseStreamedResponse>({
-    source: () => this.state(),
-    computation: (source, previous) => {
-      const { value = '', sequence, done } = source.chunk;
-      if (typeof sequence === 'undefined') {
-        return { 
-          chunk: '',
-          chunks: '',
-          done: false,
-        };
-      }
-
-      const p = previous?.value || { chunk: '', chunks: '' };
-      return { 
-        chunk: value,
-        chunks: `${p.chunks}${value}`,
-        sequence,
-        done,
-      }; 
-    }
-  });
-
-  renderMarkdown = input(true);
-
   renderer = inject(Renderer2);
   parserService = inject(ParserService)
 
   constructor() {
     afterRenderEffect({
-      write: () => {
-      const { chunk, chunks } = this.streamedResponse();
-
-      if (!this.renderMarkdown()) {
-        this.element().append(chunk);
-        return;
-      }
-
-        const parser = this.parser();
-        DOMPurify.sanitize(chunks);
-        if (DOMPurify.removed.length) {
-          smd.parser_end(parser);
-          return;
-        }
-
-        smd.parser_write(parser, chunk);
-      }
+      write: () => this.parserService.writeToElement(this.state().value || '')
     });
   }
 

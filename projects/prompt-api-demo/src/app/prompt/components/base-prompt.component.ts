@@ -9,7 +9,7 @@ export abstract class BasePromptComponent {
     promptService = inject(AbstractPromptService);
   
     session = this.promptService.session;
-    chunk = this.promptService.chunk;
+    value = this.promptService.chunk;
     isLoading = this.promptService.isLoading;
     error = this.promptService.error;
     

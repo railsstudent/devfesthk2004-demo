@@ -28,9 +28,7 @@ const INITIAL_PROMPTS: LanguageInitialPrompt = [
   <div class="session">
     <h3>N-shots prompting</h3>
     <app-initial-prompt [initialPrompts]="initialPrompts()" /> 
-    <app-prompt-response [state]="responseState()" [(query)]="query" 
-      [renderMarkdown]="false" (submitPrompt)="submitPrompt()"
-    />
+    <app-prompt-response [state]="responseState()" [(query)]="query" (submitPrompt)="submitPrompt()" />
   `,
   styleUrl: './prompt.component.css',
   providers: [
@@ -50,7 +48,7 @@ export class NShotsPromptComponent extends BasePromptComponent {
     numPromptTokens: this.numPromptTokens(),
     tokenContext: this.tokenContext(),
     error: this.error(),
-    chunk: this.chunk(),
+    value: this.value(),
   }));
 
   constructor() {

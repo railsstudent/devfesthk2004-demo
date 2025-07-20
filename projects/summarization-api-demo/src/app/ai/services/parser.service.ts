@@ -21,8 +21,8 @@ export class ParserService {
             return;
         }
 
-        if (!chunk) {
-            console.log('Empty chunk, return');
+        if (!chunk && !this.parser.pending) {
+            console.log('Empty chunk and parser does not have pending character, return');
             return;
         }
 
@@ -34,5 +34,8 @@ export class ParserService {
         }
 
         smd.parser_write(this.parser, chunk);
+        if (!chunk && this.parser.pending.length) {
+            smd.parser_end(this.parser);
+        }
     }
 }

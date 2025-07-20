@@ -102,6 +102,7 @@ export class SummarizationService implements OnDestroy {
             reader.read()
                 .then(function processText({ value, done }): any {
                     if (done) {
+                        options.chunk.set(value || '');
                         return;
                     }
                     

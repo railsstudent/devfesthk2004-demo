@@ -26,10 +26,11 @@ const cmpCapabilties = (a: Capability, b: Capability) => a.temperature === b.tem
         <div>
           <div>
             <span class="label" for="temp">Temperature: </span>
-            <input type="number" id="temp" name="temp" class="per-session" [(ngModel)]="capabilities.temperature" max="3" />
-            <span class="label"> (Max temperature: 3) </span>          
+            <input type="number" id="temp" name="temp" class="per-session" [(ngModel)]="capabilities.temperature" max="2" />
+            <span class="label"> (Max temperature: 2) </span>          
             <span class="label" for="topK">TopK: </span>
             <input type="number" id="topK" name="topK" class="per-session" [(ngModel)]="capabilities.topK" max="8" />
+            <span class="label"> (Max TopK: 8) </span>          
           </div>
           <div>
             <span class="label" for="temp">Per Session: </span>
@@ -57,7 +58,7 @@ export class ZeroPromptComponent extends BasePromptComponent {
     numPromptTokens: this.numPromptTokens(),
     tokenContext: this.zeroPromptService.tokenContext(),
     error: this.error(),
-    chunk: this.chunk(),
+    value: this.value(),
   }));
 
   temperature = this.zeroPromptService.temperature;
