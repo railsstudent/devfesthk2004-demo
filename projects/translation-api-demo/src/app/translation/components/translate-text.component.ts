@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, output, Renderer2, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatorService } from '../../ai/services/translator.service';
 import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
@@ -9,7 +9,7 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
     template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem; display: flex;">
         <div style="margin-right: 0.5rem; flex-basis: 50%;">
-            @for(pair of languagePairs(); track $index) {
+            @for(pair of vm().languagePairs; track $index) {
                 <p>canTranslate('{{ pair.sourceLanguage }}', '{{ pair.targetLanguage}}') = {{ pair.available }}</p>
             }
         </div>
@@ -27,14 +27,15 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
                 }
             </div>
             <div>
-                <p>{{ downloadingText() }}</p>
-                <p>Translation: {{ translation() }}</p>
+                <p>Usage: {{ vm().usage }} tokens</p>
+                <p>{{ downloadingModelText() }}</p>
+                <p>Translation: <span #answer>{{ translation() }}</span></p>
             </div>
-            @if (strError()) {
+            @if (vm().strError) {
                 <div>
                     <p>
                         <span class="label" for="input">Error:</span> 
-                        <span>{{strError()}}</span>
+                        <span>{{vm().strError}}</span>
                     </p>
                 </div>
             }
@@ -50,22 +51,29 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
 })
 export class TranslateTextComponent {
     service = inject(TranslatorService);
-    languagePairs = input.required<LanguagePairAvailable[]>();
-    inputText = input.required<string>();
-    isDisableButtons= computed(() => this.service.downloadPercentage() < 100);
-    downloadingText = computed(() => {
-        const percentage = this.service.downloadPercentage();
+    vm = input.required<{
+        usage: number;
+        sample: {
+            sourceLanguage: string;
+            inputText: string;
+        };
+        languagePairs: LanguagePairAvailable[];
+        strError:  string;
+        downloadPercentage: number;
+    }>();
+    
+    isDisableButtons= computed(() => this.vm().downloadPercentage < 100);
+    downloadingModelText = computed(() => {
+        const percentage = this.vm().downloadPercentage;
         const isDownloading = percentage > 0 && percentage < 100;
         return isDownloading ? `Downloaded ${percentage}%` : '';
     });
 
     translation = signal('');
-    downloadSuccess = output<LanguagePairAvailable>();
-    
-    strError = this.service.strError;
+    downloadSuccess = output<LanguagePairAvailable>(); 
 
     canTranslateButtons = computed(() =>
-        this.languagePairs().reduce((acc, pair) => {
+        this.vm().languagePairs.reduce((acc, pair) => {
             if (pair.available === 'available') {
                 return acc.concat({ ...pair, text: `${pair.sourceLanguage} to ${pair.targetLanguage}` })
             } else if (pair.available === 'downloadable' || pair.available === 'downloading') {
@@ -75,9 +83,23 @@ export class TranslateTextComponent {
         }, [] as (LanguagePairAvailable & { text: string })[])
     );
 
+    chunk = signal('');
+    answer = viewChild.required<ElementRef<HTMLSpanElement>>('answer');
+    element = computed(() => this.answer().nativeElement);
+    // renderer = inject(Renderer2);
+
+    // constructor() {
+    //     afterRenderEffect({
+    //         write: () => this.element().append(this.chunk())
+    //     })
+    // }
+
     async translateText(languagePair: LanguagePair) {
         this.translation.set('');
-        const result = await this.service.translate(languagePair, this.inputText());
+        // if (this.element().lastChild) {
+        //     this.renderer.setProperty(this.element(), 'innerHTML', '');
+        // }
+        const result = await this.service.translate(languagePair, this.vm().sample.inputText);
         this.translation.set(result);
     }
 

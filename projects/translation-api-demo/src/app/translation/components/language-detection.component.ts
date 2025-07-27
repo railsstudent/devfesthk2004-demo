@@ -38,7 +38,7 @@ import { LanguageDetectionResultComponent } from './language-detection-result.co
 })
 export class LanguageDetectionComponent {
   service = inject(LanguageDetectorService);
-  inputText = signal('Buenos tarde. Mucho Gusto. Hoy es 1 de Junio, 2025 y Mi charla es sobre Chrome AI. Uso el Language Detector API para detectar el idioma de este texto. Uso el Translation API para traducir entre dos idiomas.');
+  inputText = signal('México es un país de vibrante cultura y gran diversidad, cuya capital, la Ciudad de México, es una de las metrópolis más pobladas del mundo. Con más de 125 millones de habitantes, su población es mayoritariamente mestiza y, aunque el español es el idioma oficial, se hablan numerosas lenguas indígenas como el náhuatl y el maya. Su gastronomía, reconocida mundialmente, deleita con platillos icónicos como los tacos, el mole y el pozole. El clima es increíblemente variado, desde desértico en el norte hasta tropical en el sur, lo que permite disfrutar de atracciones famosas que incluyen las antiguas ruinas de Chichén Itzá y Teotihuacán. Durante su visita, se puede nadar en los místicos cenotes de la península de Yucatán, bucear en los arrecifes de Cozumel, recorrer las coloridas ciudades coloniales como San Miguel de Allende, y relajarse en las paradisíacas playas de Cancún y Tulum, sin olvidar la vibrante vida nocturna y cultural de sus grandes urbes.');
   detectedLanguage = signal<LanguageDetectionWithNameResult | undefined>(undefined);
 
   detector = this.service.detector;

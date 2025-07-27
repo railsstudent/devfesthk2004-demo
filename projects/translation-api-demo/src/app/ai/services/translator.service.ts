@@ -9,7 +9,12 @@ import { isTranslatorAPISupported } from '../utils/ai-detection';
 export class TranslatorService  {
     #controller = new AbortController();
     strError = signal('');
-    downloadPercentage = signal(100);
+
+    #downloadPercentage = signal(100);
+    downloadPercentage = this.#downloadPercentage.asReadonly();
+
+    #usage = signal(0);
+    usage = this.#usage.asReadonly();
 
     private readonly errors: Record<string, string> = {
         'InvalidStateError': 'The document is not active. Please try again later.',
@@ -45,17 +50,17 @@ export class TranslatorService  {
     private async createTranslator(languagePair: LanguagePair): Promise<Translator> {
         await isTranslatorAPISupported();
 
-        this.downloadPercentage.set(0);
+        this.#downloadPercentage.set(0);
         const requireMonitor = await this.isCreateMonitorCallbackNeeded(languagePair);
         if (!requireMonitor) {
-            this.downloadPercentage.set(100);            
+            this.#downloadPercentage.set(100);            
         }
 
         const monitor = requireMonitor ? 
             (m: CreateMonitor) => m.addEventListener("downloadprogress", (e) => {
                 const percentage = Math.floor(e.loaded * 100);
                 console.log(`Translator: Downloaded ${percentage}%`);
-                this.downloadPercentage.set(percentage);
+                this.#downloadPercentage.set(percentage);
             }) : undefined;
 
         return Translator.create({
@@ -87,6 +92,29 @@ export class TranslatorService  {
             if (!translator) {
                 return '';
             }
+
+            const translatedText = await translator.translate(inputText, 
+                { signal: this.#controller.signal});            
+            translator.destroy();
+
+            return translatedText;
+        } catch (e) {
+            this.handleErrors(e, languagePair);
+            return '';
+        }
+    }
+
+    async translateStream(languagePair: LanguagePair, inputText: string): Promise<string> {
+        try { 
+            const translator = await this.createTranslator(languagePair);
+            if (!translator) {
+                return '';
+            }
+
+            const usage = translator.measureInputUsage(inputText);
+            const stream = translator.translateStreaming(inputText, {
+                signal: this.#controller.signal
+            });
 
             const translatedText = await translator.translate(inputText, 
                 { signal: this.#controller.signal});            
