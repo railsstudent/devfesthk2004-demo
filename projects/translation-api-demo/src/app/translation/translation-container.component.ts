@@ -5,6 +5,7 @@ import { LanguageDetectionComponent } from './components/language-detection.comp
 import { TranslateTextComponent } from './components/translate-text.component';
 import { AllowTranslation } from './types/allow-translation.type';
 import { ViewModel } from './types/view-model.type';
+import { StreamTranslation } from './types/stream-translation.type';
 
 @Component({
     selector: 'app-translation-container',
@@ -16,7 +17,9 @@ import { ViewModel } from './types/view-model.type';
       @let inputText = vm().sample.inputText;
       @if (vm().sample.sourceLanguage && inputText) {
         <app-translate-text [vm]="vm()" [chunk]="chunk()"
-          (downloadLanguagePack)="downloadNewLanguage($event)" />
+          (downloadLanguagePack)="downloadNewLanguage($event)" 
+          (streamTranslate)="translate($event)"
+        />
       } @else if (inputText) {
         <p>{{ inputText }} cannot be translated.</p>
       }
@@ -47,6 +50,10 @@ export class TranslationContainerComponent {
       this.languagePairs.set(languagePairs);
       this.sample.set({ sourceLanguage, inputText });
     }
+  }
+
+  async translate({ languagePair, inputText }: StreamTranslation) {
+    await this.translationService.translateStream(languagePair, inputText);
   }
 
   async downloadNewLanguage(languagePair: LanguagePair) {

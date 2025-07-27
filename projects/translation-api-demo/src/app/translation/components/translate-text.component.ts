@@ -1,7 +1,7 @@
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, output, Renderer2, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, output, Renderer2, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TranslatorService } from '../../ai/services/translator.service';
 import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
+import { StreamTranslation } from '../types/stream-translation.type';
 import { ViewModel } from '../types/view-model.type';
 
 @Component({
@@ -51,7 +51,6 @@ import { ViewModel } from '../types/view-model.type';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranslateTextComponent {
-    service = inject(TranslatorService);
     renderer = inject(Renderer2);
     vm = input.required<ViewModel>();
     chunk = input.required<string>();
@@ -64,6 +63,8 @@ export class TranslateTextComponent {
     });
 
     downloadLanguagePack = output<LanguagePair>(); 
+    streamTranslate = output<StreamTranslation>();
+
     answer = viewChild.required<ElementRef<HTMLSpanElement>>('answer');
     element = computed(() => this.answer().nativeElement);
 
@@ -94,7 +95,10 @@ export class TranslateTextComponent {
         if (this.element().lastChild) {
             this.renderer.setProperty(this.element(), 'innerHTML', '');
         }
-        await this.service.translateStream(languagePair, this.vm().sample.inputText);
+        this.streamTranslate.emit({
+            languagePair,
+            inputText: this.vm().sample.inputText
+        });
     }
 
     async download(languagePair: LanguagePair) {
