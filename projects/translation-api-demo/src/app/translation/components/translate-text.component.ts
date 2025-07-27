@@ -52,7 +52,9 @@ import { ViewModel } from '../types/view-model.type';
 })
 export class TranslateTextComponent {
     service = inject(TranslatorService);
+    renderer = inject(Renderer2);
     vm = input.required<ViewModel>();
+    chunk = input.required<string>();
     
     isDisableButtons= computed(() => this.vm().downloadPercentage < 100);
     downloadingModelText = computed(() => {
@@ -61,8 +63,9 @@ export class TranslateTextComponent {
         return isDownloading ? `Downloaded ${percentage}%` : '';
     });
 
-    translation = signal('');
     downloadLanguagePack = output<LanguagePair>(); 
+    answer = viewChild.required<ElementRef<HTMLSpanElement>>('answer');
+    element = computed(() => this.answer().nativeElement);
 
     canTranslateButtons = computed(() =>
         this.vm().languagePairs.reduce((acc, pair) => {
@@ -75,15 +78,13 @@ export class TranslateTextComponent {
         }, [] as (LanguagePairAvailable & { text: string })[])
     );
 
-    answer = viewChild.required<ElementRef<HTMLSpanElement>>('answer');
-    element = computed(() => this.answer().nativeElement);
-    renderer = inject(Renderer2);
-    chunk = this.service.chunk;
-
     constructor() {
         afterRenderEffect({
             write: () => { 
-                console.log('this.chunk()', this.chunk());
+                if (!this.chunk()) {
+                    return;
+                }
+                console.log('chunk', this.chunk());
                 this.element().append(this.chunk());
             }
         })

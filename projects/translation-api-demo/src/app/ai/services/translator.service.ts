@@ -100,12 +100,13 @@ export class TranslatorService  {
                 signal: this.#controller.signal
             });
             this.#usage.set(usage);
+            this.strError.set('');
+            this.#chunk.set('');
 
             const stream = translator.translateStreaming(inputText, {
                 signal: this.#controller.signal
             });
 
-            this.strError.set('');
 
             const self = this;
             const reader = stream.getReader();

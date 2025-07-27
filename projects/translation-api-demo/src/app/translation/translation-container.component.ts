@@ -4,6 +4,7 @@ import { LanguagePair, LanguagePairAvailable } from '../ai/types/language-pair.t
 import { LanguageDetectionComponent } from './components/language-detection.component';
 import { TranslateTextComponent } from './components/translate-text.component';
 import { AllowTranslation } from './types/allow-translation.type';
+import { ViewModel } from './types/view-model.type';
 
 @Component({
     selector: 'app-translation-container',
@@ -14,7 +15,7 @@ import { AllowTranslation } from './types/allow-translation.type';
       <app-language-detection (nextStep)="updateCanTranslate($event)" />
       @let inputText = vm().sample.inputText;
       @if (vm().sample.sourceLanguage && inputText) {
-        <app-translate-text [vm]="vm()"
+        <app-translate-text [vm]="vm()" [chunk]="chunk()"
           (downloadLanguagePack)="downloadNewLanguage($event)" />
       } @else if (inputText) {
         <p>{{ inputText }} cannot be translated.</p>
@@ -28,13 +29,14 @@ export class TranslationContainerComponent {
   languagePairs = signal<LanguagePairAvailable[]>([]);
   sample = signal({ sourceLanguage: '', inputText: '' });
 
-  vm = computed(() => ({
+  vm = computed<ViewModel>(() => ({
     usage: this.translationService.usage(),
     sample: this.sample(),
     languagePairs: this.languagePairs(),
     strError: this.translationService.strError(),
     downloadPercentage: this.translationService.downloadPercentage(),
   }));
+  chunk = this.translationService.chunk;
 
   async updateCanTranslate(allowTranslation: AllowTranslation) {
     this.languagePairs.set([]);
