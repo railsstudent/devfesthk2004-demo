@@ -16,6 +16,9 @@ export class TranslatorService  {
     #usage = signal(0);
     usage = this.#usage.asReadonly();
 
+    #chunk = signal('');
+    chunk = this.#chunk.asReadonly();
+
     private readonly errors: Record<string, string> = {
         'InvalidStateError': 'The document is not active. Please try again later.',
         'NetworkError': 'The network is not available to download the AI model.',
@@ -104,26 +107,43 @@ export class TranslatorService  {
         }
     }
 
-    async translateStream(languagePair: LanguagePair, inputText: string): Promise<string> {
+    async translateStream(languagePair: LanguagePair, inputText: string): Promise<void> {
         try { 
             const translator = await this.createTranslator(languagePair);
             if (!translator) {
-                return '';
+                return;
             }
 
-            const usage = translator.measureInputUsage(inputText);
+            const usage = await translator.measureInputUsage(inputText);
+            this.#usage.set(usage);
+
             const stream = translator.translateStreaming(inputText, {
                 signal: this.#controller.signal
             });
 
-            const translatedText = await translator.translate(inputText, 
-                { signal: this.#controller.signal});            
-            translator.destroy();
+            this.strError.set('');
 
-            return translatedText;
+            const self = this;
+            const reader = stream.getReader();
+            reader.read()
+                .then(function processText({ done, value }): any {
+                    if (done) {
+                        return;
+                    }
+
+                    self.#chunk.set(value);
+                    reader.read().then(processText);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    self.handleErrors(err, languagePair);
+                })
+                .finally (() => { 
+                    translator.destroy();
+                    console.log('Translator destroyed');
+                });
         } catch (e) {
             this.handleErrors(e, languagePair);
-            return '';
         }
     }
 

@@ -2,6 +2,7 @@ import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, Elemen
 import { FormsModule } from '@angular/forms';
 import { TranslatorService } from '../../ai/services/translator.service';
 import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pair.type';
+import { ViewModel } from '../types/view-model.type';
 
 @Component({
     selector: 'app-translate-text',
@@ -29,7 +30,7 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
             <div>
                 <p>Usage: {{ vm().usage }} tokens</p>
                 <p>{{ downloadingModelText() }}</p>
-                <p>Translation: <span #answer>{{ translation() }}</span></p>
+                <p>Translation: <span #answer></span></p>
             </div>
             @if (vm().strError) {
                 <div>
@@ -51,16 +52,7 @@ import { LanguagePair, LanguagePairAvailable } from '../../ai/types/language-pai
 })
 export class TranslateTextComponent {
     service = inject(TranslatorService);
-    vm = input.required<{
-        usage: number;
-        sample: {
-            sourceLanguage: string;
-            inputText: string;
-        };
-        languagePairs: LanguagePairAvailable[];
-        strError:  string;
-        downloadPercentage: number;
-    }>();
+    vm = input.required<ViewModel>();
     
     isDisableButtons= computed(() => this.vm().downloadPercentage < 100);
     downloadingModelText = computed(() => {
@@ -83,24 +75,25 @@ export class TranslateTextComponent {
         }, [] as (LanguagePairAvailable & { text: string })[])
     );
 
-    chunk = signal('');
     answer = viewChild.required<ElementRef<HTMLSpanElement>>('answer');
     element = computed(() => this.answer().nativeElement);
-    // renderer = inject(Renderer2);
+    renderer = inject(Renderer2);
+    chunk = this.service.chunk;
 
-    // constructor() {
-    //     afterRenderEffect({
-    //         write: () => this.element().append(this.chunk())
-    //     })
-    // }
+    constructor() {
+        afterRenderEffect({
+            write: () => { 
+                console.log('this.chunk()', this.chunk());
+                this.element().append(this.chunk());
+            }
+        })
+    }
 
     async translateText(languagePair: LanguagePair) {
-        this.translation.set('');
-        // if (this.element().lastChild) {
-        //     this.renderer.setProperty(this.element(), 'innerHTML', '');
-        // }
-        const result = await this.service.translate(languagePair, this.vm().sample.inputText);
-        this.translation.set(result);
+        if (this.element().lastChild) {
+            this.renderer.setProperty(this.element(), 'innerHTML', '');
+        }
+        await this.service.translateStream(languagePair, this.vm().sample.inputText);
     }
 
     async download(languagePair: LanguagePair) {
