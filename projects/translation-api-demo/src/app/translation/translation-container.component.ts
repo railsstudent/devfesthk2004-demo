@@ -4,8 +4,8 @@ import { LanguagePair, LanguagePairAvailable } from '../ai/types/language-pair.t
 import { LanguageDetectionComponent } from './components/language-detection.component';
 import { TranslateTextComponent } from './components/translate-text.component';
 import { AllowTranslation } from './types/allow-translation.type';
-import { ViewModel } from './types/view-model.type';
 import { StreamTranslation } from './types/stream-translation.type';
+import { ViewModel } from './types/view-model.type';
 
 @Component({
     selector: 'app-translation-container',
