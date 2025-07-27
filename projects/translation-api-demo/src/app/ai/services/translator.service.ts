@@ -89,24 +89,6 @@ export class TranslatorService  {
         }
     }
 
-    async translate(languagePair: LanguagePair, inputText: string): Promise<string> {
-        try { 
-            const translator = await this.createTranslator(languagePair);
-            if (!translator) {
-                return '';
-            }
-
-            const translatedText = await translator.translate(inputText, 
-                { signal: this.#controller.signal});            
-            translator.destroy();
-
-            return translatedText;
-        } catch (e) {
-            this.handleErrors(e, languagePair);
-            return '';
-        }
-    }
-
     async translateStream(languagePair: LanguagePair, inputText: string): Promise<void> {
         try { 
             const translator = await this.createTranslator(languagePair);
@@ -114,7 +96,9 @@ export class TranslatorService  {
                 return;
             }
 
-            const usage = await translator.measureInputUsage(inputText);
+            const usage = await translator.measureInputUsage(inputText, {
+                signal: this.#controller.signal
+            });
             this.#usage.set(usage);
 
             const stream = translator.translateStreaming(inputText, {

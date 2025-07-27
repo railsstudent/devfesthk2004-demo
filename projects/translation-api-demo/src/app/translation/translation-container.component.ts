@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { TranslatorService } from '../ai/services/translator.service';
-import { LanguagePairAvailable } from '../ai/types/language-pair.type';
+import { LanguagePair, LanguagePairAvailable } from '../ai/types/language-pair.type';
 import { LanguageDetectionComponent } from './components/language-detection.component';
 import { TranslateTextComponent } from './components/translate-text.component';
 import { AllowTranslation } from './types/allow-translation.type';
@@ -15,7 +15,7 @@ import { AllowTranslation } from './types/allow-translation.type';
       @let inputText = vm().sample.inputText;
       @if (vm().sample.sourceLanguage && inputText) {
         <app-translate-text [vm]="vm()"
-          (downloadSuccess)="downloadNewLanguage($event)" />
+          (downloadLanguagePack)="downloadNewLanguage($event)" />
       } @else if (inputText) {
         <p>{{ inputText }} cannot be translated.</p>
       }
@@ -47,14 +47,17 @@ export class TranslationContainerComponent {
     }
   }
 
-  downloadNewLanguage(language: LanguagePairAvailable) {
-    this.languagePairs.update((prev) => prev.map((item) => {
-        if (item.sourceLanguage === language.sourceLanguage && 
-          item.targetLanguage === language.targetLanguage) {
-          return language
-        }
-        return item;
-      })
-    );
+  async downloadNewLanguage(languagePair: LanguagePair) {
+    const language = await this.translationService.downloadLanguagePackage(languagePair);
+    if (language?.available === 'available') {
+      this.languagePairs.update((prev) => prev.map((item) => {
+          if (item.sourceLanguage === language.sourceLanguage && 
+            item.targetLanguage === language.targetLanguage) {
+            return language
+          }
+          return item;
+        })
+      );
+    }
   }
 }

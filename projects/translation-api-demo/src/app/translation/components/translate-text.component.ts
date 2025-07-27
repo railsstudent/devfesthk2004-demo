@@ -62,7 +62,7 @@ export class TranslateTextComponent {
     });
 
     translation = signal('');
-    downloadSuccess = output<LanguagePairAvailable>(); 
+    downloadLanguagePack = output<LanguagePair>(); 
 
     canTranslateButtons = computed(() =>
         this.vm().languagePairs.reduce((acc, pair) => {
@@ -97,10 +97,6 @@ export class TranslateTextComponent {
     }
 
     async download(languagePair: LanguagePair) {
-        const result = await this.service.downloadLanguagePackage(languagePair);
-        if (result?.available === 'available') {
-            this.downloadSuccess.emit(result);
-        }
+        this.downloadLanguagePack.emit(languagePair);
     }
-
 }
