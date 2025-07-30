@@ -9,12 +9,12 @@ import { ViewModel } from '../types/view-model.type';
     imports: [FormsModule],
     template: `
     <div style="border: 1px solid black; border-radius: 0.25rem; padding: 1rem; display: flex;">
-        <div style="margin-right: 0.5rem; flex-basis: 50%;">
+        <div style="margin-right: 0.5rem; flex-basis: 50%; flex-grow: 1; flex-shrink: 1;">
             @for(pair of vm().languagePairs; track $index) {
                 <p>canTranslate('{{ pair.sourceLanguage }}', '{{ pair.targetLanguage}}') = {{ pair.available }}</p>
             }
         </div>
-        <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: column; flex-grow: 1; flex-basis: 50%; flex-shrink: 1;">
             <div style="margin: 1rem;">
                 @for(item of canTranslateButtons(); track $index) {
                     @let pair = { sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage };

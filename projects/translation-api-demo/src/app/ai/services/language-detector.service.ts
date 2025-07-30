@@ -1,6 +1,5 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import { EXPECTED_INPUT_LANGUAGES } from '../constants/input-languages.constant';
-import { ERROR_CODES } from '../enums/error-codes.enum';
 import { LanguageDetectionWithNameResult } from '../types/language-detection-result.type';
 import { validateLanguageDetector } from '../utils/ai-detection';
 
@@ -10,7 +9,6 @@ import { validateLanguageDetector } from '../utils/ai-detection';
 export class LanguageDetectorService implements OnDestroy  {
     #controller = new AbortController();
     #detector = signal<LanguageDetector | undefined>(undefined);
-    detector = this.#detector.asReadonly();
     strError = signal('');
 
     private readonly errors: Record<string, string> = {
@@ -24,9 +22,10 @@ export class LanguageDetectorService implements OnDestroy  {
 
     async detect(query: string, minConfidence = 0.6): Promise<LanguageDetectionWithNameResult | undefined> {
         this.strError.set('');
-        const detector = this.detector();
+        const detector = this.#detector() || await this.createDetector();
+
         if (!detector) {
-            throw new Error(ERROR_CODES.NO_LANGUAGE_DETECTOR);
+            return undefined;
         }
 
         try {
@@ -61,9 +60,9 @@ export class LanguageDetectorService implements OnDestroy  {
     }
 
     async createDetector() {
-        if (this.detector()) {
+        if (this.#detector()) {
             console.log('Language Detector found.');
-            return;
+            return this.#detector();
         }
 
         try {
@@ -81,6 +80,7 @@ export class LanguageDetectorService implements OnDestroy  {
             });
 
             this.#detector.set(newDetector);
+            return this.#detector();
         } catch (e) {
             if (e instanceof DOMException) {
                 const err = this.errors[e.name];
@@ -95,6 +95,7 @@ export class LanguageDetectorService implements OnDestroy  {
                 console.error(e);
                 this.strError.set(this.errors['UnknownError']);
             }
+            return undefined;
         }
     }
 
@@ -108,7 +109,7 @@ export class LanguageDetectorService implements OnDestroy  {
     }
 
     ngOnDestroy(): void {
-        const detector = this.detector();
+        const detector = this.#detector();
         if (detector) {
             detector.destroy();
         }
