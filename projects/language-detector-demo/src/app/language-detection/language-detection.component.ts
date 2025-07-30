@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LanguageDetectionService } from '../ai/services/language-detection.service';
 import { LanguageDetectionWithNameResult } from '../ai/types/language-detection-result.type';
@@ -12,15 +12,19 @@ import { LanguageDetectionResultComponent } from './components/language-detectio
       <h3>Language Detector API Demo</h3>
       <div>
         <span class="label" for="input">Input text: </span>
-        <textarea id="input" name="input" [(ngModel)]="inputText" rows="3"></textarea>
+        <textarea id="input" name="input" [(ngModel)]="inputText" rows="15"></textarea>
       </div>
-      <div>
-        <span class="label">Input Quota: </span>
-        <span class="label">{{ inputQuota() }}</span>
+      <div style="display: flex;">
+        <div style="margin-right: 1rem;">
+          <span class="label">Input Quota: </span>
+          <span class="label">{{ inputQuota() }}</span>
+        </div>
+        <div>
+          <span class="label">Input Usage: </span>
+          <span class="label">{{ usage() }}</span>
+        </div>
       </div>
-      <button style="margin-right: 0.5rem;" (click)="setup()">Create a detector</button>
-      <button style="margin-right: 0.5rem;" (click)="teardown()">Destroy a detector</button>
-      <button (click)="detectLanguage()" [disabled]="isDisableDetectLanguage()">Detect Language</button>
+      <button (click)="detectLanguage()" [disabled]="this.inputText().trim() === ''">Detect Language</button>
       <app-language-detection-result [detectedLanguages]="detectedLanguages()" />
     </div>
   `,
@@ -30,18 +34,8 @@ export class LanguageDetectionComponent {
   service = inject(LanguageDetectionService);
   inputText = signal('');
   detectedLanguages = signal<LanguageDetectionWithNameResult[]>([]);
-  detector = this.service.detector;
   inputQuota = this.service.inputQuota;
-
-  isDisableDetectLanguage = computed(() => !this.detector() || this.inputText().trim() === '');
-
-  async setup() {
-    await this.service.createDetector();    
-  }
-
-  teardown() {
-    this.service.destroyDetector();
-  }
+  usage = this.service.usage;
 
   async detectLanguage(topNLanguages = 3) {
     const results = await this.service.detect(this.inputText(), topNLanguages);

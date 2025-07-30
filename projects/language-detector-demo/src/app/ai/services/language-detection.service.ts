@@ -9,19 +9,22 @@ export class LanguageDetectionService implements OnDestroy  {
     #controller = new AbortController();
 
     #detector = signal<LanguageDetector| undefined>(undefined);
-    detector = this.#detector.asReadonly();
     inputQuota = computed(() => {
-        const detector = this.detector();
+        const detector = this.#detector();
         return detector ? detector.inputQuota : 0;
     });
+    #usage = signal(0);
+    usage = this.#usage.asReadonly();
 
     async detect(query: string, topNResults = 3): Promise<LanguageDetectionWithNameResult[]> {
-        const detector = this.detector();
+        const detector = this.#detector() ? this.#detector() : await this.createDetector();
         if (!detector) {
-            throw new Error('Failed to create the LanguageDetector.');
+            return [];
         }
 
         try {
+            const usage = await detector.measureInputUsage(query);
+            this.#usage.set(usage);
             const results = await detector.detect(query);
             const minTopNReesults = Math.min(topNResults, results.length);
             const probablyLanguages = results.slice(0, minTopNReesults);
@@ -37,25 +40,15 @@ export class LanguageDetectionService implements OnDestroy  {
         }
     }
 
-    destroyDetector() {
-        this.resetDetector();
-    }
-
-    private resetDetector() {
-        const detector = this.detector();
-
-        if (detector) {
-            detector.destroy();
-            console.log('Destroy the language detector.');
-            this.#detector.set(undefined);
-        }
-    }
-
     async createDetector() {
-        this.resetDetector();
+        if (this.#detector()) {
+            return this.#detector();
+        }
         
         const newDetector = await this.createDetectorWithMonitor();
         this.#detector.set(newDetector);
+
+        return this.#detector();
     }
 
     private async createDetectorWithMonitor() {
@@ -85,7 +78,7 @@ export class LanguageDetectionService implements OnDestroy  {
     }
 
     ngOnDestroy(): void {
-        const detector = this.detector();
+        const detector = this.#detector();
         if (detector) {
             detector.destroy();
         }
