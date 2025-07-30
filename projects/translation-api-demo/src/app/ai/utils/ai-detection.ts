@@ -2,14 +2,6 @@ import { catchError, from, map, Observable, of, switchMap } from 'rxjs';
 import { EXPECTED_INPUT_LANGUAGES } from '../constants/input-languages.constant';
 import { ERROR_CODES } from '../enums/error-codes.enum';
 
-export async function getLanguageDetectorAPIAvailability(): Promise<Omit<Availability, 'uavailable'>> {
-   if (!('Translator' in self)) {
-      throw new Error(ERROR_CODES.NO_TRANSLATION_API);
-   }
-
-   return validateLanguageDetector();
-}
-
 export async function isTranslatorAPISupported(): Promise<boolean> {
    if (!('Translator' in self)) {
       throw new Error(ERROR_CODES.NO_TRANSLATION_API);
@@ -34,13 +26,13 @@ export async function validateLanguageDetector() {
 }
 
 export function areAPIsSupported(): Observable<string> {
-   return from(getLanguageDetectorAPIAvailability()).pipe(
-      switchMap (() => {
+   return from(validateLanguageDetector()).pipe(
+      switchMap ((x) => {
          return isTranslatorAPISupported()
             .then(() => '')
             .catch((e) => {
                console.error(e);
-               return e instanceof Error ? e.message : 'Unknown error encountered in the Translator API';
+               return e instanceof Error && e.message ? e.message : 'Unknown error encountered in the Translator API';
             })
       }),
       map((errTranslatorAPI) => errTranslatorAPI ? errTranslatorAPI : ''),
