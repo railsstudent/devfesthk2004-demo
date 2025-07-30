@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { EXPECTED_TRANSLATOR_LANGUAGES } from '../constants/translator-languages.constant';
 import { LanguagePair, LanguagePairAvailable } from '../types/language-pair.type';
-import { isTranslatorAPISupported } from '../utils/ai-detection';
+import { areAPIsSupported } from '../utils/ai-detection';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +36,7 @@ export class TranslatorService  {
     }
 
     async createLanguagePairs(sourceLanguage: string): Promise<LanguagePairAvailable[]> {
-        await isTranslatorAPISupported()
+        await areAPIsSupported()
 
         const results: LanguagePairAvailable[] = [];
         for (const targetLanguage of EXPECTED_TRANSLATOR_LANGUAGES) {
@@ -51,7 +51,7 @@ export class TranslatorService  {
     }
 
     private async createTranslator(languagePair: LanguagePair): Promise<Translator> {
-        await isTranslatorAPISupported();
+        await areAPIsSupported();
 
         this.#downloadPercentage.set(0);
         const requireMonitor = await this.isCreateMonitorCallbackNeeded(languagePair);

@@ -41,7 +41,10 @@ export class PromptShowcaseComponent {
     
     return { 
       component,
-      inputs
+      inputs: {
+        ...inputs,
+        defaultCapabilities: this.defaultCapabilities(),
+      }
     }; 
   });
 
