@@ -1,19 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, resource, signal } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, inject, input, inputBinding, linkedSignal, OnDestroy, resource, signal, twoWayBinding, Type, viewChild, ViewContainerRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SummarizationService } from '../../ai/services/summarization.service';
 import { Mode } from '../../ai/types/summarizer-mode.type';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
 import data from '../data/description.json';
 import { SummarizerOptionsComponent } from './summarizer-options.component';
-import { StreamSummaryComponent } from './stream-summary.component';
-import { SummaryComponent } from './summary.component';
 
 const findDefault = <T>(options: T[], defaultValue: T) => 
   options.find((item) => item ===  defaultValue) || options[0]
 
 @Component({
     selector: 'app-summarizer',
-    imports: [FormsModule, SummarizerOptionsComponent, StreamSummaryComponent, SummaryComponent],
+    imports: [FormsModule, SummarizerOptionsComponent],
     template: `
     <app-summarizer-options [selectOptions]="selectOptions()"
       [(selectedFormat)]="selectedFormat" [(selectedType)]="selectedType" [(selectedLength)]="selectedLength"
@@ -25,8 +23,6 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
     } 
     <label for="sharedContext">Shared Context:</label>
     <input id="sharedContext" name="sharedContext" [(ngModel)]="sharedContext" />
-    <!-- <app-stream-summary [options]="summarizerCreateOptions()" [content]="text()" /> -->
-    <app-summary [options]="summarizerCreateOptions()" [content]="text()" />
     <ng-container #vcr />
   `,
     styles: `
@@ -36,7 +32,7 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
   `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SummarizerComponent {
+export class SummarizerComponent implements OnDestroy {
   summarizationService = inject(SummarizationService);
   selectOptions = input.required<SummarizerSelectOptions>();
 
@@ -71,4 +67,36 @@ export class SummarizerComponent {
 
   error = this.summarizationService.error;
   availability = computed(() =>  this.availabilityResource.hasValue() ? this.availabilityResource.value() : false);
+
+  vcr = viewChild.required('vcr', { read: ViewContainerRef });
+
+  private async getComponentType(): Promise<Type<any>> {
+    if (this.selectedMode() === 'streaming') {
+      const { StreamSummaryComponent } = await import('./stream-summary.component');
+      return StreamSummaryComponent;
+    }
+
+    const { SummaryComponent } = await import('./summary.component');
+    return SummaryComponent;
+  }
+
+  constructor() {
+    afterRenderEffect({
+      write: async () => { 
+        const vcr = this.vcr();
+        vcr.clear();
+        const componentType = await this.getComponentType();
+        vcr.createComponent(componentType, {
+          bindings: [
+            inputBinding('options', () => this.summarizerCreateOptions()),
+            twoWayBinding('content', this.text),
+          ]
+        });
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.vcr().clear();
+  }
 }

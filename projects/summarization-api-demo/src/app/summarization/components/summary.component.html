@@ -1,0 +1,10 @@
+<label for="content">Content:</label>
+<textarea id="content" name="content" rows="20" [(ngModel)]="content"></textarea>
+<div>
+    @let buttonText = isSummarizing() ? 'Summarizing...' : 'Summarize';
+    @let disabled = content().trim() === '' || isSummarizing();
+    <button (click)="requestSummary()" [disabled]="disabled">{{ buttonText }}</button>
+</div>
+@if (!error()) {
+    <div #answer></div>
+}

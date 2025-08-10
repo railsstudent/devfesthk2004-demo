@@ -1,22 +1,11 @@
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, model, Renderer2, resource, ResourceLoaderParams, ResourceStreamItem, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, model, Renderer2, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ParserService, SummarizationService } from '../../ai/services';
 
 @Component({
     selector: 'app-summary',
     imports: [FormsModule],
-    template: `
-      <label for="content">Content:</label>
-      <textarea id="content" name="content" rows="20" [(ngModel)]="content"></textarea>
-      <div>
-        @let buttonText = isSummarizing() ? 'Summarizing...' : 'Summarize';
-        @let disabled = content().trim() === '' || isSummarizing();
-        <button (click)="requestSummary()" [disabled]="disabled">{{ buttonText }}</button>
-      </div>
-      @if (!error()) {
-        <div>{{ chunk() }}</div>
-      }
-    `,
+    templateUrl: './summary.component.html',
     styles: `
       input {
         width: 100%;
@@ -26,20 +15,38 @@ import { ParserService, SummarizationService } from '../../ai/services';
   })
   export class SummaryComponent {
     summarizationService = inject(SummarizationService);
-  
+    parserService = inject(ParserService);
+    renderer = inject(Renderer2);
+
     content = model.required<string>();  
     options = input.required<SummarizerCreateCoreOptions>();
+
+    answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
+    element = computed(() => this.answer().nativeElement);
   
     error = signal('');
     isSummarizing = signal(false);
     chunk = signal('');
+
+    constructor() {
+        afterRenderEffect({
+          write: () => { 
+            const value = this.chunk();
+            if (value) {
+              this.parserService.writeToElement(value);
+            }
+          }
+        });
+      }
   
     async requestSummary() {    
         try {
+            this.isSummarizing.set(true);
+            this.chunk.set('');
+            this.clearSummary();
+
             const summarizer = await this.summarizationService.createSummarizer(this.options());
             if (summarizer) {
-                this.isSummarizing.set(true);
-                this.chunk.set('');
                 const result = await this.summarizationService.summarize({ 
                     summarizer, 
                     content: this.content().trim(), 
@@ -53,4 +60,12 @@ import { ParserService, SummarizationService } from '../../ai/services';
             this.isSummarizing.set(false);
         }
     }
+
+    private clearSummary() {
+        const element = this.element();
+        if (element.lastChild) {
+          this.renderer.setProperty(element, 'innerHTML', '');
+        }
+        this.parserService.resetParser(element);
+      }
 }

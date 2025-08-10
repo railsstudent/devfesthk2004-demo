@@ -5,18 +5,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
 @Component({
     selector: 'app-stream-summary',
     imports: [FormsModule],
-    template: `
-      <label for="content">Content:</label>
-      <textarea id="content" name="content" rows="20" [(ngModel)]="content"></textarea>
-      <div>
-        @let buttonText = isSummarizing() ? 'Summarizing...' : 'Summarize';
-        @let disabled = content().trim() === '' || isSummarizing();
-        <button (click)="requestSummary()" [disabled]="disabled">{{ buttonText }}</button>
-      </div>
-      @if (!error()) {
-        <div #answer></div>
-      }
-    `,
+    templateUrl: './summary.component.html',
     styles: `
       input {
         width: 100%;
@@ -45,7 +34,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
 
     chunkValue = computed(() => this.chunkResource.hasValue() ? this.chunkResource.value() : undefined);
     
-    processSummary = this.summarizationService.createChunkStreamReader();
+    processSummary = this.summarizationService.createChunkReader();
    
     constructor() {
       afterRenderEffect({
@@ -60,10 +49,12 @@ import { ParserService, SummarizationService } from '../../ai/services';
   
     async requestSummary() {    
         try {
+            this.isSummarizing.set(true);
+            this.chunk.set({ value: '' });
+            this.clearSummary();
+
             const summarizer = await this.summarizationService.createSummarizer(this.options());
-            if (summarizer) {
-                this.clearSummary();
-      
+            if (summarizer) {      
                 await this.processSummary({ 
                   summarizer, 
                   content: this.content().trim(), 
