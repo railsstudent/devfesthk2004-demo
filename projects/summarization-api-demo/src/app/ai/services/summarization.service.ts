@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, signal } from '@angular/core';
+import { Injectable, OnDestroy, ResourceStreamItem, signal } from '@angular/core';
 import { SummarizerReaderOptions } from '../types/summarizer-reader-options.type';
 import { getAvailability } from '../utils/ai-detection';
 
@@ -77,48 +77,28 @@ export class SummarizationService implements OnDestroy {
         }
     }
 
-    private async createStreamReader({ summarizer, content, mode }: SummarizerReaderOptions) {
-        if (mode === 'streaming') {
-            const stream = summarizer.summarizeStreaming(content, {
-                signal: this.#abortController.signal,
-            });
-            return stream.getReader();
-        }
-
-        const result = await summarizer.summarize(content, { signal: this.#abortController.signal})
-        const batchStream = new ReadableStream<string>({
-            start(controller) {
-                controller.enqueue(result);
-                controller.close();
-            }
-        });
-        
-        return batchStream.getReader();
-    }
-    
     createChunkStreamReader() {
-        return async (options: SummarizerReaderOptions) => {      
-            const reader = await this.createStreamReader(options);
-            reader.read()
-                .then(function processText({ value, done }): any {
-                    if (done) {
-                        return;
-                    }
-                    
-                    options.chunk.set(value);
-                    return reader.read().then(processText);
-                })
-                .catch((err) => {
-                    console.error(err);
-                    if (err instanceof Error) {
-                        throw err;
-                    }
-                    throw new Error('Error in streaming the summary.');
-                })
-                .finally(() => {
-                    options.summarizer.destroy();
-                    options.isSummarizing.set(false);
+        return async ({ summarizer, chunk, content, isSummarizing }: SummarizerReaderOptions) => {  
+            try {
+                isSummarizing.set(true);
+                chunk.set({ value: '' });
+                const stream = summarizer.summarizeStreaming(content, {
+                    signal: this.#abortController.signal,
                 });
+                
+                for await (const value of stream) {
+                    chunk.set({ value });
+                }
+            } catch (err) {
+                console.error(err);
+                if (err instanceof Error) {
+                    throw err;
+                }
+                throw new Error('Error in streaming the summary.');
+            } finally {
+                summarizer.destroy();
+                isSummarizing.set(false);
+            }
         }
     }
 

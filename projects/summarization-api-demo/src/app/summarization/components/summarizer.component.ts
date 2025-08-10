@@ -24,8 +24,9 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
     } 
     <label for="sharedContext">Shared Context:</label>
     <input id="sharedContext" name="sharedContext" [(ngModel)]="sharedContext" />
-    <app-summary [options]="summarizerCreateOptions()" [content]="text()" [selectedMode]="selectedMode()" />
-    <app-summary [options]="summarizerCreateOptions()" [content]="text2()" [selectedMode]="selectedMode()" />
+    <app-summary [options]="summarizerCreateOptions()" [content]="text()" />
+    <!-- <app-summary [options]="summarizerCreateOptions()" [content]="text2()" [selectedMode]="selectedMode()" /> -->
+    <ng-container #vcr />
   `,
     styles: `
     input {
@@ -39,7 +40,6 @@ export class SummarizerComponent {
   selectOptions = input.required<SummarizerSelectOptions>();
 
   text = signal(data.cicd);
-  text2 = signal(data.llm);
   sharedContext = signal('Generate a summary of book description from https://www.packtpub.com/');
 
   selectedFormat = linkedSignal(() => findDefault(this.selectOptions().formats, 'markdown'));
