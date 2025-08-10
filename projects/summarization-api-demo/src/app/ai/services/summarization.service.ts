@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, ResourceStreamItem, signal } from '@angular/core';
+import { Injectable, OnDestroy, signal } from '@angular/core';
 import { SummarizerReaderOptions } from '../types/summarizer-reader-options.type';
 import { getAvailability } from '../utils/ai-detection';
 
@@ -74,6 +74,24 @@ export class SummarizationService implements OnDestroy {
         } catch (e) {
             this.handleErrors(e);
             return undefined;
+        }
+    }
+
+    async summarize({ summarizer, content }: Omit<SummarizerReaderOptions, 'chunk' | 'isSummarizing'>) {
+        try {
+            const text = await summarizer.summarize(content, {
+                signal: this.#abortController.signal,
+            });
+            
+            return text;
+        } catch (err) {
+            console.error(err);
+            if (err instanceof Error) {
+                throw err;
+            }
+            throw new Error('Error in streaming the summary.');
+        } finally {
+            summarizer.destroy();
         }
     }
 

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ParserService, SummarizationService } from '../../ai/services';
 
 @Component({
-    selector: 'app-summary',
+    selector: 'app-stream-summary',
     imports: [FormsModule],
     template: `
       <label for="content">Content:</label>
@@ -14,7 +14,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
         <button (click)="requestSummary()" [disabled]="disabled">{{ buttonText }}</button>
       </div>
       @if (!error()) {
-        <div>{{ chunk() }}</div>
+        <div #answer></div>
       }
     `,
     styles: `
@@ -24,33 +24,64 @@ import { ParserService, SummarizationService } from '../../ai/services';
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
   })
-  export class SummaryComponent {
+  export class StreamSummaryComponent {
     summarizationService = inject(SummarizationService);
+    parserService = inject(ParserService);
+    renderer = inject(Renderer2);
   
     content = model.required<string>();  
     options = input.required<SummarizerCreateCoreOptions>();
   
+    answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
+    element = computed(() => this.answer().nativeElement);
+
     error = signal('');
     isSummarizing = signal(false);
-    chunk = signal('');
+    chunk = signal<ResourceStreamItem<string | undefined>>({ value: '' });
+
+    chunkResource = resource({
+      stream: async () => this.chunk,
+    });
+
+    chunkValue = computed(() => this.chunkResource.hasValue() ? this.chunkResource.value() : undefined);
+    
+    processSummary = this.summarizationService.createChunkStreamReader();
+   
+    constructor() {
+      afterRenderEffect({
+        write: () => { 
+          const value = this.chunkValue();
+          if (value) {
+            this.parserService.writeToElement(value);
+          }
+        }
+      });
+    }
   
     async requestSummary() {    
         try {
             const summarizer = await this.summarizationService.createSummarizer(this.options());
             if (summarizer) {
-                this.isSummarizing.set(true);
-                this.chunk.set('');
-                const result = await this.summarizationService.summarize({ 
-                    summarizer, 
-                    content: this.content().trim(), 
+                this.clearSummary();
+      
+                await this.processSummary({ 
+                  summarizer, 
+                  content: this.content().trim(), 
+                  chunk: this.chunk, 
+                  isSummarizing: this.isSummarizing,
                 });
-                this.chunk.set(result);
             }
         } catch (err) {
             console.error(err);
             this.error.set('Error in streaming the summary.');
-        } finally {
-            this.isSummarizing.set(false);
         }
+    }
+
+    private clearSummary() {
+      const element = this.element();
+      if (element.lastChild) {
+        this.renderer.setProperty(element, 'innerHTML', '');
+      }
+      this.parserService.resetParser(element);
     }
 }

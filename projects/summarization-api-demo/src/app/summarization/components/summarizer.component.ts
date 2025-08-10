@@ -5,6 +5,7 @@ import { Mode } from '../../ai/types/summarizer-mode.type';
 import { SummarizerSelectOptions } from '../../ai/types/summarizer-select-options.type';
 import data from '../data/description.json';
 import { SummarizerOptionsComponent } from './summarizer-options.component';
+import { StreamSummaryComponent } from './stream-summary.component';
 import { SummaryComponent } from './summary.component';
 
 const findDefault = <T>(options: T[], defaultValue: T) => 
@@ -12,7 +13,7 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
 
 @Component({
     selector: 'app-summarizer',
-    imports: [FormsModule, SummarizerOptionsComponent, SummaryComponent],
+    imports: [FormsModule, SummarizerOptionsComponent, StreamSummaryComponent, SummaryComponent],
     template: `
     <app-summarizer-options [selectOptions]="selectOptions()"
       [(selectedFormat)]="selectedFormat" [(selectedType)]="selectedType" [(selectedLength)]="selectedLength"
@@ -24,8 +25,8 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
     } 
     <label for="sharedContext">Shared Context:</label>
     <input id="sharedContext" name="sharedContext" [(ngModel)]="sharedContext" />
+    <!-- <app-stream-summary [options]="summarizerCreateOptions()" [content]="text()" /> -->
     <app-summary [options]="summarizerCreateOptions()" [content]="text()" />
-    <!-- <app-summary [options]="summarizerCreateOptions()" [content]="text2()" [selectedMode]="selectedMode()" /> -->
     <ng-container #vcr />
   `,
     styles: `
