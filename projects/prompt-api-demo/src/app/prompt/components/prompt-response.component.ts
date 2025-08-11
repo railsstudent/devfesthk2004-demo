@@ -12,10 +12,7 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
   imports: [TokenizationComponent, FormsModule, NgTemplateOutlet],
   template: `
     @let responseState = state();
-    <app-tokenization [numPromptTokens]="responseState.numPromptTokens" [tokenContext]="responseState.tokenContext" />
-    <div>
-      <span class="label">Status: </span><span>{{ responseState.status }}</span>
-    </div>
+    <app-tokenization [state]="responseState"  />
     @if (perSessionTemplate()) {
       <ng-container [ngTemplateOutlet]="perSessionTemplate()" [ngTemplateOutletContext]="perSessionTemplateContext()" />
     }
@@ -26,7 +23,7 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
     <button (click)="askAIModel()" [disabled]="responseState.submitDisabled">{{ responseState.text }}</button>
     <div>
       <span class="label">Response: </span>
-      <div #answer></div>
+      <div #answer style="font-size: 1.25rem;"></div>
     </div>
     @let error = responseState.error;
     @if (error) {

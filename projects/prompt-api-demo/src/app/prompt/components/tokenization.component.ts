@@ -1,27 +1,33 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Tokenization } from '../../ai/types/prompt.type';
+import { PromptResponse } from '../types/prompt-response.type';
 
 @Component({
     selector: 'app-tokenization',
-    imports: [],
     template: `
-    <div>
-      <p><span class="label">Number of Prompt tokens: </span><span>{{ numTokens() }}</span></p>
-      <p><span class="label">Tokens: </span><span>{{ tokenStr() }}</span></p>
+    <div style="display: flex;">
+      <p style="margin-right: 1rem;">
+        <span class="label">Number of Prompt tokens: </span><span>{{ state().numPromptTokens }}</span>
+      </p>
+      <p style="margin-right: 1rem;">
+        <span class="label">Tokens: </span><span>{{ tokenStr() }}</span>
+      </p>
+      <div> 
+        <span class="label">Status: </span><span>{{ state().status }}</span>
+      </div>
     </div>
   `,
-    styles: ``,
-    changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TokenizationComponent {
-  numTokens = input.required<number>({ alias: 'numPromptTokens' });
-  tokenContext = input.required<Tokenization | null>();
+  state = input.required<PromptResponse>();
 
   tokenStr = computed(() => {
-    const tokenContext = this.tokenContext();
+    const tokenContext = this.state().tokenContext;
     if (!tokenContext) {
       return 'Token information is unavailable.'
     }
-    return `${tokenContext.tokensSoFar} / ${tokenContext.maxTokens} (${tokenContext.tokensLeft} left)`
+    const { tokensSoFar, maxTokens, tokensLeft } = tokenContext;
+    return `${tokensSoFar} / ${maxTokens} (${tokensLeft} left)`
   })
 }
