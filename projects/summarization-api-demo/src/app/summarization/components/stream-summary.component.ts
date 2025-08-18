@@ -43,6 +43,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
         write: () => { 
           const value = this.chunkValue();
           if (value) {
+            console.log('chunk', value)
             this.parserService.writeToElement(value);
           }
         }
