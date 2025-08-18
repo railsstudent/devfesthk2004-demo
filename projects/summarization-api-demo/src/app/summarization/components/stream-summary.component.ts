@@ -69,6 +69,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
                   });
                 } else {
                   this.chunk.set({ value: '' });
+                  this.isSummarizing.set(false);
                 }
             }
         } catch (err) {
