@@ -27,6 +27,8 @@ import { ParserService, SummarizationService } from '../../ai/services';
     error = signal('');
     isSummarizing = signal(false);
     chunk = signal('');
+    inputUsage = signal(0);
+    inputQuota = signal(0);
 
     constructor() {
         afterRenderEffect({
@@ -47,10 +49,13 @@ import { ParserService, SummarizationService } from '../../ai/services';
 
             const summarizer = await this.summarizationService.createSummarizer(this.options());
             if (summarizer) {
-                const result = await this.summarizationService.summarize({ 
+                const content = this.content().trim();
+                this.inputUsage.set(await summarizer.measureInputUsage(content));
+                this.inputQuota.set(summarizer.inputQuota);
+                const result = this.inputUsage() <= this.inputQuota() ? await this.summarizationService.summarize({ 
                     summarizer, 
-                    content: this.content().trim(), 
-                });
+                    content, 
+                }) : '';
                 this.chunk.set(result);
             }
         } catch (err) {

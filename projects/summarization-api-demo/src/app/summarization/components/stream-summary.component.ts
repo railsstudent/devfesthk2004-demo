@@ -27,6 +27,8 @@ import { ParserService, SummarizationService } from '../../ai/services';
     error = signal('');
     isSummarizing = signal(false);
     chunk = signal<ResourceStreamItem<string | undefined>>({ value: '' });
+    inputUsage = signal(0);
+    inputQuota = signal(0);
 
     chunkResource = resource({
       stream: async () => this.chunk,
@@ -54,13 +56,20 @@ import { ParserService, SummarizationService } from '../../ai/services';
             this.clearSummary();
 
             const summarizer = await this.summarizationService.createSummarizer(this.options());
-            if (summarizer) {      
-                await this.processSummary({ 
-                  summarizer, 
-                  content: this.content().trim(), 
-                  chunk: this.chunk, 
-                  isSummarizing: this.isSummarizing,
-                });
+            if (summarizer) {
+                const content = this.content().trim();
+                this.inputUsage.set(await summarizer.measureInputUsage(content));
+                this.inputQuota.set(summarizer.inputQuota);
+                if (this.inputUsage() <= this.inputQuota()) {
+                  await this.processSummary({ 
+                    summarizer, 
+                    content, 
+                    chunk: this.chunk, 
+                    isSummarizing: this.isSummarizing,
+                  });
+                } else {
+                  this.chunk.set({ value: '' });
+                }
             }
         } catch (err) {
             console.error(err);

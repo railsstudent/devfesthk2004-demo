@@ -1,6 +1,6 @@
 <label for="content">Content:</label>
 <textarea id="content" name="content" rows="20" [(ngModel)]="content"></textarea>
-<p>Token Usage: {{ ` of ` }}</p>
+<p>Token Usage: {{ `${inputUsage()} of ${inputQuota()}` }}</p>
 <div>
     @let buttonText = isSummarizing() ? 'Summarizing...' : 'Summarize';
     @let disabled = content().trim() === '' || isSummarizing();
