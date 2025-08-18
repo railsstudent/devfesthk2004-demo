@@ -8,9 +8,7 @@ import { SetupComponent } from './summarization/components/setup.component';
     template: `
     <h2>Chrome Built-in Summarization API </h2>
     <div style="margin-bottom: 0.5rem;">
-      @let btnSetupText = showSetup() ? 'Hide Setup' : 'Show Setup';
       @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show User Agent';
-      <button style="margin-right: 0.25rem;" (click)="showSetup.set(!showSetup())">{{ btnSetupText }}</button>
       <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText }}</button>
     </div>
     @if (showSetup()) {
