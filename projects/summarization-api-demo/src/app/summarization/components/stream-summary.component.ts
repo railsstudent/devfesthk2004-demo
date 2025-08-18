@@ -1,4 +1,4 @@
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, model, Renderer2, resource, ResourceLoaderParams, ResourceStreamItem, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, model, Renderer2, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ParserService, SummarizationService } from '../../ai/services';
 
@@ -26,22 +26,16 @@ import { ParserService, SummarizationService } from '../../ai/services';
 
     error = signal('');
     isSummarizing = signal(false);
-    chunk = signal<ResourceStreamItem<string | undefined>>({ value: '' });
+    chunk = signal('');
     inputUsage = signal(0);
     inputQuota = signal(0);
-
-    chunkResource = resource({
-      stream: async () => this.chunk,
-    });
-
-    chunkValue = computed(() => this.chunkResource.hasValue() ? this.chunkResource.value() : undefined);
     
     processSummary = this.summarizationService.createChunkReader();
    
     constructor() {
       afterRenderEffect({
         write: () => { 
-          const value = this.chunkValue();
+          const value = this.chunk();
           if (value) {
             console.log('chunk', value)
             this.parserService.writeToElement(value);
@@ -53,7 +47,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
     async requestSummary() {    
         try {
             this.isSummarizing.set(true);
-            this.chunk.set({ value: '' });
+            this.chunk.set('');
             this.clearSummary();
 
             const summarizer = await this.summarizationService.createSummarizer(this.options());
@@ -69,7 +63,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
                     isSummarizing: this.isSummarizing,
                   });
                 } else {
-                  this.chunk.set({ value: '' });
+                  this.chunk.set('');
                   this.isSummarizing.set(false);
                 }
             }

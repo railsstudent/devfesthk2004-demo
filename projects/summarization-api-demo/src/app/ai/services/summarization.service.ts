@@ -103,7 +103,7 @@ export class SummarizationService implements OnDestroy {
                 });
                 
                 for await (const value of stream) {
-                    chunk.set({ value });
+                    chunk.set(value);
                 }
             } catch (err) {
                 console.error(err);

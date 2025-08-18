@@ -1,8 +1,8 @@
-import { ResourceStreamItem, WritableSignal } from '@angular/core';
+import { WritableSignal } from '@angular/core';
 
 export type SummarizerReaderOptions = {
     summarizer: Summarizer;
     content: string;
-    chunk: WritableSignal<ResourceStreamItem<string | undefined>>;
+    chunk: WritableSignal<string>;
     isSummarizing: WritableSignal<boolean>;
 }
