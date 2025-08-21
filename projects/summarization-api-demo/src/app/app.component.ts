@@ -1,19 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DetectAIComponent } from './detect-ai.component';
-import { SetupComponent } from './summarization/components/setup.component';
 
 @Component({
     selector: 'app-root',
-    imports: [DetectAIComponent, SetupComponent],
+    imports: [DetectAIComponent],
     template: `
     <h2>Chrome Built-in Summarization API </h2>
-    <div style="margin-bottom: 0.5rem;">
-      @let btnUserAgentText = showUserAgent() ? 'Hide User Agent' : 'Show User Agent';
-      <button (click)="showUserAgent.set(!showUserAgent())">{{ btnUserAgentText }}</button>
-    </div>
-    @if (showSetup()) {
-      <app-setup />
-    }
     <app-detect-ai [showUserAgent]="showUserAgent()" />
   `,
     styles: `
