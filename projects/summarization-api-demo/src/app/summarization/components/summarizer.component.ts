@@ -52,7 +52,7 @@ export class SummarizerComponent {
   selectedFormat = linkedSignal(() => findDefault(this.selectOptions().formats, 'markdown'));
   selectedType = linkedSignal(() => findDefault(this.selectOptions().types, 'key-points'));
   selectedLength = linkedSignal(() => findDefault(this.selectOptions().lengths, 'medium'));
-  selectedMode = signal<Mode>('batch');
+  selectedMode = signal<Mode>('streaming');
 
   outputStyles = computed(() => ({
     type: this.selectedType(),

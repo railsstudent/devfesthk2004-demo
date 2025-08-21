@@ -19,9 +19,7 @@ import { SummarizerContainerComponent } from './summarization/summarizer-contain
       } @else if (error !== 'unknown') {
         {{ error }}
       } @else {
-        <p>If you're on Chrome, join the <a href="https://developer.chrome.com/docs/ai/built-in#get_an_early_preview" target="_blank">
-          Early Preview Program</a> to enable it.
-        </p>
+        <p>Unknown error occurred</p>
       }
     </div>
   `,
