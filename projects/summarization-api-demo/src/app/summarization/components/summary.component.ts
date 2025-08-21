@@ -20,7 +20,8 @@ import { ParserService, SummarizationService } from '../../ai/services';
 
     content = model.required<string>();  
     options = input.required<SummarizerCreateCoreOptions>();
-
+    context = input.required<string>();
+  
     answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
     element = computed(() => this.answer().nativeElement);
   
@@ -55,6 +56,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
                 const result = this.inputUsage() <= this.inputQuota() ? await this.summarizationService.summarize({ 
                     summarizer, 
                     content, 
+                    context: this.context().trim(),
                 }) : '';
                 this.chunk.set(result);
             }

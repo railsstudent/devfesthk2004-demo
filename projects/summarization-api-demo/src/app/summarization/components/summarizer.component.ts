@@ -26,9 +26,12 @@ const findDefault = <T>(options: T[], defaultValue: T) =>
     } 
     <label for="sharedContext">Shared Context:</label>
     <input id="sharedContext" name="sharedContext" [(ngModel)]="sharedContext" />
+    <label for="context">Context:</label>
+    <input id="context" name="context" [(ngModel)]="context" />
     @let options = {
       options: summarizerCreateOptions(),
       content: this.text(),
+      context: this.context(),
     };
 
     <ng-container [ngComponentOutlet]="getComponentType()" 
@@ -46,8 +49,9 @@ export class SummarizerComponent {
   summarizationService = inject(SummarizationService);
   selectOptions = input.required<SummarizerSelectOptions>();
 
-  text = signal(data.cicd);
+  text = signal(data.js);
   sharedContext = signal('Generate a summary of book description from https://www.packtpub.com/');
+  context = signal('This book summary is for experienced software architects who understand JavaScript.')
 
   selectedFormat = linkedSignal(() => findDefault(this.selectOptions().formats, 'markdown'));
   selectedType = linkedSignal(() => findDefault(this.selectOptions().types, 'key-points'));

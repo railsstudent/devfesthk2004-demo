@@ -77,10 +77,11 @@ export class SummarizationService implements OnDestroy {
         }
     }
 
-    async summarize({ summarizer, content }: Omit<SummarizerReaderOptions, 'chunk' | 'isSummarizing'>) {
+    async summarize({ summarizer, content, context }: Omit<SummarizerReaderOptions, 'chunk' | 'isSummarizing'>) {
         try {
             const text = await summarizer.summarize(content, {
                 signal: this.#abortController.signal,
+                context,
             });
             
             return text;
@@ -96,10 +97,11 @@ export class SummarizationService implements OnDestroy {
     }
 
     createChunkReader() {
-        return async ({ summarizer, chunk, content, isSummarizing }: SummarizerReaderOptions) => {  
+        return async ({ summarizer, chunk, content, isSummarizing, context }: SummarizerReaderOptions) => {  
             try {
                 const stream = summarizer.summarizeStreaming(content, {
                     signal: this.#abortController.signal,
+                    context
                 });
                 
                 for await (const value of stream) {

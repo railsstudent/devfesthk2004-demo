@@ -20,6 +20,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
   
     content = model.required<string>();  
     options = input.required<SummarizerCreateCoreOptions>();
+    context = input.required<string>();
   
     answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
     element = computed(() => this.answer().nativeElement);
@@ -53,6 +54,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
             const summarizer = await this.summarizationService.createSummarizer(this.options());
             if (summarizer) {
                 const content = this.content().trim();
+                const context = this.context().trim();
                 this.inputUsage.set(await summarizer.measureInputUsage(content));
                 this.inputQuota.set(summarizer.inputQuota);
                 if (this.inputUsage() <= this.inputQuota()) {
@@ -61,6 +63,7 @@ import { ParserService, SummarizationService } from '../../ai/services';
                     content, 
                     chunk: this.chunk, 
                     isSummarizing: this.isSummarizing,
+                    context,
                   });
                 } else {
                   this.chunk.set('');

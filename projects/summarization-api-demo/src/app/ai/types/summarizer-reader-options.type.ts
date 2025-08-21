@@ -5,4 +5,5 @@ export type SummarizerReaderOptions = {
     content: string;
     chunk: WritableSignal<string>;
     isSummarizing: WritableSignal<boolean>;
+    context: string;
 }
