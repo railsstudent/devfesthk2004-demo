@@ -9,7 +9,9 @@ import { LanguageDetectionComponent } from './language-detection/language-detect
     template: `
     <div>
       <p style="margin-bottom: 0.5rem;">
-        Explainer: https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs
+        Explainer: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs">
+        https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs
+        </a>
       </p>
       @let error = hasCapability();
       @if (!error) {

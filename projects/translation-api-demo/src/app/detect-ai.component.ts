@@ -1,17 +1,18 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UserAgentComponent } from './ai/user-agent.component';
 import { areAPIsSupported } from './ai/utils/ai-detection';
 import { TranslationContainerComponent } from './translation/translation-container.component';
 
 @Component({
     selector: 'app-detect-ai',
-    imports: [TranslationContainerComponent, UserAgentComponent],
+    imports: [TranslationContainerComponent],
     template: `
-    @if (showUserAgent()) {
-      <app-user-agent />
-    }
     <div>
+      <p style="margin-bottom: 0.5rem;">
+        Explainer: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs">
+        https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs
+        </a>
+      </p>
       @let error = hasCapability();
       @if (!error) {
         <app-translation-container />
@@ -27,6 +28,5 @@ import { TranslationContainerComponent } from './translation/translation-contain
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetectAIComponent {
-  showUserAgent = input(false);
   hasCapability = toSignal(areAPIsSupported(), { initialValue: '' });
 }
