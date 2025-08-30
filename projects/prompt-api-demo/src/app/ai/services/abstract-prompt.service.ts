@@ -58,7 +58,10 @@ export abstract class AbstractPromptService {
         this.#error.set('');
         this.#isLoading.set(true);
         this.#chunk.set('');
-        const stream = await session.promptStreaming(query);
+        const stream = await session.promptStreaming(query, {
+            signal: this.controller?.signal,
+        });
+
         const self = this;
         const reader = stream.getReader();
         reader.read()
@@ -113,5 +116,12 @@ export abstract class AbstractPromptService {
             console.log('Destroy the prompt session.');
             this.resetSession(undefined);
         }
+    }
+
+    stopPrompting() {
+        this.controller.abort();
+        console.log('Abort the controller.');
+        this.controller = new AbortController();
+        console.log('Create a new AbortController.');
     }
 }

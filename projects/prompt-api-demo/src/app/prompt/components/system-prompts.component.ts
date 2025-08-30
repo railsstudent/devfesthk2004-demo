@@ -18,7 +18,11 @@ import { PromptResponseComponent } from './prompt-response.component';
         <span class="label" for="input">System Prompt: </span>
         <textarea id="input" name="input" [(ngModel)]="systemPrompt" rows="4" [disabled]="state().disabled"></textarea>
       </div>
-      <app-prompt-response [state]="responseState()" [(query)]="query" (submitPrompt)="submitPrompt()" />
+      <app-prompt-response [state]="responseState()" 
+        [(query)]="query" 
+        (submitPrompt)="submitPrompt()" 
+        (abortPrompt)="promptService.stopPrompting()"
+      />
     </div>
   `,
     styleUrl: './prompt.component.css',

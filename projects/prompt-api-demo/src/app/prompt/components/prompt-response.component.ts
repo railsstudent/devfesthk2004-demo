@@ -21,6 +21,7 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
       <textarea id="input" name="input" [(ngModel)]="query" [disabled]="responseState.disabled" rows="3"></textarea>
     </div>
     <button (click)="askAIModel()" [disabled]="responseState.submitDisabled">{{ responseState.text }}</button>
+    <button (click)="abort()" [disabled]="!responseState.submitDisabled">Abort</button>
     <div>
       <span class="label">Response: </span>
       <div #answer style="font-size: 1.25rem;"></div>
@@ -43,6 +44,7 @@ export class PromptResponseComponent {
   perSessionTemplateContext = input<any | undefined>(undefined);
 
   submitPrompt = output();
+  abortPrompt = output();
 
   answer = viewChild.required<ElementRef<HTMLDivElement>>('answer');
   element = computed(() => this.answer().nativeElement);
@@ -63,5 +65,9 @@ export class PromptResponseComponent {
     }
     this.parserService.resetParser(element);
     this.submitPrompt.emit();
+  }
+
+  abort() {
+    this.abortPrompt.emit();
   }
 }

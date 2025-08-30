@@ -28,7 +28,12 @@ const INITIAL_PROMPTS: LanguageInitialPrompt = [
   <div class="session">
     <h3>N-shots prompting</h3>
     <app-initial-prompt [initialPrompts]="initialPrompts()" /> 
-    <app-prompt-response [state]="responseState()" [(query)]="query" (submitPrompt)="submitPrompt()" />
+    <app-prompt-response 
+      [state]="responseState()" 
+      [(query)]="query" 
+      (submitPrompt)="submitPrompt()" 
+      (abortPrompt)="promptService.stopPrompting()"
+    />
   `,
   styleUrl: './prompt.component.css',
   providers: [

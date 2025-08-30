@@ -21,6 +21,7 @@ const cmpCapabilties = (a: Capability, b: Capability) => a.temperature === b.tem
         (submitPrompt)="submitPrompt()"
         [perSessionTemplate]="isPerSession() ? session : undefined"
         [perSessionTemplateContext]="templateContext()"
+        (abortPrompt)="promptService.stopPrompting()"
       />
       <ng-template #session let-capabilities="capabilities">
         @let maxTemperature = defaultCapabilities()?.maxTemperature || 2;

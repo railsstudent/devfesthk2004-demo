@@ -13,7 +13,7 @@ export abstract class BasePromptComponent {
     isLoading = this.promptService.isLoading;
     error = this.promptService.error;
     
-    query = signal('Tell me about the job responsibility of an A.I. engineer, maximum 500 words.');
+    query = signal('Tell me about the job responsibilities and compensation of a head of engineering.  I am currently a software architect, what are the skills needed to be ready for this role? Where can I find online courses and certifications to prepare for this role?');
     numPromptTokens = signal(0);
     
     state = computed<State>(() => {
