@@ -24,7 +24,7 @@ const transform = (value: TemplateRef<any> | undefined) => typeof value === 'und
     <button (click)="abort()" [disabled]="!responseState.submitDisabled">Abort</button>
     <div>
       <span class="label">Response: </span>
-      <div #answer style="font-size: 1.25rem;"></div>
+      <div #answer style="font-size: 1.1rem;"></div>
     </div>
     @let error = responseState.error;
     @if (error) {
