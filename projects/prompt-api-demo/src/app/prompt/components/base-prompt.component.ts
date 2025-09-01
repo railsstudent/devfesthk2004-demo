@@ -21,7 +21,7 @@ export abstract class BasePromptComponent {
         const isUnavailableForCall = isLoading || this.query().trim() === '';
         return {
             status: isLoading ? 'Processing...' : 'Idle',
-            text: isLoading ? 'Progressing...' : 'Submit',
+            text: isLoading ? 'Processing...' : 'Submit',
             disabled: isLoading,
             numTokensDisabled: isUnavailableForCall,
             submitDisabled: isUnavailableForCall,
